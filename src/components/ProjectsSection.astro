@@ -1,0 +1,118 @@
+---
+import type { ProjectsSectionContent } from "../lib/content-types";
+import SectionHeadingCard from "./SectionHeadingCard.astro";
+
+interface Props {
+  t: ProjectsSectionContent;
+}
+
+const { t } = Astro.props as Props;
+---
+
+<section class="section-theme-warm" id="projects">
+  <div class="section-inner">
+    <p class="rd-eyebrow">{t.projects.eyebrow}</p>
+    <SectionHeadingCard text={t.projects.title} as="h2" size="lg" />
+    <p class="rd-note editorial-text editorial-text-muted">{t.projects.note}</p>
+
+    <div class="rd-projects-grid">
+      {t.projects.items.map((project) => (
+        <article class="rd-project-card rd-reveal">
+          <div class="rd-project-visual" aria-hidden="true">
+            <span>{project.id}</span>
+          </div>
+          <p class="rd-project-category">{project.category}</p>
+          <h3>{project.title}</h3>
+          <div class="rd-tags">
+            {project.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+          <p class="rd-project-status">{project.status}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .rd-projects-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .rd-project-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .rd-project-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--color-accent);
+  }
+
+  .rd-project-visual {
+    display: grid;
+    place-content: center;
+    min-height: 160px;
+    margin-bottom: 1.25rem;
+    border: 1px dashed var(--color-border);
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg, rgba(138, 106, 31, 0.14), transparent 55%),
+      linear-gradient(315deg, rgba(184, 144, 44, 0.12), transparent 55%);
+  }
+
+  .rd-project-visual span {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    color: var(--color-text-dim);
+  }
+
+  .rd-project-category {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--color-accent-2);
+    margin-bottom: 0.4rem;
+  }
+
+  .rd-project-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .rd-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .rd-tags span {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    font-size: 0.72rem;
+    color: var(--color-text-dim);
+  }
+
+  .rd-project-status {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-text-dim);
+  }
+
+  @media (max-width: 900px) {
+    .rd-projects-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

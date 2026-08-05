@@ -1,0 +1,39 @@
+---
+// Same `.rd-page`/`.rd-section` shell as `ToolsPageContent.astro` and
+// `ServicesPageContent.astro` — this page is part of that same page-content
+// family, it just embeds a React island for its interactive body instead of
+// static markup. The island is mounted with `client:only="react"`: it never
+// renders on the server (no FFmpeg/DOM-only code ever runs during
+// SSR/build), and its own JS (including the dynamic `@ffmpeg/*` imports
+// inside `src/lib/videoConverter/ffmpegClient.ts`) is fetched only once
+// this component hydrates in the browser.
+import VideoConverter from "./VideoConverter/VideoConverter.tsx";
+
+const { t } = Astro.props;
+const copy = t.videoConverter;
+---
+
+<main class="rd-page">
+  <section class="rd-section rd-page-hero">
+    <p class="rd-eyebrow">{copy.eyebrow}</p>
+    <h1 class="rd-title">{copy.title}</h1>
+    <p class="rd-note">{copy.intro}</p>
+  </section>
+
+<section class="rd-section rd-page-tool">
+  <p style="color: red; font-size: 2rem;">PRUEBA DE SECCIÓN</p>
+
+  <VideoConverter client:only="react" copy={copy} />
+</section>
+</main>
+
+<style>
+  .rd-page-hero {
+    border-top: none;
+    padding-top: clamp(6rem, 12vw, 8rem);
+  }
+
+  .rd-page-tool {
+    padding-top: 0;
+  }
+</style>

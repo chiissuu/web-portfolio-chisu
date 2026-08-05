@@ -1,0 +1,2018 @@
+---
+import RollLink from "./RollLink.astro";
+// Sidebar nav icons only — the hero's own top nav (`.hx-nav` / `RollLink`)
+// and the mobile nav stay text-only, unchanged. `lucide-astro` renders
+// `stroke="currentColor"` by default, which is why the icons never set an
+// explicit color: they inherit whatever the parent `<a>` sets (light/dark/
+// active box text color — see `.hx-compact-vertical-nav a` below).
+import { House, UserRound, Mail, FolderKanban, BriefcaseBusiness, Wrench, CircleHelp } from "lucide-astro";
+import type { HeroExperienceContent } from "../lib/content-types";
+
+interface Props {
+  t: HeroExperienceContent;
+}
+
+const { t } = Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Hero's own top nav (`.hx-nav-left`/`.hx-nav-right`, RollLink) + the
+// mobile nav — UNTOUCHED order/hrefs/count (still 6, no FAQ), since
+// neither is part of this task's scope. `icon` here is vestigial (kept
+// from an earlier pass, harmless) — neither consumer reads it.
+const navItems = [
+  { href: "#home", label: t.nav.home, icon: House },
+  { href: "#about", label: t.nav.about, icon: UserRound },
+  { href: "#contact", label: t.nav.contact, icon: Mail },
+  { href: "#projects", label: t.nav.projects, icon: FolderKanban },
+  { href: "#services", label: t.nav.services, icon: BriefcaseBusiness },
+  { href: "#tools", label: t.nav.tools, icon: Wrench },
+];
+
+// Indexed BEFORE the left/right split so `data-morph-source="nav-{index}"`
+// stays continuous (0-5) across both halves and lines up with the matching
+// `morphIndex` on `sidebarNavItems` below. Slicing first (the old code)
+// would reset each half's index back to 0 and collide.
+const indexedNavItems = navItems.map((item, index) => ({ ...item, index }));
+const navLeft = indexedNavItems.slice(0, 3);
+const navRight = indexedNavItems.slice(3);
+
+// Dedicated, independently-ordered nav model for the sidebar ONLY —
+// `navItems`/`navLeft`/`navRight` above (hero's own top nav + mobile nav)
+// stay completely untouched. `navId` is the stable key the active-section
+// script (in the <script> below) matches against. `morphIndex` links back
+// to the hero's own nav item by its ORIGINAL index in `navItems` above, so
+// the hero→sidebar crossfade still works for the 5 links that have a hero
+// equivalent — Servicios/Tools now point at their real subpages instead of
+// an anchor, but still morph in from the same hero nav item they always
+// did. FAQ has no hero-nav equivalent, so `morphIndex` is `null` and it
+// simply appears static once the sidebar itself fades in (same as the
+// Contacto CTA, which also has no morph source).
+const sidebarNavItems = [
+  { navId: "home", label: t.nav.home, icon: House, href: "#home", morphIndex: 0 },
+  { navId: "about", label: t.nav.about, icon: UserRound, href: "#about", morphIndex: 1 },
+  { navId: "projects", label: t.nav.projects, icon: FolderKanban, href: "#projects", morphIndex: 3 },
+  { navId: "services", label: t.nav.services, icon: BriefcaseBusiness, href: `${base}/servicios/`, morphIndex: 4 },
+  { navId: "tools", label: t.nav.tools, icon: Wrench, href: `${base}/tools/`, morphIndex: 5 },
+  { navId: "contact", label: t.nav.contact, icon: Mail, href: "#contact", morphIndex: 2 },
+  { navId: "faq", label: t.nav.faq, icon: CircleHelp, href: "#faq", morphIndex: null as number | null },
+];
+
+// Placeholder cutout — swap public/assets/images/profile-cutout-alt.png for
+// the final professional portrait when it's ready. No code change needed.
+// It's a low-resolution placeholder on purpose; we don't run any filter
+// (sharpen/saturate/etc.) to try to disguise that — only the deliberate
+// scroll-driven blur (see --portrait-blur) touches this image.
+const portraitSrc = `${base}/assets/images/profile-cutout-alt.png`;
+
+// `displayWordmark` ("CHISU") is the giant decorative hero mark — NOT the
+// site's real name. It's split into independent letters (not a single SVG
+// <text>) so each one can be staggered individually by the GSAP entrance
+// timeline. The container's accessible name is `siteName` ("CHIISSUU", the
+// real brand), not this decorative string; every letter span is
+// aria-hidden.
+const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
+---
+
+<section class="hx-wrap section-theme-warm" id="home">
+  <div class="hx-pin" id="hx-pin">
+    <!--
+      `.hx-pin-fade` is a real DOM child, NOT `.hx-pin`'s own CSS
+      `background` — deliberately, since ScrollTrigger pins `.hx-pin`
+      directly (see the <script> below) and its background must stay
+      untouched/unanimated. This child carries the warm backdrop instead,
+      painted first (z-index: 0, before `.hx-glow`) so it sits behind
+      every other layer, and is the ONLY thing the scroll timeline fades
+      (opacity 1->0) in the final ~12% of the timeline — revealing the
+      real `AboutSection` (already scrolled up beneath the fixed pin
+      thanks to `pinSpacing: false`) through it, instead of a hard,
+      un-smoothed cut the instant the pin releases.
+    -->
+    <div class="hx-pin-fade" id="hx-pin-fade" aria-hidden="true"></div>
+    <div class="hx-glow" aria-hidden="true"></div>
+
+    <!--
+      `.hx-full-hero-scroll-motion` is a pure positioning/responsibility
+      boundary, never transformed as a unit. The scroll timeline instead
+      writes `transform`/`opacity` on each individual element tagged
+      `data-morph-source` inside it (brand, tagline, metrics, nav links —
+      each travels to its own `.hx-compact-sidebar` equivalent), plus
+      opacity-only fades on the elements with no sidebar equivalent
+      (portrait, title, chip card, actions). `.hx-compact-sidebar` itself
+      now lives outside `.hx-wrap` entirely (see below, after the closing
+      `</section>`) so it can persist past the hero. There is no
+      intermediate "About Me" transition screen — the hero hands off
+      directly to the real `AboutSection` (`id="about"`) rendered right
+      after this component; see the scroll timeline's State C below, which
+      is the last state. The entrance timeline, separately, only ever
+      touches elements inside `.hx-full-hero-intro-motion` — so the two
+      systems never write `transform` on the same element.
+    -->
+    <div class="hx-full-hero-scroll-motion" id="hx-scroll-motion">
+      <div class="hx-full-hero-intro-motion" id="hx-intro-motion">
+        <div class="hx-wordmark" id="hx-wordmark" role="img" aria-label={t.hero.displayWordmark} data-morph-source="brand">
+          <div class="hx-wordmark-row" id="hx-wordmark-row">
+            {wordmarkLetters.map((letter) => (
+              <span class="hx-wordmark-letter" aria-hidden="true">{letter}</span>
+            ))}
+          </div>
+        </div>
+
+        <nav class="hx-nav hx-nav-left" aria-label="Primary">
+          {navLeft.flatMap((item, i) => [
+            i > 0 && (
+              <span class="hx-nav-sep" aria-hidden="true">|</span>
+            ),
+            <span class="hx-nav-item" data-morph-source={`nav-${item.index}`}>
+              <RollLink href={item.href} label={item.label} />
+            </span>,
+          ])}
+        </nav>
+
+        <nav class="hx-nav hx-nav-right" aria-label="Secondary">
+          {navRight.flatMap((item, i) => [
+            i > 0 && (
+              <span class="hx-nav-sep" aria-hidden="true">|</span>
+            ),
+            <span class="hx-nav-item" data-morph-source={`nav-${item.index}`}>
+              <RollLink href={item.href} label={item.label} />
+            </span>,
+          ])}
+        </nav>
+
+        <div class="hx-portrait">
+          <img src={portraitSrc} alt={t.hero.imageAlt} />
+        </div>
+
+        <div class="hx-foreground" id="hx-foreground">
+          <h1 class="hx-title-block">
+            <span class="hx-title-mask"><span class="hx-title-line">{t.hero.title[0]}</span></span>
+            <span class="hx-title-mask"><span class="hx-title-line hx-title-highlight"><mark>{t.hero.title[1]}</mark></span></span>
+            <span class="hx-title-mask"><span class="hx-title-line">{t.hero.title[2]}</span></span>
+          </h1>
+
+          <div class="hx-metrics">
+            {t.hero.metrics.map((metric, index) => (
+              <div class="hx-metric-card hx-frosted-card" data-morph-source={`metric-${index}`}>
+                <span class="hx-metric-value">{metric.value}</span>
+                <span class="hx-metric-label">{metric.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div class="hx-aside-right">
+            <div class="hx-chip-card hx-frosted-card">
+              {t.hero.chips.map((chip) => (
+                <span class="hx-chip">
+                  <i aria-hidden="true"></i>
+                  {chip}
+                </span>
+              ))}
+            </div>
+
+            <p class="hx-tagline" data-morph-source="tagline">{t.hero.tagline}</p>
+          </div>
+
+          <div class="hx-actions">
+            <a class="hx-btn hx-btn-primary" href="#projects">{t.hero.primaryCta}</a>
+            <a class="hx-btn hx-btn-ghost" href="#about">{t.hero.secondaryCta}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!--
+  Sidebar lives OUTSIDE `.hx-wrap` on purpose: it must persist (position:
+  fixed) for the rest of the page — Sobre mí, Proyectos, Servicios y Tools,
+  Contacto, FAQ — well past the point where `.hx-wrap` (and its sticky
+  `.hx-pin`) end. The `<aside>` itself is transparent (no background of its
+  own) so the full-width section background behind it (warm/dark,
+  alternating per section) shows through; each `<article>` inside carries
+  its own `.hx-glass` translucent surface — the SAME finish as the hero's
+  "Sobre mí" ghost button (`.hx-btn-ghost`), never a solid/near-opaque
+  panel — so a section boundary crossing behind the sidebar is genuinely
+  visible through a card's own background, not just at its edges. There is
+  intentionally NO single `data-bg-theme` on this `<aside>` anymore — each
+  `<article>` below tracks and tweens its OWN `data-theme`
+  ("warm"/"dark") independently, driven by real per-article
+  `getBoundingClientRect()` overlap against every `.section-theme-dark`
+  section (see the per-article theme sync in the <script> below), so two
+  adjacent articles can legitimately show different themes at the same
+  scroll position while a section boundary is crossing between them.
+  Reuses `t.hero`/`t.nav`/`t.contact` data only; no text here is
+  hardcoded/duplicated from elsewhere. Starts `aria-hidden="true"`; the
+  scroll timeline flips it to `"false"` (and adds `.is-active`) once the
+  morph has crossed its activation threshold.
+-->
+<aside
+  class="hx-compact-sidebar"
+  id="hx-compact-sidebar"
+  aria-label="Compact site navigation"
+  aria-hidden="true"
+>
+  <article class="hx-sidebar-article hx-glass hx-sidebar-brand" data-theme="warm">
+    <a class="hx-compact-mark" href="#home" data-morph-target="brand">{t.hero.sidebarMark}</a>
+    <p class="hx-compact-tagline" data-morph-target="tagline">{t.hero.tagline}</p>
+  </article>
+
+  <article class="hx-sidebar-article hx-glass hx-sidebar-metrics" data-theme="warm">
+    <div class="hx-compact-metrics">
+      {t.hero.metrics.map((metric, index) => (
+        <div class="hx-compact-metric" data-morph-target={`metric-${index}`}>
+          <span class="hx-compact-metric-value">{metric.value}</span>
+          <span class="hx-compact-metric-label">{metric.label}</span>
+        </div>
+      ))}
+    </div>
+  </article>
+
+  <!-- Orden fijo del sidebar: Inicio -> Sobre mí -> Proyectos -> Servicios
+       -> Tools -> Contacto -> FAQ. Servicios/Tools llevan a sus subpáginas
+       reales (no anclas); el resto sigue anclado dentro de esta misma
+       página. El orden de las SECCIONES reales de la página no cambia —
+       solo el orden de este listado de enlaces. -->
+  <article class="hx-sidebar-article hx-glass hx-sidebar-nav" data-theme="warm">
+    <nav class="hx-compact-vertical-nav" aria-label="Compact navigation links">
+      {sidebarNavItems.map((item) => {
+        const Icon = item.icon;
+        const morphTarget = item.morphIndex !== null ? `nav-${item.morphIndex}` : undefined;
+        return (
+          <a href={item.href} data-morph-target={morphTarget} data-nav-id={item.navId}>
+            <Icon class="hx-compact-nav-icon" aria-hidden="true" size={18} />
+            <span class="hx-compact-nav-label">{item.label}</span>
+          </a>
+        );
+      })}
+    </nav>
+  </article>
+
+  <!-- Orden fijo: LinkedIn (deshabilitado, sin URL) -> GitHub -> Redes
+       Sociales -> Botón Contacto. El botón vive DENTRO de este artículo
+       ahora (ya no es un elemento hermano fuera de él) para evitar una
+       instancia duplicada. -->
+  <article class="hx-sidebar-article hx-glass hx-sidebar-socials" data-theme="warm">
+    <div class="hx-compact-socials">
+      <span class="hx-compact-social-linkedin" aria-disabled="true">{t.contact.links.linkedinLabel}</span>
+      <a href={t.contact.links.github} target="_blank" rel="noopener noreferrer">{t.contact.links.githubLabel}</a>
+      <a href={t.contact.links.linktree} target="_blank" rel="noopener noreferrer">{t.contact.links.linktreeLabel}</a>
+    </div>
+    <a class="hx-btn hx-btn-primary hx-compact-cta" href="#contact">{t.nav.contact}</a>
+  </article>
+</aside>
+
+<button class="hx-mobile-toggle" id="hx-mobile-toggle" aria-expanded="false" aria-controls="hx-mobile-nav">
+  <span></span><span></span><span></span>
+</button>
+
+<nav class="hx-mobile-nav" id="hx-mobile-nav" aria-label="Mobile navigation">
+  {navItems.map((item) => (
+    <a href={item.href}>{item.label}</a>
+  ))}
+</nav>
+
+<style>
+  /* Structural fix, not another height tweak — `position: sticky` +
+     `.hx-wrap` taller than the viewport was the root cause of the empty
+     warm-background stretch, not the exact height chosen (300svh, then
+     240svh, then 195svh, then 165svh all had the same underlying issue:
+     a wrapper taller than the viewport, unpinning only once the wrapper's
+     OWN bottom scrolled by, independent of whether the animation itself
+     had anything left to show). Replaced with a ScrollTrigger-controlled
+     `pin` (see `buildScrollTimeline()` in the <script> below):
+     `.hx-wrap`/`.hx-pin` are both exactly one viewport tall, ScrollTrigger
+     pins `.hx-pin` for exactly one additional viewport height of scroll
+     (`end: () => `+=${window.innerHeight}`), and `pinSpacing: false` means
+     `AboutSection` — immediately next in the document, no spacer, no
+     provisional panel — slides up in normal flow beneath the fixed hero
+     the entire time, reaching the viewport top exactly when the pin
+     releases. */
+  .hx-wrap {
+    position: relative;
+    height: 100svh;
+  }
+
+  .hx-pin {
+    /* Wordmark geometry drives the nav position below it — keep every
+       consumer of "where does the wordmark end" reading from these custom
+       properties instead of a hardcoded number. `--hx-wordmark-font-size`
+       is overwritten inline by the JS auto-fit pass once fonts are ready,
+       and every calc() below re-evaluates live off that same variable. */
+    --hx-wordmark-top: 4vh;
+    --hx-wordmark-font-size: clamp(5.5rem, 19vw, 15rem);
+    --hx-wordmark-line-height: 0.86;
+    --hx-nav-gap: clamp(1rem, 2vw, 2rem);
+    --hx-nav-top: calc(
+      var(--hx-wordmark-top) + (var(--hx-wordmark-font-size) * var(--hx-wordmark-line-height)) + var(--hx-nav-gap)
+    );
+    --hx-figure-x: 50%;
+    /* Pulled in from the viewport edge (was clamp(2rem,9vw,5.5rem)) so the
+       metric/trait cards sit closer to the centered composition instead of
+       hugging the sides. */
+    --hx-aside-inset: clamp(1.5rem, 6vw, 4rem);
+    --portrait-blur: 0px;
+    /* Drives the "|" nav separators' opacity (see `.hx-nav-item` below) —
+       tweened via a proxy object, same pattern as `--portrait-blur`, since
+       a `::after` pseudo-element can't be a direct GSAP tween target. */
+    --nav-sep-opacity: 1;
+
+    /* No longer `position: sticky` — ScrollTrigger's own `pin: pinEl`
+       option (see the <script> below) now does the fixing. `top: auto`
+       is inert here (a `position: relative` element ignores `top` unless
+       explicitly offset) but kept for clarity/parity with the pin
+       geometry it replaces. */
+    position: relative;
+    top: auto;
+    height: 100svh;
+    min-height: 640px;
+    overflow: clip;
+    /* No `background` here anymore — that would be animating the
+       background of the element ScrollTrigger pins directly. The warm
+       backdrop now lives on `.hx-pin-fade`, a real child (see the markup
+       above), which is what the timeline actually fades. */
+  }
+
+  /* See the markup comment above `.hx-pin-fade` — painted first (before
+     `.hx-glow`) at z-index: 0 so it sits behind every other layer in the
+     pin, providing the same warm backdrop `.hx-pin`'s own `background`
+     used to, but as an independently animatable element. */
+  .hx-pin-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--color-bg);
+    pointer-events: none;
+  }
+
+  .hx-glow {
+    position: absolute;
+    inset: -10%;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(138, 100, 32, 0.1), transparent 45%),
+      radial-gradient(circle at 82% 78%, rgba(224, 197, 139, 0.12), transparent 45%);
+    pointer-events: none;
+  }
+
+  /* --- Scroll-motion wrapper: purely a positioning/responsibility
+     boundary now — it is NEVER transformed as a unit by the scroll
+     timeline (that was the earlier "whole hero slides/scales together"
+     bug). Every element that has a sidebar equivalent (brand, tagline,
+     metrics, nav links — each tagged `[data-morph-source]`) travels to its
+     own target individually; everything else (portrait, title, chip card,
+     actions) just fades out in place. --- */
+  .hx-full-hero-scroll-motion {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+  }
+
+  /* Individually FLIP-morphed elements — each one gets its own
+     translate/scale toward its sidebar target, computed from measured
+     rects (see the <script> below), never from the parent wrapper. */
+  [data-morph-source] {
+    will-change: transform, opacity;
+  }
+
+  .hx-full-hero-intro-motion {
+    position: relative;
+    height: 100%;
+  }
+
+  /* Layer order: bg -> CHISU (giant display wordmark) -> portrait ->
+     professional title -> nav/cards. `CHISU` is 5 letters, not the 8 of
+     `CHIISSUU` — see `t.hero.displayWordmark` vs `t.hero.siteName` in
+     content-types.ts for why these are separate fields. */
+  /* Outer positioning shell only — spans the full width so it can CENTER
+     the compact word row inside it via `justify-content: center`. This
+     element itself is never measured for sizing; `fitWordmarkWidth()` in
+     the <script> below measures `.hx-wordmark-row` (the actual word),
+     never this container. */
+  .hx-wordmark {
+    position: absolute;
+    inset-inline: 0;
+    top: var(--hx-wordmark-top);
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    pointer-events: none;
+  }
+
+  /* The actual word: `width: max-content` makes it shrink-to-fit its own
+     letters (never stretched by the outer container), so `CHISU` always
+     renders as ONE continuous, compact word — never individually
+     positioned letters, never `space-between`/`flex-grow`. `gap: 0` +
+     `letter-spacing: 0` on the letters below means there is zero
+     deliberate spacing anywhere in this row; the outer `.hx-wordmark`'s
+     `justify-content: center` centers this whole row as a unit. */
+  .hx-wordmark-row {
+    display: inline-flex;
+    width: max-content;
+    gap: 0;
+    white-space: nowrap;
+  }
+
+  .hx-wordmark-letter {
+    font-family: var(--font-wordmark);
+    font-weight: 900;
+    font-size: var(--hx-wordmark-font-size);
+    line-height: var(--hx-wordmark-line-height);
+    letter-spacing: 0;
+    /* Translucent brand-gold-strong "watermark" tone. The previous flat
+       --color-brand-gold (#e0c58b) sat almost exactly on top of
+       --color-bg (#d5cfbe) — the giant mark existed in the DOM but was
+       effectively invisible against the background. This reads as a
+       clearly legible background wordmark without competing with the
+       foreground title/portrait. */
+    color: rgba(138, 100, 32, 0.32);
+    text-shadow: 0 1px 2px rgba(26, 25, 25, 0.12);
+  }
+
+  .hx-portrait {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: var(--hx-figure-x);
+    z-index: 2;
+    /* Slightly shorter than before (was min(100svh,920px)) so the head
+       clears the wordmark/nav row instead of touching the top edge — the
+       figure stays centered and bottom-anchored, just not stretched to the
+       full viewport height. */
+    height: min(92svh, 860px);
+    width: auto;
+    max-width: none;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .hx-portrait img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    object-position: 50% 100%;
+    /* Only the deliberate scroll-driven blur touches this image — it's a
+       low-res placeholder on purpose, and no filter should try to hide that. */
+    filter: blur(var(--portrait-blur, 0px));
+    will-change: filter;
+  }
+
+  .hx-foreground {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+
+  .hx-title-block {
+    position: absolute;
+    left: var(--hx-figure-x);
+    top: 44%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15em;
+    text-align: center;
+    font-family: var(--font-title);
+    font-weight: 700;
+    /* Bigger than the previous clamp(1.2rem, 2.4vw, 2rem). */
+    font-size: clamp(1.5rem, 3vw, 2.6rem);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    /* Sits over the torso — light paper tone with a dark, soft shadow for
+       contrast instead of dark-ink-on-light-halo. */
+    color: var(--color-paper);
+    text-shadow: 0 10px 26px rgba(26, 25, 25, 0.55), 0 2px 8px rgba(26, 25, 25, 0.4);
+  }
+
+  .hx-title-mask {
+    display: block;
+    overflow: hidden;
+  }
+
+  .hx-title-line {
+    display: block;
+  }
+
+  .hx-title-highlight mark {
+    background: rgba(224, 197, 139, 0.78);
+    color: var(--color-ink);
+    padding: 0.05em 0.35em;
+    border-radius: 4px;
+    box-decoration-break: clone;
+  }
+
+  .hx-metrics {
+    position: absolute;
+    left: var(--hx-aside-inset);
+    /* Derived from the nav row, with extra clearance (was +2.75rem) so a
+       bigger, non-monospaced "Contacto" nav label can never collide with
+       the metric cards below it regardless of exact rendered width. */
+    top: calc(var(--hx-nav-top) + 3.5rem);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: clamp(9rem, 12vw, 11.5rem);
+  }
+
+  /* `.hx-glass` — SIDEBAR-ONLY now (see `.hx-sidebar-article` further
+     down). Kept intentionally at this very low, near-invisible opacity
+     (a literal copy of the hero's "Sobre mí" ghost button finish) because
+     the sidebar's own boundary-bleed-through effect depends on it: the
+     warm/dark section physically behind a `.hx-sidebar-article` needs to
+     show through clearly while a section boundary crosses behind the
+     fixed sidebar. The 3 hero cards below use the separate, more opaque
+     `.hx-frosted-card` instead — a real frosted-glass finish is what's
+     wanted there, not the same bleed-through requirement. */
+  .hx-glass {
+    background: rgb(213 207 190 / 12%);
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: var(--color-ink);
+  }
+
+  /* `.hx-frosted-card` — the visible frosted-glass finish for the hero's
+     3 foreground cards only (2 metric cards + the chip card): a
+     genuinely translucent, blurred panel, never solid/opaque white,
+     tuned to read clearly against the busy portrait/background instead
+     of the sidebar's much lower, near-invisible `.hx-glass` opacity. */
+  .hx-frosted-card {
+    background: rgb(213 207 190 / 62%);
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 8px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 12px 30px rgb(26 25 25 / 8%);
+    color: var(--color-ink);
+  }
+
+  .hx-metric-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .hx-metric-card:nth-child(2) {
+    align-self: flex-end;
+    margin-top: -0.2rem;
+  }
+
+  .hx-metric-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--color-ink);
+  }
+
+  .hx-metric-label {
+    font-size: 0.72rem;
+    line-height: 1.3;
+    color: var(--color-ink);
+    opacity: 0.66;
+  }
+
+  /* Groups chip-card + tagline into one flowing stack — their combined
+     height varies with viewport/font, so only normal flow (anchored once,
+     below the nav with generous clearance) can guarantee no collision with
+     "Servicios" / "Tools" in the nav row above. */
+  .hx-aside-right {
+    position: absolute;
+    right: var(--hx-aside-inset);
+    top: calc(var(--hx-nav-top) + 3.5rem);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.1rem;
+    max-width: 18rem;
+  }
+
+  /* See `.hx-frosted-card` above — same shared frosted-glass finish. */
+  .hx-chip-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .hx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    opacity: 0.82;
+    white-space: nowrap;
+  }
+
+  .hx-chip i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-brand-gold);
+  }
+
+  .hx-tagline {
+    max-width: 20ch;
+    text-align: right;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--color-ink);
+    opacity: 0.7;
+  }
+
+  .hx-actions {
+    position: absolute;
+    left: var(--hx-figure-x);
+    bottom: clamp(2.25rem, 6.5vh, 3.75rem);
+    z-index: 4;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .hx-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .hx-btn-primary {
+    background: var(--color-brand-gold);
+    color: var(--color-ink);
+  }
+
+  .hx-btn-ghost {
+    border-color: var(--color-line);
+    color: var(--color-ink);
+    background: rgb(213 207 190 / 12%);
+    backdrop-filter: blur(6px);
+  }
+
+  .hx-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .hx-nav {
+    position: absolute;
+    top: var(--hx-nav-top);
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    /* Bigger and no longer monospaced. */
+    font-family: var(--font-body);
+    font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+
+  .hx-nav-left {
+    left: clamp(1.5rem, 4vw, 2.8vw);
+  }
+
+  .hx-nav-right {
+    right: clamp(1.5rem, 4vw, 2.8vw);
+  }
+
+  /* Separators are real DOM siblings between `.hx-nav-item`s (inserted in
+     the markup, not a `::after` on the link) so they can be vertically
+     centered independently of text baseline metrics — a baseline-anchored
+     "|" pseudo-element sat visibly low. `aria-hidden`, `align-self: center`
+     + `line-height: 1` (the flex row's own `align-items: center` already
+     centers it too — both are set for robustness), and NOT nested inside
+     `.hx-nav-item`/`RollLink`, so it never participates in the rollover
+     hover animation. Color is `--color-ink` (real black), inherited from
+     `.hx-nav` — previously dimmed to a fixed 40% opacity, which read as
+     gray instead of black even at rest. Opacity now reads ONLY
+     `--nav-sep-opacity`, tweened by the scroll timeline (they have no
+     sidebar equivalent — see Section 4 of the scroll spec) — same
+     custom-property pattern as `--portrait-blur` — so alignment/fade-out
+     behavior on scroll is unchanged, just fully opaque (black) at rest. */
+  .hx-nav-sep {
+    align-self: center;
+    line-height: 1;
+    opacity: var(--nav-sep-opacity, 1);
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+
+  .hx-nav :global(a:hover) {
+    color: var(--color-brand-gold-strong);
+  }
+
+  /* --- Compact sidebar: its own composition, a `position: fixed` sibling
+     of `.hx-wrap` (see the markup below the hero `</section>`) so it
+     persists past the end of the hero instead of disappearing with the
+     sticky `.hx-pin`. TRANSPARENT — no background/border of its own — so
+     the full-width section background behind it shows through completely;
+     each `.hx-sidebar-article` carries the actual `.hx-glass` surface.
+     Revealed by opacity ONLY — never `x`/translate, so it never reads as
+     sliding in from the left. `visibility`/`pointer-events` are driven by
+     the `.is-active` class (added by the scroll timeline once the morph
+     crosses its activation point), NOT `display: none` — the FLIP
+     measurements in the <script> below need `getBoundingClientRect()` on
+     its children while still visually hidden. `--hx-sidebar-width` is
+     defined once, at `body.redesign-home` scope (see Layout.astro), so the
+     sidebar's width and the sections' inner-content compensation can never
+     drift out of sync; the literal clamp() here is only a fallback for
+     contexts where that variable isn't set. */
+  /* `top`/`bottom` (not `inset-block: 0`) + `justify-content: flex-start`
+     (not `center`) on purpose: with 4 articles — the nav one now holding 7
+     links — the sidebar's natural content height can exceed the viewport.
+     Centering a taller-than-box flex column splits the overflow evenly
+     above `top` AND below `bottom`, i.e. off-screen in BOTH directions at
+     once, invisibly — that was the actual cause of content reading as
+     "cut off top and bottom". Anchoring to `flex-start` + a real
+     `max-height` + `overflow-y: auto` means any leftover overflow (should
+     the compaction below still not be enough on a given screen) becomes a
+     contained, scrollable overflow at the BOTTOM only, never an invisible
+     one — never `transform: scale()`, which would shrink the sidebar as a
+     unit instead of fixing the actual layout cause. */
+  .hx-compact-sidebar {
+    position: fixed;
+    top: clamp(0.75rem, 1.5vh, 1rem);
+    bottom: clamp(0.75rem, 1.5vh, 1rem);
+    inset-inline-start: 0;
+    z-index: 90;
+    width: var(--hx-sidebar-width, clamp(15.5rem, 22vw, 19.5rem));
+    height: auto;
+    max-height: calc(100svh - clamp(1.5rem, 3vh, 2rem));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(0.45rem, 0.9vh, 0.75rem);
+    padding: clamp(1rem, 2vh, 1.5rem) clamp(1.25rem, 2.5vw, 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .hx-compact-sidebar.is-active {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
+     `<aside>` anymore. Each `.hx-sidebar-article` carries its OWN
+     `data-theme` ("warm"/"dark"), flipped independently by the per-article
+     overlap check in the <script> below (real `getBoundingClientRect()`
+     overlap against every `.section-theme-dark` section), so two articles
+     can legitimately disagree at the same scroll position while a section
+     boundary is crossing between them. `--art-text`/`--art-text-muted`/
+     `--art-border` are GSAP-tweened (not just CSS-transitioned) — see
+     `checkArticleThemes()` — so the ~0.3s color swap is driven the same
+     way as every other scroll-linked value in this component. Same warm/
+     dark color values as `.section-theme-warm`/`.section-theme-dark` in
+     Layout.astro — keep in sync if those ever change. The article's own
+     BACKGROUND (from `.hx-glass`) never switches with theme — it stays a
+     constant translucent tan so whatever's physically behind it (warm or
+     dark section) always bleeds through proportionally; only text/border
+     need the discrete legibility swap. */
+  .hx-sidebar-article[data-theme="warm"] {
+    --art-text: #000;
+    --art-text-muted: #000;
+    --art-border: var(--color-line);
+    --art-divider: #000;
+  }
+
+  .hx-sidebar-article[data-theme="dark"] {
+    --art-text: #fff;
+    --art-text-muted: #fff;
+    --art-border: rgb(255 255 255 / 14%);
+    --art-divider: #fff;
+  }
+
+  /* Four independent articles (brand+description, metrics, nav, socials —
+     the last one also contains the Contacto CTA as its final child) — each
+     its own `.hx-glass` (see above — the exact ghost-button finish), never
+     nested cards inside cards. Border/text color read the per-article
+     `--art-*` custom properties above; background stays the constant
+     translucent `.hx-glass` tan regardless of theme. Vertical padding/gap
+     kept deliberately tight (not the original 1.1rem/0.6rem) so all 4
+     articles — the nav one now holding 7 links instead of 6 — fit inside
+     `.hx-compact-sidebar`'s capped height without relying on `scale()`;
+     see the `@media (max-height: 950px)` tier further down for an even
+     tighter pass on short viewports. */
+  .hx-sidebar-article {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.85rem 1.25rem;
+    border-color: var(--art-border, var(--color-line));
+    color: var(--art-text, var(--color-ink));
+    transition: border-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Boxed brand mark ("CHISU®") — same gold as the Contacto CTA
+     (`--color-brand-gold`, NOT `--color-brand-gold-strong`, which is a
+     different token), always solid black text regardless of the article's
+     warm/dark theme (the gold background provides its own contrast either
+     way), contained radius (not a pill). `align-self: flex-start` keeps it
+     shrink-wrapped to the text instead of stretching to the article's full
+     width (the article is a column flexbox with default stretch). */
+  .hx-compact-mark {
+    display: inline-flex;
+    align-self: flex-start;
+    font-family: var(--font-wordmark);
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    padding: 0.3rem 0.65rem;
+    border-radius: 7px;
+    background: var(--color-brand-gold);
+    color: #000;
+  }
+
+  .hx-compact-tagline {
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: var(--art-text-muted, var(--color-ink));
+  }
+
+  /* Two columns, side by side (was a vertical stack of 2 rows) — each
+     metric's number sits above its own centered description, with a thin
+     divider between the two columns. */
+  .hx-compact-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .hx-compact-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.3rem;
+    padding-inline: 0.4rem;
+  }
+
+  .hx-compact-metric + .hx-compact-metric {
+    border-left: 1px solid var(--art-divider, var(--color-line));
+  }
+
+  /* Same brand gold as `.hx-compact-mark`/the Contacto CTA — never yellow,
+     never `--art-text`. */
+  .hx-compact-metric-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    line-height: 1.1;
+    color: var(--color-brand-gold);
+  }
+
+  /* Contrast fix, warm theme only: an extremely thin black outline on the
+     glyph so "2+"/"10+" stay legible when the article is over a light/warm
+     section. Same gold fill, same font-size/weight/line-height/box model —
+     `-webkit-text-stroke` paints along the glyph outline, it doesn't add
+     layout width. Dark theme is untouched (no reset needed — this selector
+     simply doesn't match `[data-theme="dark"]`). */
+  .hx-sidebar-article[data-theme="warm"] .hx-compact-metric-value {
+    -webkit-text-stroke: 0.4px #000;
+  }
+
+  .hx-compact-metric-label {
+    font-size: 0.72rem;
+    line-height: 1.25;
+    color: var(--art-text, var(--color-ink));
+  }
+
+  .hx-compact-vertical-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Each of the 7 links (Inicio/Sobre mí/Proyectos/Servicios/Tools/
+     Contacto/FAQ) is its own rectangular box — light-gray on a warm
+     section, dark-gray on a dark one, keyed off the SAME `data-theme`
+     attribute the rest of the article already reads (no new detection
+     logic, just a new selector on the existing mechanism). Colors here are
+     deliberately literal (not `--art-text`) since they're paired 1:1 with
+     the matching literal background per the spec. Consistent dimensions/
+     padding across all 6 — none of this varies by link. */
+  .hx-compact-vertical-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 7px;
+    background: #e7e3d9;
+    color: #000;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .hx-sidebar-article[data-theme="dark"] .hx-compact-vertical-nav a {
+    background: #242424;
+    color: #fff;
+  }
+
+  .hx-compact-vertical-nav a:hover:not(.is-active) {
+    color: var(--color-brand-gold-strong);
+  }
+
+  /* Active link: same brand gold as `.hx-compact-mark`/the Contacto CTA.
+     Both selectors are needed — the plain one for a warm article, the
+     `[data-theme="dark"]`-scoped one to win specificity over the dark box
+     rule above — so the active state reads the same (gold bg, black text)
+     no matter which theme the article is currently in. */
+  .hx-compact-vertical-nav a.is-active,
+  .hx-sidebar-article[data-theme="dark"] .hx-compact-vertical-nav a.is-active {
+    background: var(--color-brand-gold);
+    color: #000;
+  }
+
+  .hx-compact-nav-icon {
+    flex-shrink: 0;
+  }
+
+  .hx-compact-nav-label {
+    flex: 1;
+  }
+
+  .hx-compact-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--art-text-muted, var(--color-ink));
+  }
+
+  .hx-compact-socials a:hover {
+    color: var(--color-brand-gold-strong);
+    opacity: 1;
+  }
+
+  /* Not a link — `aria-disabled`, no `href`, no simulated clickability.
+     Only a cursor affordance is added on top of the shared
+     `.hx-compact-socials` text color. */
+  .hx-compact-social-linkedin {
+    cursor: not-allowed;
+  }
+
+  /* Overrides `.hx-btn`/`.hx-btn-primary` (shared with the hero's own
+     "Ver Proyectos"/"Sobre Mí" buttons, which stay untouched) for this
+     instance only — same-specificity single-class selectors, so source
+     order (this rule comes later in the stylesheet) is what makes these
+     win. Rectangular (not the shared 999px pill), text forced to solid
+     black regardless of theme, ≥44px clickable height. Background stays
+     inherited from `.hx-btn-primary` (`--color-brand-gold`) — already
+     correct, not overridden here. */
+  .hx-compact-cta {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+    border-radius: 8px;
+    font-size: clamp(1rem, 0.95vw, 1.1rem);
+    font-weight: 700;
+    color: #000;
+    min-height: 44px;
+  }
+
+  .hx-mobile-toggle,
+  .hx-mobile-nav {
+    display: none;
+  }
+
+  /* Reduced motion / narrow viewport fallback: stacked static hero, no
+     scroll-jacking, no scroll-driven layers. */
+  .hx-wrap.hx-static {
+    height: auto;
+  }
+
+  .hx-pin.hx-static {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+    padding: 5.5rem 1.25rem 2.5rem;
+  }
+
+  .hx-pin.hx-static .hx-full-hero-scroll-motion,
+  .hx-pin.hx-static .hx-full-hero-intro-motion {
+    height: auto;
+    transform: none;
+  }
+
+  /* The sidebar is no longer a descendant of `.hx-pin` (it's a fixed
+     sibling of `.hx-wrap` now), so it can't be reached through that
+     ancestor selector — the adjacent-sibling combinator reaches it
+     directly off `.hx-wrap.hx-static` instead. `display: none` here (not
+     just leaving it at opacity:0/visibility:hidden) is deliberate: in
+     reduced-motion/mobile-static mode it must not sit in an inert
+     opacity:0 limbo indefinitely. */
+  .hx-wrap.hx-static + .hx-compact-sidebar {
+    display: none;
+  }
+
+  .hx-pin.hx-static .hx-wordmark {
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  /* On the static/mobile layout the word is allowed to wrap across lines
+     instead of forcing a single `nowrap` row that would overflow a narrow
+     viewport — the desktop `.hx-wordmark-row` (max-content, nowrap) is
+     reset here specifically for that reason. */
+  .hx-pin.hx-static .hx-wordmark-row {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    white-space: normal;
+    gap: 0.05em;
+  }
+
+  .hx-pin.hx-static .hx-wordmark-letter {
+    font-size: clamp(2.4rem, 15vw, 4.5rem);
+  }
+
+  .hx-pin.hx-static .hx-nav {
+    display: none;
+  }
+
+  .hx-pin.hx-static .hx-portrait {
+    position: relative;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    inset-inline-start: auto;
+    inset-block-end: auto;
+    transform: none;
+    height: 40vh;
+    margin: 0 auto;
+  }
+
+  .hx-pin.hx-static .hx-foreground {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .hx-pin.hx-static .hx-title-block,
+  .hx-pin.hx-static .hx-metrics,
+  .hx-pin.hx-static .hx-aside-right,
+  .hx-pin.hx-static .hx-actions {
+    position: relative;
+    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    transform: none;
+  }
+
+  .hx-pin.hx-static .hx-title-block {
+    color: var(--color-ink);
+    text-shadow: none;
+  }
+
+  .hx-pin.hx-static .hx-metrics {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+
+  .hx-pin.hx-static .hx-metric-card:nth-child(2) {
+    align-self: stretch;
+    margin-top: 0;
+  }
+
+  .hx-pin.hx-static .hx-aside-right {
+    align-items: center;
+    max-width: none;
+  }
+
+  .hx-pin.hx-static .hx-chip-card {
+    width: 100%;
+    max-width: 22rem;
+  }
+
+  .hx-pin.hx-static .hx-tagline {
+    max-width: 32ch;
+    text-align: center;
+  }
+
+  /* Tablet / small-desktop tier: a deliberately different composition, not a
+     uniform shrink of the desktop-large layout. */
+  @media (min-width: 900px) and (max-width: 1599px) {
+    .hx-pin {
+      --hx-wordmark-top: 3.2vh;
+      --hx-wordmark-font-size: clamp(4.5rem, 16vw, 10rem);
+      --hx-aside-inset: clamp(1.25rem, 5vw, 3rem);
+    }
+
+    .hx-title-block {
+      top: 40%;
+      font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+    }
+
+    .hx-metrics {
+      width: clamp(8rem, 14vw, 10rem);
+    }
+
+    .hx-chip-card {
+      padding: 0.85rem 1rem;
+    }
+  }
+
+  /* Laptop tier — between the tablet composition above and the
+     large-desktop default clamp() baked into `.hx-pin` (used at
+     >=1920px). The JS auto-fit pass (`fitWordmarkWidth()`) recalculates
+     the exact px value on load/resize regardless, but every tier still
+     gets its own explicit starting point rather than relying on one
+     clamp() to cover both 1600px and 3000px viewports. */
+  @media (min-width: 1600px) and (max-width: 1919px) {
+    .hx-pin {
+      --hx-wordmark-font-size: clamp(5rem, 17vw, 12rem);
+    }
+  }
+
+  /* Extra compaction pass for short-but-still-desktop viewports (e.g.
+     1917x906) — the base sizing above already fits comfortably on tall
+     desktop screens; this tier only tightens further so the 4 articles
+     (7-link nav included) have a realistic chance of fitting without the
+     `overflow-y: auto` fallback ever engaging. That fallback (see
+     `.hx-compact-sidebar` above) stays in place regardless, as protection
+     for anything shorter than this still covers. */
+  @media (max-height: 950px) and (min-width: 900px) {
+    .hx-compact-sidebar {
+      padding-block: clamp(0.65rem, 1.4vh, 1rem);
+      gap: clamp(0.35rem, 0.7vh, 0.5rem);
+    }
+
+    .hx-sidebar-article {
+      padding-block: 0.65rem;
+      gap: 0.45rem;
+    }
+
+    .hx-compact-vertical-nav {
+      gap: 0.3rem;
+    }
+
+    .hx-compact-tagline {
+      line-height: 1.3;
+    }
+  }
+
+  /* Second, more aggressive compaction tier for genuinely short desktop
+     viewports (e.g. 1280x720), where the 950px tier above still leaves
+     the sidebar taller than its `max-height` (measured in a real browser:
+     clientHeight 696px vs scrollHeight 825px at 1280x720, ~129px of
+     overflow relying on the `overflow-y: auto` fallback). Scoped to
+     `max-height: 850px` so it never applies at 1917x906 or 1440x900 —
+     both stay on the 950px tier above, completely unchanged. Every value
+     here uses `padding-block`/`gap` (never the `padding` shorthand), so
+     horizontal padding, width, and horizontal position are untouched;
+     font-size, colors, border-radius, icons and the `.is-active` state
+     are untouched too — only vertical rhythm changes. `overflow-y: auto`
+     on `.hx-compact-sidebar` stays in place as a safety fallback; this
+     tier's job is to make it stop being needed at these sizes, not to
+     hide overflow. */
+  @media (min-width: 900px) and (max-height: 850px) {
+    .hx-compact-sidebar {
+      padding-block: 0.4rem;
+      gap: 0.2rem;
+    }
+
+    .hx-sidebar-article {
+      padding-block: 0.35rem;
+      gap: 0.25rem;
+    }
+
+    .hx-compact-vertical-nav {
+      gap: 0.16rem;
+    }
+
+    .hx-compact-vertical-nav a {
+      min-height: 36px;
+      padding-block: 0.3rem;
+    }
+
+    .hx-compact-socials {
+      gap: 0.25rem;
+    }
+
+    .hx-compact-cta {
+      min-height: 42px;
+      padding-block: 0.4rem;
+      margin-top: 0.125rem;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .hx-nav,
+    .hx-compact-sidebar {
+      display: none;
+    }
+
+    .hx-mobile-toggle {
+      display: grid;
+      place-content: center;
+      gap: 4px;
+      position: fixed;
+      right: 1rem;
+      top: 1rem;
+      z-index: 110;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--color-line);
+      background: rgb(213 207 190 / 70%);
+      backdrop-filter: blur(8px);
+    }
+
+    .hx-mobile-toggle span {
+      width: 18px;
+      height: 2px;
+      background: var(--color-ink);
+    }
+
+    .hx-mobile-nav {
+      position: fixed;
+      inset: 0;
+      z-index: 105;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      background: rgb(213 207 190 / 96%);
+      backdrop-filter: blur(10px);
+      font-family: var(--font-body);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--color-ink);
+    }
+
+    .hx-mobile-nav.hx-open {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  // Bundled with the `gsap` package already installed via `npm install` —
+  // not an additional dependency.
+  gsap.registerPlugin(ScrollTrigger);
+
+  const wrap = document.querySelector<HTMLElement>(".hx-wrap");
+  const pin = document.getElementById("hx-pin");
+  const scrollMotion = document.getElementById("hx-scroll-motion");
+  const introMotion = document.getElementById("hx-intro-motion");
+  const wordmark = document.getElementById("hx-wordmark");
+  const compactSidebar = document.getElementById("hx-compact-sidebar");
+
+  const mobileToggle = document.getElementById("hx-mobile-toggle");
+  const mobileNav = document.getElementById("hx-mobile-nav");
+
+  mobileToggle?.addEventListener("click", () => {
+    const isOpen = mobileNav?.classList.toggle("hx-open");
+    mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  mobileNav?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      mobileNav.classList.remove("hx-open");
+      mobileToggle?.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  const prefersReducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let prefersReducedMotion = prefersReducedMotionQuery.matches;
+
+  // Progressive enhancement: if any of the scroll-driven pieces are
+  // missing, the static markup (and the `.hx-static` CSS fallback) still
+  // renders/functions without JS ever having run.
+  if (wrap && pin && scrollMotion && introMotion && wordmark && compactSidebar) {
+    const wrapEl: HTMLElement = wrap;
+    const pinEl: HTMLElement = pin;
+    // `scrollMotion` itself is intentionally left unassigned to a local
+    // beyond the existence check above — `.hx-full-hero-scroll-motion` stays
+    // in the DOM as a positioning/responsibility boundary (see the <style>
+    // comment on `.hx-full-hero-scroll-motion`), but the scroll timeline no
+    // longer transforms it as a unit, so there's nothing left to read it for.
+    const introMotionEl: HTMLElement = introMotion;
+    const wordmarkEl: HTMLElement = wordmark;
+    const compactSidebarEl: HTMLElement = compactSidebar;
+
+    const isDesktopViewport = () => window.innerWidth >= 900;
+
+    // Every GSAP tween/ScrollTrigger created synchronously here — and every
+    // one created later inside a `ctx.add(() => ...)` call — is tracked by
+    // this context, so `ctx.revert()` fully tears the hero's animation
+    // state back down (used on Astro view-transition navigation away from
+    // the page, if that's ever enabled).
+    const ctx = gsap.context(() => {
+      // ---- Wordmark auto-fit ------------------------------------------
+      // Adjusts `--hx-wordmark-font-size` (already read by every layout
+      // calc() below it) so `CHISU`, laid out as one compact, centered,
+      // non-stretched word, renders at ~94% of the viewport width instead
+      // of relying on a guessed clamp() value alone. Also capped by a
+      // HEIGHT budget: with only 5 letters (vs. the previous 8-letter
+      // "CHIISSUU") filling the same width target, each glyph is much
+      // bigger, and at wide-but-short viewports (e.g. 1901x902) a purely
+      // width-driven size can grow tall enough to clip against
+      // `.hx-pin`'s `overflow: clip` — the height cap trades a little
+      // width for guaranteed "sin recortarse accidentalmente".
+      //
+      // Measures `.hx-wordmark-row` (the actual word, `width: max-content`
+      // so it always reports its true shrink-to-fit content width) — NOT
+      // `.hx-wordmark` (the outer positioning shell, which spans the full
+      // viewport width via `inset-inline: 0` and would report ~100vw
+      // regardless of the letters' real size, making the ratio below
+      // meaningless). Font-size is read off an actual letter span, since
+      // `.hx-wordmark`/`.hx-wordmark-row` never set `font-size`
+      // themselves — only `.hx-wordmark-letter` does.
+      function fitWordmarkWidth() {
+        const targetWidth = window.innerWidth * 0.94;
+        pinEl.style.removeProperty("--hx-wordmark-font-size");
+        const rowEl = wordmarkEl.querySelector<HTMLElement>(".hx-wordmark-row");
+        const firstLetter = wordmarkEl.querySelector<HTMLElement>(".hx-wordmark-letter");
+        if (!rowEl || !firstLetter) return;
+        const naturalWidth = rowEl.getBoundingClientRect().width;
+        if (naturalWidth <= 0) return;
+        const currentFontSize = parseFloat(getComputedStyle(firstLetter).fontSize);
+        if (!Number.isFinite(currentFontSize) || currentFontSize <= 0) return;
+        const widthFitted = currentFontSize * (targetWidth / naturalWidth);
+        const lineHeight = parseFloat(getComputedStyle(pinEl).getPropertyValue("--hx-wordmark-line-height")) || 0.86;
+        // The wordmark may use at most ~40% of the viewport height, leaving
+        // room below it (via --hx-nav-top's calc() chain) for nav/metrics/
+        // portrait/title.
+        const heightBudget = window.innerHeight * 0.4;
+        const heightCapped = heightBudget / lineHeight;
+        const fitted = Math.min(widthFitted, heightCapped);
+        pinEl.style.setProperty("--hx-wordmark-font-size", `${fitted.toFixed(2)}px`);
+      }
+
+      // ---- Entrance timeline (intro-motion elements only) --------------
+      // Order preserved from the original spec: 1) letters in from the
+      // right with a blur(10px)->0 wipe, 2) portrait rising from below,
+      // 3) title lines revealed through a mask, 4) nav / cards / buttons
+      // settling in last.
+      async function playEntrance() {
+        const letters = Array.from(wordmarkEl.querySelectorAll<HTMLElement>(".hx-wordmark-letter"));
+        const portraitImg = introMotionEl.querySelector<HTMLElement>(".hx-portrait img");
+        const titleLines = Array.from(introMotionEl.querySelectorAll<HTMLElement>(".hx-title-line"));
+        const navLinks = Array.from(introMotionEl.querySelectorAll<HTMLElement>(".hx-nav .roll-link"));
+        const metrics = introMotionEl.querySelector<HTMLElement>(".hx-metrics");
+        const asideRight = introMotionEl.querySelector<HTMLElement>(".hx-aside-right");
+        const actions = introMotionEl.querySelector<HTMLElement>(".hx-actions");
+        const closingTargets = [...navLinks, metrics, asideRight, actions].filter(
+          (el): el is HTMLElement => el !== null
+        );
+
+        // If the page didn't load at the top, or the user asked for
+        // reduced motion, the intro must resolve to its end state
+        // instantly rather than play — never leave letters/portrait/title
+        // stuck in their hidden "from" state.
+        const skipToEnd = prefersReducedMotion || window.scrollY > 0;
+
+        try {
+          await document.fonts.ready;
+        } catch {
+          // Older browsers without document.fonts — proceed anyway.
+        }
+
+        fitWordmarkWidth();
+
+        if (portraitImg instanceof HTMLImageElement && typeof portraitImg.decode === "function") {
+          try {
+            await portraitImg.decode();
+          } catch {
+            // decode() can reject on cache/network races — the image still
+            // renders, it just wasn't guaranteed decoded first.
+          }
+        }
+
+        const allTargets = [...letters, portraitImg, ...titleLines, ...closingTargets].filter(
+          (el): el is HTMLElement => el !== null
+        );
+
+        const tl = gsap.timeline({
+          defaults: { ease: "power3.out" },
+          paused: true,
+          onComplete: () => {
+            // No inline transform/opacity/filter left behind that could
+            // conflict with the scroll timeline below.
+            gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
+          },
+        });
+
+        if (letters.length) {
+          tl.from(
+            letters,
+            { xPercent: 60, opacity: 0, filter: "blur(10px)", duration: 0.55, stagger: 0.06 },
+            0
+          );
+        }
+
+        if (portraitImg) {
+          tl.from(
+            portraitImg,
+            { yPercent: 14, opacity: 0, duration: 0.75, ease: "power2.out" },
+            letters.length ? "-=0.35" : 0
+          );
+        }
+
+        if (titleLines.length) {
+          tl.from(titleLines, { yPercent: 110, duration: 0.6, stagger: 0.08 }, "-=0.3");
+        }
+
+        if (closingTargets.length) {
+          tl.from(closingTargets, { y: 16, opacity: 0, duration: 0.5, stagger: 0.05 }, "-=0.2");
+        }
+
+        // The entrance must end EXACTLY at scroll progress 0 — it never
+        // runs while scrolled, and its resting state (post clearProps) is
+        // the same "natural" CSS state the scroll timeline treats as its
+        // own progress-0 baseline, so there's no visual pop at the handoff.
+        if (skipToEnd || tl.duration() === 0) {
+          tl.progress(1);
+        } else {
+          tl.play();
+        }
+      }
+
+      void playEntrance();
+
+      // ---- Scroll timeline (individual FLIP-style morph, sidebar
+      // persistence) ------------------------------------------------------
+      //
+      // Every element tagged `data-morph-source="<key>"` inside the hero
+      // travels — on its own, via a measured translate+scale, never as a
+      // group — toward the sidebar element tagged `data-morph-target` with
+      // the same key. Elements with no sidebar equivalent (portrait, title,
+      // chip card, actions, nav separators) just fade out in place with at
+      // most a tiny leftward drift. `.hx-full-hero-scroll-motion` itself is
+      // never transformed. There are only 3 states now (A/B/C) — the old
+      // 4th state ("About Me transition") was removed entirely (see the
+      // <style> comment above `.hx-wrap`); State C's sidebar reveal is the
+      // last thing that happens, ending exactly at local progress 1.0 so
+      // the hero hands off directly into the real `AboutSection`. Every
+      // position in `buildScrollTimeline()` below was rebalanced together
+      // (not just State C in isolation) so motion continues across
+      // practically the whole 0->1 range instead of finishing early and
+      // leaving a visually-quiet stretch before the sidebar takes over —
+      // combined with `.hx-wrap`'s shorter height (see the <style>
+      // comment above `.hx-wrap`), this closes the gap both
+      // proportionally and in absolute scroll distance.
+      const SIDEBAR_ACTIVATE_AT = 0.66;
+
+      // Union of a node's *children* rects rather than the node's own
+      // `getBoundingClientRect()`. Needed because `.hx-wordmark` (and a few
+      // other sources/targets) are stretched to fill their positioned
+      // parent via `inset-inline: 0` etc. — their own box is much wider
+      // than the content actually rendered inside them, which would throw
+      // off the scale computed below. Falls back to the element's own rect
+      // when it has no element children (e.g. `.hx-tagline`, a bare <p>).
+      function contentRect(el: HTMLElement): DOMRect {
+        const children = Array.from(el.children) as HTMLElement[];
+        if (!children.length) return el.getBoundingClientRect();
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+        children.forEach((child) => {
+          const r = child.getBoundingClientRect();
+          left = Math.min(left, r.left);
+          top = Math.min(top, r.top);
+          right = Math.max(right, r.right);
+          bottom = Math.max(bottom, r.bottom);
+        });
+        if (!Number.isFinite(left) || !Number.isFinite(top)) return el.getBoundingClientRect();
+        return new DOMRect(left, top, Math.max(right - left, 1), Math.max(bottom - top, 1));
+      }
+
+      interface MorphPair {
+        source: HTMLElement;
+        target: HTMLElement;
+      }
+
+      function collectMorphPairs(): MorphPair[] {
+        const sources = Array.from(introMotionEl.querySelectorAll<HTMLElement>("[data-morph-source]"));
+        const pairs: MorphPair[] = [];
+        sources.forEach((source) => {
+          const key = source.getAttribute("data-morph-source");
+          if (!key) return;
+          const target = compactSidebarEl.querySelector<HTMLElement>(`[data-morph-target="${key}"]`);
+          if (target) pairs.push({ source, target });
+        });
+        return pairs;
+      }
+
+      // Center-to-center delta (not edge-to-edge) so the source always
+      // converges on its target's visual center regardless of aspect-ratio
+      // differences between the two (e.g. the full wordmark vs. the small
+      // compact mark). Scale is capped at 1 — every sidebar target is
+      // smaller than its hero source, never larger — and uses the smaller
+      // of the two axis ratios so text never stretches unevenly.
+      function computeMorph(source: HTMLElement, target: HTMLElement) {
+        const sourceRect = contentRect(source);
+        const targetRect = contentRect(target);
+        const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+        const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+        const scale = Math.max(
+          Math.min(targetRect.width / sourceRect.width, targetRect.height / sourceRect.height, 1),
+          0.001
+        );
+        return {
+          x: targetCenterX - sourceCenterX,
+          y: targetCenterY - sourceCenterY,
+          scale,
+        };
+      }
+
+      function collectNoTargetGroup(): HTMLElement[] {
+        const portraitImg = introMotionEl.querySelector<HTMLElement>(".hx-portrait img");
+        const titleBlock = introMotionEl.querySelector<HTMLElement>(".hx-title-block");
+        const chipCard = introMotionEl.querySelector<HTMLElement>(".hx-chip-card");
+        const actionsEl = introMotionEl.querySelector<HTMLElement>(".hx-actions");
+        return [portraitImg, titleBlock, chipCard, actionsEl].filter((el): el is HTMLElement => el !== null);
+      }
+
+      const blurProxy = { blur: 0 };
+      const navSepProxy = { opacity: 1 };
+
+      function buildScrollTimeline() {
+        const morphPairs = collectMorphPairs();
+        const noTargetGroup = collectNoTargetGroup();
+        const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
+
+        // Structural fix (not another height/timing tweak): `.hx-wrap`/
+        // `.hx-pin` are now both exactly one viewport tall (see the
+        // <style> comment above `.hx-wrap`) and ScrollTrigger itself pins
+        // `pinEl` — `position: sticky` is gone. `end: () =>
+        // `+=${window.innerHeight}`` gives the pin exactly one additional
+        // viewport height of scroll to live through, and `pinSpacing:
+        // false` means the real `AboutSection` (immediately next in the
+        // document, no spacer, no provisional panel) slides up in normal
+        // flow beneath the fixed hero that whole time, reaching the
+        // viewport top exactly as the pin releases at progress 1.0 — so
+        // there is no leftover warm-background scroll distance regardless
+        // of exactly how the timeline's internal tween positions are
+        // balanced. `anticipatePin: 1` avoids a one-frame jump right as
+        // pinning engages.
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: wrapEl,
+            start: "top top",
+            end: () => `+=${window.innerHeight}`,
+            scrub: 0.35,
+            pin: pinEl,
+            pinSpacing: false,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self: { progress: number }) => {
+              const active = self.progress > SIDEBAR_ACTIVATE_AT;
+              compactSidebarEl.classList.toggle("is-active", active);
+              compactSidebarEl.setAttribute("aria-hidden", active ? "false" : "true");
+            },
+          },
+        });
+
+        // State A — 0% to 12%: hero completely still, only the portrait
+        // starts blurring (0px -> ~12px). Sidebar stays fully invisible.
+        // Shortened from 0-20% so the central elements stay in their
+        // settled state for less "dead" time up front — the previous
+        // pacing (fixed positions carried over from a taller 240svh/
+        // 300svh wrap) front-loaded stillness and back-loaded the fade,
+        // leaving a visibly quiet stretch right before the sidebar
+        // reveal. Every position below is rebalanced together so motion
+        // continues practically the entire way through the timeline.
+        tl.fromTo(
+          blurProxy,
+          { blur: 0 },
+          {
+            blur: 12,
+            duration: 0.12,
+            onUpdate: () => pinEl.style.setProperty("--portrait-blur", `${blurProxy.blur.toFixed(2)}px`),
+          },
+          0
+        );
+
+        // State B — 12% to 70%: every source with a sidebar equivalent
+        // travels (translate + scale, computed above) toward its target,
+        // then fades out right at the end of its own travel — never as a
+        // group, always toward the left-hand sidebar, never rightward.
+        // `brand` (CHISU -> CHIISSUU) goes through this exact same
+        // mechanism: it travels/scales toward the sidebar's brand slot
+        // like every other source, then fades out while the sidebar
+        // (revealed in State C below) crossfades the different text
+        // (CHIISSUU) in — a crossfade between two distinct strings, never
+        // a letter-by-letter morph between them. The travel itself runs
+        // longer (0.12->0.60) and the fade-out is pushed later
+        // (0.55->0.70) than before, so the central elements stay visible
+        // longer instead of disappearing early and leaving a quiet
+        // stretch before the sidebar takes over.
+        morphPairs.forEach(({ source, target }) => {
+          const morph = computeMorph(source, target);
+          tl.to(source, { x: morph.x, y: morph.y, scale: morph.scale, duration: 0.48 }, 0.12);
+          tl.to(source, { opacity: 0, duration: 0.15 }, 0.55);
+        });
+
+        // Elements with NO sidebar equivalent: stay put through state A,
+        // then fade fully out with at most a small leftward drift —
+        // never rightward, never re-styled. Slower/later fade (was
+        // 0.22->0.62, now 0.15->0.70) for the same "don't disappear too
+        // soon" reason as the morph pairs above.
+        if (noTargetGroup.length) {
+          tl.to(noTargetGroup, { x: -18, opacity: 0, duration: 0.55 }, 0.15);
+        }
+
+        // Nav separators ("|") have no sidebar equivalent either — faded
+        // via the CSS custom property instead of animating the
+        // `::after` content directly.
+        tl.fromTo(
+          navSepProxy,
+          { opacity: 1 },
+          {
+            opacity: 0,
+            duration: 0.4,
+            onUpdate: () => pinEl.style.setProperty("--nav-sep-opacity", navSepProxy.opacity.toFixed(3)),
+          },
+          0.12
+        );
+
+        // State C — 66% to 100%: the sidebar's own container/background
+        // appears via OPACITY ONLY (no `x`, so it never reads as sliding
+        // in from the left) while its targets — positioned all along,
+        // just hidden by the container's own opacity/visibility — crossfade
+        // into view along with it. `.is-active` (visibility/pointer-events/
+        // aria-hidden) is handled in `onUpdate` above, keyed off the same
+        // 0.66 threshold this tween starts at, and it deliberately starts
+        // BEFORE State B's fade-out fully finishes (0.66 vs. 0.70) so the
+        // two crossfade into each other with no gap between them. Ends at
+        // 1.0, the exact moment `pinEl` releases per the pin geometry
+        // above (the thing that actually guarantees no leftover gap now —
+        // this timing just keeps the sidebar's own settle in sync with it).
+        tl.fromTo(compactSidebarEl, { opacity: 0 }, { opacity: 1, duration: 0.34 }, 0.66);
+
+        // Warm backdrop crossfade — fades ONLY `.hx-pin-fade` (never
+        // `pinEl`'s own background, which no longer exists — see the
+        // <style> comment above `.hx-pin`), in the final 12% of the
+        // timeline. By this point `AboutSection`'s real dark background
+        // has already scrolled up to sit directly beneath the fixed pin
+        // (per `pinSpacing: false` above), so fading this single layer
+        // reveals it smoothly instead of the hard cut that would happen
+        // the instant the pin releases with no fade at all.
+        if (pinFadeEl) {
+          tl.to(pinFadeEl, { opacity: 0, duration: 0.12 }, 0.88);
+        }
+
+        // If this (re)build happens mid-scroll (e.g. a resize while already
+        // past the activation point), sync the sidebar's active state to
+        // the current scroll position immediately rather than waiting for
+        // the next scroll event.
+        const trigger = tl.scrollTrigger;
+        if (trigger) {
+          const active = trigger.progress > SIDEBAR_ACTIVATE_AT;
+          compactSidebarEl.classList.toggle("is-active", active);
+          compactSidebarEl.setAttribute("aria-hidden", active ? "false" : "true");
+        }
+
+        return tl;
+      }
+
+      function clearScrollDrivenState() {
+        pinEl.style.removeProperty("--portrait-blur");
+        pinEl.style.removeProperty("--nav-sep-opacity");
+        const morphSources = Array.from(introMotionEl.querySelectorAll<HTMLElement>("[data-morph-source]"));
+        const noTargetGroup = collectNoTargetGroup();
+        gsap.set([...morphSources, ...noTargetGroup], { clearProps: "all" });
+        gsap.set(compactSidebarEl, { clearProps: "opacity" });
+        const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
+        if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity" });
+        // Explicit `display: none` fallback for reduced-motion/mobile static
+        // mode (see `.hx-wrap.hx-static + .hx-compact-sidebar` in the
+        // <style> above) — this just resets the class/attribute state that
+        // CSS rule depends on, so the sidebar never sits in an inert,
+        // half-visible limbo.
+        compactSidebarEl.classList.remove("is-active");
+        compactSidebarEl.setAttribute("aria-hidden", "true");
+      }
+
+      let scrollTl: gsap.core.Timeline | null = null;
+
+      function evaluateMode() {
+        const shouldScroll = !prefersReducedMotion && isDesktopViewport();
+
+        if (shouldScroll) {
+          // Always rebuilt from scratch (never just `invalidate()`d): the
+          // morph's x/y/scale values are baked in from measured rects at
+          // build time, so a resize needs fresh measurements, not a replay
+          // of stale ones.
+          if (scrollTl) {
+            scrollTl.scrollTrigger?.kill();
+            scrollTl.kill();
+            scrollTl = null;
+          }
+          wrapEl.classList.remove("hx-static");
+          pinEl.classList.remove("hx-static");
+          scrollTl = buildScrollTimeline();
+        } else if (scrollTl) {
+          scrollTl.scrollTrigger?.kill();
+          scrollTl.kill();
+          scrollTl = null;
+          wrapEl.classList.add("hx-static");
+          pinEl.classList.add("hx-static");
+          clearScrollDrivenState();
+        }
+      }
+
+      // The very first measurement pass must wait for fonts/portrait decode
+      // — same readiness gate `playEntrance()` awaits — so the FLIP rects
+      // above aren't taken against not-yet-laid-out text/wordmark sizing.
+      // Deferred to a microtask/async boundary, so it re-enters the context
+      // via `ctx.add()` just like the resize/motion-pref handlers below.
+      async function bootScrollTimeline() {
+        try {
+          await document.fonts.ready;
+        } catch {
+          // Older browsers without document.fonts — proceed anyway.
+        }
+        const portraitImgEl = introMotionEl.querySelector<HTMLImageElement>(".hx-portrait img");
+        if (portraitImgEl && typeof portraitImgEl.decode === "function") {
+          try {
+            await portraitImgEl.decode();
+          } catch {
+            // decode() can reject on cache/network races — proceed anyway.
+          }
+        }
+        fitWordmarkWidth();
+        ctx.add(() => evaluateMode());
+        // Initial sync in case the page loads already scrolled mid-way
+        // through a dark section (e.g. a deep link/anchor, or a reload
+        // with scroll restoration) — otherwise every article would sit at
+        // its default "warm" state until the next scroll event.
+        checkArticleThemes();
+        // Same reasoning as the article-theme sync above, but for which
+        // sidebar link should read as active — built AFTER `evaluateMode()`
+        // has already constructed (or torn down) the hero's own pin/morph
+        // ScrollTrigger, so these measurements are taken against final
+        // geometry, then `ScrollTrigger.refresh()` makes every trigger
+        // (old and new) agree on final positions.
+        ctx.add(() => createNavActiveTriggers());
+        ScrollTrigger.refresh();
+      }
+
+      void bootScrollTimeline();
+
+      let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+      const onResize = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          fitWordmarkWidth();
+          // Re-entering the context here (via `ctx.add`) means anything
+          // `evaluateMode()` creates on this later, asynchronous call is
+          // still tracked for cleanup — not just the very first call above.
+          ctx.add(() => evaluateMode());
+        }, 120);
+      };
+      window.addEventListener("resize", onResize);
+
+      const onMotionPrefChange = (event: MediaQueryListEvent) => {
+        prefersReducedMotion = event.matches;
+        ctx.add(() => evaluateMode());
+      };
+      prefersReducedMotionQuery.addEventListener("change", onMotionPrefChange);
+
+      // ---- Per-article sidebar theme sync (GSAP + ScrollTrigger only,
+      // no React, no IntersectionObserver) --------------------------------
+      //
+      // The sidebar is transparent and each `.hx-sidebar-article` carries
+      // its own constant translucent `.hx-glass` background (see the
+      // <style> above) — so a section boundary crossing behind the
+      // sidebar is already visible THROUGH a card via alpha blending
+      // alone. What still needs deciding, independently per article, is
+      // whether that article's TEXT/BORDER should read as "warm" or
+      // "dark" for legibility. A single whole-sidebar toggle (the old
+      // IntersectionObserver keyed to the viewport's vertical center)
+      // forced every article to flip at once; here each article measures
+      // its OWN `getBoundingClientRect()` overlap against every real
+      // `.section-theme-dark` section and only that one article's colors
+      // tween.
+      const WARM_ART = {
+        "--art-text": "#000000",
+        "--art-text-muted": "#000000",
+        "--art-border": "rgba(26, 25, 25, 0.14)",
+        "--art-divider": "#000000",
+      };
+      const DARK_ART = {
+        "--art-text": "#ffffff",
+        "--art-text-muted": "#ffffff",
+        "--art-border": "rgb(255 255 255 / 14%)",
+        "--art-divider": "#ffffff",
+      };
+
+      interface ArticleThemeState {
+        el: HTMLElement;
+        isDark: boolean;
+        isNav: boolean;
+      }
+
+      const sidebarArticleEls = Array.from(
+        compactSidebarEl.querySelectorAll<HTMLElement>(".hx-sidebar-article")
+      );
+      const articleStates: ArticleThemeState[] = sidebarArticleEls.map((el) => ({
+        el,
+        isDark: false,
+        // The nav article uses a higher (~35%-of-its-own-height) overlap
+        // threshold than the others to avoid flicker — it's tall and thin,
+        // so a small sliver of overlap at its very top/bottom edge would
+        // otherwise flip it back and forth every few pixels of scroll.
+        isNav: el.classList.contains("hx-sidebar-nav"),
+      }));
+
+      function checkArticleThemes() {
+        if (!articleStates.length) return;
+        const darkSections = Array.from(document.querySelectorAll<HTMLElement>(".section-theme-dark"));
+
+        articleStates.forEach((state) => {
+          const artRect = state.el.getBoundingClientRect();
+          if (artRect.height <= 0) return;
+
+          let maxOverlap = 0;
+          darkSections.forEach((section) => {
+            const secRect = section.getBoundingClientRect();
+            const overlapTop = Math.max(artRect.top, secRect.top);
+            const overlapBottom = Math.min(artRect.bottom, secRect.bottom);
+            const overlap = Math.max(0, overlapBottom - overlapTop);
+            if (overlap > maxOverlap) maxOverlap = overlap;
+          });
+
+          const overlapRatio = maxOverlap / artRect.height;
+          // Brand/metrics/socials switch at the start of any real overlap;
+          // the nav article needs ~35% of its own height covered first.
+          const threshold = state.isNav ? 0.35 : 0.02;
+          const shouldBeDark = overlapRatio >= threshold;
+
+          // Only the article whose computed state actually CHANGED gets a
+          // new tween — every other article's existing tween (or resting
+          // state) is left alone, so nothing re-runs every scroll frame.
+          if (shouldBeDark === state.isDark) return;
+          state.isDark = shouldBeDark;
+          state.el.setAttribute("data-theme", shouldBeDark ? "dark" : "warm");
+          gsap.to(state.el, {
+            ...(shouldBeDark ? DARK_ART : WARM_ART),
+            duration: prefersReducedMotion ? 0 : 0.3,
+            ease: "power1.out",
+            overwrite: "auto",
+          });
+        });
+      }
+
+      const articleThemeTrigger = ScrollTrigger.create({
+        start: 0,
+        end: "max",
+        onUpdate: checkArticleThemes,
+        onRefresh: checkArticleThemes,
+      });
+
+      // ---- Sidebar active-link tracking (ScrollTrigger only, no new
+      // deps) ---------------------------------------------------------
+      //
+      // One ScrollTrigger per SECTION GROUP, not per link — Servicios and
+      // Tools are two nav entries but ONE shared visual section on the
+      // home page (`#services-tools`, containing `#services`/`#tools` as
+      // side-by-side columns), so they share a single trigger keyed to the
+      // combined wrapper and both light up together. Every other group
+      // has exactly one nav id. FAQ now gets its own group/trigger too
+      // (previously it had none, so Contacto stayed active by default —
+      // no longer the case: FAQ is now a real controlled link).
+      // `data-nav-id` (set on each sidebar link's markup above) is the
+      // section's real `id` — for Servicios/Tools that id belongs to the
+      // HOME PAGE's in-page column, not the `/servicios/`/`/tools/`
+      // subpage the link's `href` actually points to; the two are
+      // deliberately decoupled (see `sidebarNavItems` in the frontmatter).
+      const navLinkEls = Array.from(
+        compactSidebarEl.querySelectorAll<HTMLAnchorElement>("[data-nav-id]")
+      );
+
+      const NAV_TRIGGER_GROUPS: { sectionId: string; navIds: string[] }[] = [
+        { sectionId: "home", navIds: ["home"] },
+        { sectionId: "about", navIds: ["about"] },
+        { sectionId: "projects", navIds: ["projects"] },
+        { sectionId: "services-tools", navIds: ["services", "tools"] },
+        { sectionId: "contact", navIds: ["contact"] },
+        { sectionId: "faq", navIds: ["faq"] },
+      ];
+
+      // Sets one or more links active at once — the ONLY case with more
+      // than one is the Servicios+Tools group above. Always clears every
+      // non-matching link first, so outside that one group there is still
+      // never more than one active link at a time.
+      function setActiveSections(ids: string[]) {
+        navLinkEls.forEach((link) => {
+          const navId = link.getAttribute("data-nav-id");
+          const isMatch = !!navId && ids.includes(navId);
+          link.classList.toggle("is-active", isMatch);
+          // Servicios/Tools `href` points at a REAL, SEPARATE page
+          // (`/servicios/`, `/tools/`) — even while their sidebar entry
+          // reads as active (still on the home page, scrolled through
+          // their combined block), `aria-current="location"` would
+          // falsely claim that link represents the page currently
+          // loaded. Only same-page anchor links (`href` starting with
+          // "#") are eligible for it.
+          const isSamePageLink = (link.getAttribute("href") ?? "").startsWith("#");
+          if (isMatch && isSamePageLink) {
+            link.setAttribute("aria-current", "location");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      let navSectionTriggers: ReturnType<typeof ScrollTrigger.create>[] = [];
+
+      function createNavActiveTriggers() {
+        navSectionTriggers.forEach((trigger) => trigger.kill());
+        navSectionTriggers = [];
+
+        NAV_TRIGGER_GROUPS.forEach((group) => {
+          const sectionEl = document.getElementById(group.sectionId);
+          if (!sectionEl) return;
+          navSectionTriggers.push(
+            ScrollTrigger.create({
+              trigger: sectionEl,
+              start: "top 45%",
+              end: "bottom 45%",
+              onEnter: () => setActiveSections(group.navIds),
+              onEnterBack: () => setActiveSections(group.navIds),
+            })
+          );
+        });
+
+        // Initial sync: `onEnter`/`onEnterBack` only fire on a
+        // direction-based crossing, so on first load (or a reload already
+        // scrolled deep into the page via a deep link) none of them may
+        // have fired yet. Pick whichever group's section top has already
+        // passed the same "45% down the viewport" line each trigger above
+        // uses, taking the LAST one that qualifies (i.e. the most
+        // recently entered).
+        const viewportLine = window.innerHeight * 0.45;
+        let currentGroup: string[] | null = null;
+        NAV_TRIGGER_GROUPS.forEach((group) => {
+          const sectionEl = document.getElementById(group.sectionId);
+          if (!sectionEl) return;
+          const rect = sectionEl.getBoundingClientRect();
+          if (rect.top <= viewportLine) {
+            currentGroup = group.navIds;
+          }
+        });
+        if (currentGroup) setActiveSections(currentGroup);
+      }
+
+      return () => {
+        window.clearTimeout(resizeTimer);
+        window.removeEventListener("resize", onResize);
+        prefersReducedMotionQuery.removeEventListener("change", onMotionPrefChange);
+        articleThemeTrigger.kill();
+        navSectionTriggers.forEach((trigger) => trigger.kill());
+      };
+    }, wrapEl);
+
+    document.addEventListener("astro:before-swap", () => ctx.revert());
+  }
+</script>

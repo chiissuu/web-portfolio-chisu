@@ -1,0 +1,68 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { SimpleNavContent } from "../lib/content-types";
+
+interface Props {
+  t: SimpleNavContent;
+}
+
+const { t } = Astro.props as Props;
+const home = withBase("/");
+
+const navItems = [
+  { href: `${home}#about`, label: t.nav.about },
+  { href: `${home}#contact`, label: t.nav.contact },
+  { href: `${home}#projects`, label: t.nav.projects },
+  { href: `${home}#services`, label: t.nav.services },
+  { href: `${home}#tools`, label: t.nav.tools },
+];
+---
+
+<nav class="rd-simple-nav">
+  <a class="rd-simple-nav-logo" href={home}>CHIISSUU</a>
+  <div class="rd-simple-nav-links">
+    {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+  </div>
+</nav>
+
+<style>
+  .rd-simple-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1.25rem, 6vw, 4rem);
+    background: rgba(231, 232, 236, 0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .rd-simple-nav-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .rd-simple-nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.9rem, 2vw, 1.6rem);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+
+  .rd-simple-nav-links a:hover {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 700px) {
+    .rd-simple-nav-links {
+      display: none;
+    }
+  }
+</style>

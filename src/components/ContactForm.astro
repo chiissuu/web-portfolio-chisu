@@ -1,0 +1,118 @@
+---
+import type { ContactSectionContent } from "../lib/content-types";
+
+interface Props {
+  t: ContactSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const f = t.contact.form;
+const fields = f.fields;
+---
+
+<form
+  class="rd-form"
+  id="contact-form"
+  data-status="idle"
+  data-msg-loading={f.submitLoading}
+  data-msg-success={f.submitSuccess}
+  data-msg-error={f.submitError}
+  novalidate
+>
+  <div class="rd-form-grid">
+    <div class="rd-field" data-field="name">
+      <label for="contact-name">{fields.name}</label>
+      <input id="contact-name" name="name" type="text" autocomplete="name" required />
+    </div>
+
+    <div class="rd-field" data-field="email">
+      <label for="contact-email">{fields.email}</label>
+      <input id="contact-email" name="email" type="email" autocomplete="email" required />
+    </div>
+
+    <div class="rd-field" data-field="reason">
+      <label for="contact-reason">{fields.reason}</label>
+      <select id="contact-reason" name="reason" required>
+        <option value="" selected disabled>{fields.reason}</option>
+        {fields.reasonOptions.map((option) => <option value={option}>{option}</option>)}
+      </select>
+    </div>
+
+    <div class="rd-field" data-field="subject">
+      <label for="contact-subject">{fields.subject}</label>
+      <input id="contact-subject" name="subject" type="text" required />
+    </div>
+
+    <div class="rd-field rd-field-full" data-field="message">
+      <label for="contact-message">{fields.message}</label>
+      <textarea id="contact-message" name="message" required></textarea>
+    </div>
+
+    <div class="rd-field rd-field-full" data-field="preferredResponse">
+      <label for="contact-preferred">{fields.preferredResponse}</label>
+      <select id="contact-preferred" name="preferredResponse" required>
+        <option value="" selected disabled>{fields.preferredResponse}</option>
+        {fields.preferredResponseOptions.map((option) => <option value={option}>{option}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="rd-form-actions">
+    <button class="rd-btn rd-btn-primary" type="submit">{f.submitIdle}</button>
+    <p class="rd-form-status" data-role="status" role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+<script>
+  import type { ContactFormData } from "../lib/forms/types";
+  import { validateContactForm } from "../lib/forms/validate";
+  import { submitFormPlaceholder } from "../lib/forms/submit";
+
+  const form = document.getElementById("contact-form") as HTMLFormElement | null;
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const statusEl = form.querySelector<HTMLElement>('[data-role="status"]');
+    const formData = new FormData(form);
+
+    const data: ContactFormData = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      reason: String(formData.get("reason") ?? ""),
+      subject: String(formData.get("subject") ?? ""),
+      message: String(formData.get("message") ?? ""),
+      preferredResponse: String(formData.get("preferredResponse") ?? ""),
+    };
+
+    form.querySelectorAll("[data-field]").forEach((field) => {
+      field.removeAttribute("data-invalid");
+    });
+
+    const errors = validateContactForm(data);
+
+    if (errors.length > 0) {
+      form.dataset.status = "error";
+      if (statusEl) statusEl.textContent = form.dataset.msgError ?? "";
+
+      errors.forEach((error) => {
+        const field = form.querySelector(`[data-field="${error.field}"]`);
+        field?.setAttribute("data-invalid", "true");
+      });
+
+      return;
+    }
+
+    form.dataset.status = "loading";
+    if (statusEl) statusEl.textContent = form.dataset.msgLoading ?? "";
+
+    const result = await submitFormPlaceholder(data);
+
+    form.dataset.status = result.ok ? "success" : "error";
+    if (statusEl) {
+      statusEl.textContent = result.ok
+        ? form.dataset.msgSuccess ?? ""
+        : form.dataset.msgError ?? "";
+    }
+  });
+</script>

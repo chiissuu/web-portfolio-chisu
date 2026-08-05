@@ -1,0 +1,191 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { ServicesToolsSectionContent } from "../lib/content-types";
+import SectionHeadingCard from "./SectionHeadingCard.astro";
+
+interface Props {
+  t: ServicesToolsSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const servicesHref = withBase("/servicios/");
+const toolsHref = withBase("/tools/");
+const toolExample = t.tools.page.items[0];
+---
+
+<section class="section-theme-dark" id="services-tools">
+  <div class="section-inner">
+    <SectionHeadingCard text={t.servicesTools.title} as="h2" size="lg" />
+
+    <div class="st-columns">
+      <div class="st-col" id="services">
+        <p class="st-col-label">{t.services.eyebrow}</p>
+
+        <p class="st-description editorial-text">
+          {t.servicesTools.services.description.map((segment) =>
+            segment.strong ? <strong>{segment.text}</strong> : segment.text
+          )}
+        </p>
+
+        <a class="st-cta" href={servicesHref}>
+          <span class="st-cta-label">{t.servicesTools.services.ctaLabel}</span>
+          <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
+        </a>
+      </div>
+
+      <div class="st-divider" aria-hidden="true"></div>
+
+      <div class="st-col" id="tools">
+        <p class="st-col-label">{t.tools.eyebrow}</p>
+
+        <p class="st-description editorial-text">{t.servicesTools.tools.description}</p>
+
+        {toolExample && (
+          <article class="st-tool-example">
+            <p class="st-tool-status">{toolExample.status}</p>
+            <h4 class="st-tool-title">{toolExample.title}</h4>
+            <p class="st-tool-text editorial-text editorial-text-muted">{toolExample.text}</p>
+            <div class="st-tool-tags">
+              {toolExample.tags.map((tag) => <span>{tag}</span>)}
+            </div>
+          </article>
+        )}
+
+        <a class="st-cta" href={toolsHref}>
+          <span class="st-cta-label">{t.servicesTools.tools.ctaLabel}</span>
+          <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .st-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    margin-top: 1rem;
+  }
+
+  .st-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .st-divider {
+    width: 1px;
+    background: var(--theme-border);
+  }
+
+  .st-col-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+  }
+
+  .st-description {
+    color: var(--theme-text-muted);
+  }
+
+  .st-description strong {
+    color: var(--theme-text);
+    font-weight: 700;
+  }
+
+  .st-tool-example {
+    padding: 1.25rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    background: var(--theme-surface);
+  }
+
+  .st-tool-status {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-brand-gold);
+    margin-bottom: 0.6rem;
+  }
+
+  .st-tool-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem;
+    color: var(--theme-text);
+  }
+
+  .st-tool-text {
+    font-size: 0.92rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .st-tool-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .st-tool-tags span {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--theme-border);
+    font-size: 0.7rem;
+    color: var(--theme-text-muted);
+  }
+
+  /* Large typographic CTA — full clickable block, not a small pill button. */
+  .st-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--theme-border);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--theme-text);
+    transition: gap 0.25s ease, color 0.25s ease;
+  }
+
+  .st-cta-arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+    color: var(--color-brand-gold);
+    font-size: 1.3em;
+  }
+
+  .st-cta:hover,
+  .st-cta:focus-visible {
+    gap: 1.6rem;
+    color: var(--color-brand-gold);
+  }
+
+  .st-cta:hover .st-cta-arrow,
+  .st-cta:focus-visible .st-cta-arrow {
+    transform: translateX(6px);
+  }
+
+  .st-cta:focus-visible {
+    outline: 2px solid var(--color-brand-gold);
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 900px) {
+    .st-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .st-divider {
+      width: 100%;
+      height: 1px;
+    }
+  }
+</style>

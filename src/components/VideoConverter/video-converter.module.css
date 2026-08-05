@@ -1,0 +1,204 @@
+/*
+  Only the pieces of UI that don't already exist elsewhere in the project
+  get new rules here (dropzone, progress bar, file-info grid, notices).
+  Everything else — buttons, labelled selects, section headings, the
+  translucent "cristal opaco" surface — reuses the global classes already
+  defined in `Layout.astro` (`.rd-btn`, `.rd-btn-primary`, `.rd-btn-ghost`,
+  `.rd-field`, `.glass-panel`, `.rd-eyebrow`, `.rd-title`, `.rd-note`,
+  `.rd-form-status`) instead of duplicating that styling here. CSS Modules
+  (not a global stylesheet) so none of this can collide with the rest of
+  the site's class names — the only place in the project React needs its
+  own scoped styles.
+*/
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 46rem;
+}
+
+.notices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.noticeMark {
+  flex: none;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15em 0.5em;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: clamp(2rem, 6vw, 3.5rem) 1.5rem;
+  border: 1.5px dashed var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzoneActive {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.dropzoneLabel {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dropzoneHint {
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+}
+
+/* Kept in the accessibility tree (focusable, announced by screen readers)
+   and NOT `display: none` — only visually hidden, via the standard
+   clip-based technique, so Tab still reaches it and native
+   Enter/Space-to-activate keeps working. The visible "Seleccionar archivo"
+   button is the <label> wrapping it; see DropZone.tsx. */
+.hiddenFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fileInputLabel {
+  cursor: pointer;
+}
+
+.fileInputLabel:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.fileInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1.5rem;
+  padding: 1.25rem 1.4rem;
+}
+
+.fileInfoTerm {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+  margin: 0 0 0.2rem;
+}
+
+.fileInfoValue {
+  margin: 0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+@media (max-width: 560px) {
+  .fileInfoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.optionsRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 560px) {
+  .optionsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progressPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem 1.4rem;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.86rem;
+}
+
+.progressPercent {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.progressBar {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border: none;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.progressBar::-webkit-progress-bar {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+.progressBar::-webkit-progress-value {
+  background: var(--color-accent);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.progressBar::-moz-progress-bar {
+  background: var(--color-accent);
+  border-radius: 999px;
+}
+
+.resultPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.25rem 1.4rem;
+}

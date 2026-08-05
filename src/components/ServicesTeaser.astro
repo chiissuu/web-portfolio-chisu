@@ -1,0 +1,54 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { ServicesSectionContent } from "../lib/content-types";
+
+interface Props {
+  t: ServicesSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const href = withBase("/servicios/");
+---
+
+<section class="rd-section rd-services" id="services">
+  <p class="rd-eyebrow">{t.services.eyebrow}</p>
+  <h2 class="rd-title">{t.services.title}</h2>
+  <p class="rd-note">{t.services.intro}</p>
+
+  <ul class="rd-services-list rd-reveal">
+    {t.services.items.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <a class="rd-btn rd-btn-primary" href={href}>{t.services.cta}</a>
+</section>
+
+<style>
+  .rd-services-list {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 62rem;
+    margin-bottom: 2.25rem;
+    list-style: none;
+  }
+
+  .rd-services-list li {
+    position: relative;
+    padding: 0.9rem 1.1rem 0.9rem 1.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .rd-services-list li::before {
+    content: "";
+    position: absolute;
+    left: 0.9rem;
+    top: 1.15rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+</style>

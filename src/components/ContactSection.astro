@@ -1,0 +1,158 @@
+---
+import ContactForm from "./ContactForm.astro";
+import type { ContactSectionContent } from "../lib/content-types";
+import SectionHeadingCard from "./SectionHeadingCard.astro";
+
+interface Props {
+  t: ContactSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const links = t.contact.links;
+---
+
+<section class="section-theme-warm" id="contact">
+  <div class="section-inner">
+    <p class="rd-eyebrow">{t.contact.eyebrow}</p>
+    <SectionHeadingCard text={t.contact.title} as="h2" size="lg" />
+
+    <div class="ct-cards rd-reveal">
+      <!-- LinkedIn: no real URL exists anywhere in the content system, so
+           this is intentionally not a link — `aria-disabled`, focusable,
+           with an accessible tooltip (not a permanent "Próximamente"). -->
+      <span
+        class="ct-card ct-card-disabled"
+        aria-disabled="true"
+        tabindex="0"
+        aria-describedby="ct-linkedin-tooltip"
+      >
+        <span class="ct-card-label">{links.linkedinLabel}</span>
+        <span class="ct-tooltip" role="tooltip" id="ct-linkedin-tooltip">{links.linkedinTooltip}</span>
+      </span>
+
+      <a class="ct-card" href={links.github} target="_blank" rel="noopener noreferrer">
+        <span class="ct-card-label">{links.githubLabel}</span>
+        <span class="ct-card-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+
+      <a class="ct-card" href={links.linktree} target="_blank" rel="noopener noreferrer">
+        <span class="ct-card-label">{links.linktreeLabel}</span>
+        <span class="ct-card-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+    </div>
+
+    <p class="ct-closing editorial-text rd-reveal">{t.contact.text}</p>
+
+    <div class="ct-form rd-reveal">
+      <ContactForm t={t} />
+    </div>
+
+    <div class="ct-email rd-reveal">
+      <p class="editorial-text editorial-text-muted">{t.contact.emailIntro}</p>
+      <a class="ct-email-btn" href={`mailto:${links.email}`}>{links.email}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ct-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .ct-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 10px;
+    background: var(--theme-surface-strong);
+    font-weight: 700;
+    color: var(--theme-text);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .ct-card:not(.ct-card-disabled):hover,
+  .ct-card:not(.ct-card-disabled):focus-visible {
+    border-color: var(--color-brand-gold-strong);
+    transform: translateY(-2px);
+  }
+
+  .ct-card-arrow {
+    color: var(--color-brand-gold-strong);
+  }
+
+  .ct-card-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .ct-tooltip {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .ct-card-disabled:hover .ct-tooltip,
+  .ct-card-disabled:focus-visible .ct-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .ct-closing {
+    max-width: 60ch;
+    margin-bottom: 2.5rem;
+    color: var(--theme-text-muted);
+  }
+
+  .ct-form {
+    margin-bottom: 3rem;
+  }
+
+  .ct-email {
+    padding-top: 2rem;
+    border-top: 1px solid var(--theme-border);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ct-email-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    background: var(--color-brand-gold);
+    color: var(--color-ink);
+    font-weight: 700;
+    transition: transform 0.2s ease;
+  }
+
+  .ct-email-btn:hover,
+  .ct-email-btn:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 700px) {
+    .ct-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

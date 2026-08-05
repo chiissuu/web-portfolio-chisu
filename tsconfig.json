@@ -1,0 +1,15 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    // React is the only JSX/TSX framework in this project (used solely by
+    // the video converter tool) — overridden explicitly here rather than
+    // relying on the preset default, so `.tsx` files typecheck against
+    // React's JSX namespace regardless of what `astro/tsconfigs/strict`
+    // assumes for `.astro` files (which aren't affected by this setting;
+    // Astro typechecks them through its own compiler output, not raw JSX).
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
+}

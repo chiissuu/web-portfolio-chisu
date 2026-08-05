@@ -1,0 +1,114 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { ToolsSectionContent } from "../lib/content-types";
+
+interface Props {
+  t: ToolsSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const page = t.tools.page;
+---
+
+<main class="rd-page">
+  <section class="rd-section rd-page-hero">
+    <p class="rd-eyebrow">{page.eyebrow}</p>
+    <h1 class="rd-title">{page.title}</h1>
+    <p class="rd-note">{page.intro}</p>
+  </section>
+
+  <section class="rd-section rd-page-tools">
+    <div class="rd-tool-grid">
+      {page.items.map((item) => (
+        <article class="rd-tool-card rd-reveal">
+          <p class="rd-tool-status">{item.status}</p>
+          <h2>{item.title}</h2>
+          <p>{item.text}</p>
+          <div class="rd-tags">
+            {item.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+          {item.href ? (
+            <a class="rd-btn rd-btn-ghost rd-tool-cta" href={withBase(item.href)}>{item.cta}</a>
+          ) : (
+            <span class="rd-btn rd-btn-ghost rd-tool-cta" aria-disabled="true">{item.cta}</span>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+</main>
+
+<style>
+  .rd-page-hero {
+    border-top: none;
+    padding-top: clamp(6rem, 12vw, 8rem);
+  }
+
+  .rd-tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .rd-tool-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+  }
+
+  .rd-tool-status {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-2);
+    margin-bottom: 0.6rem;
+  }
+
+  .rd-tool-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rd-tool-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .rd-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
+  }
+
+  .rd-tags span {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    font-size: 0.72rem;
+    color: var(--color-text-dim);
+  }
+
+  .rd-tool-cta {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  /* Only the placeholder "coming soon" tools (no `item.href`, rendered as a
+     `<span>` instead of a real `<a>`) are inert. */
+  span.rd-tool-cta {
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    .rd-tool-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

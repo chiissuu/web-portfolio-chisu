@@ -1,0 +1,32 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HeroExperience from "../components/HeroExperience.astro";
+import AboutSection from "../components/AboutSection.astro";
+import ContactSection from "../components/ContactSection.astro";
+import ProjectsSection from "../components/ProjectsSection.astro";
+import ServicesToolsSection from "../components/ServicesToolsSection.astro";
+import FaqSection from "../components/FaqSection.astro";
+import { content } from "../content/site.js";
+
+// The live site is Spanish-only for now — `content.en` exists fully typed
+// and translated in `src/content/site.js`, ready for a future locale
+// switcher, but no `/en` route renders it yet.
+const t = content.es;
+---
+
+{/*
+  Section order per the redesign spec: Home (hero) -> Sobre mí -> Proyectos ->
+  Servicios y Tools -> Contacto -> FAQ. No footer/closing statement after
+  FAQ — `ClosingStatement.astro` is intentionally not rendered here anymore
+  (left in place, unused, rather than deleted — see delivery notes).
+*/}
+<Layout title={t.seo.title} description={t.seo.description} bodyClass="redesign redesign-home" lang="es">
+  <HeroExperience t={t} />
+  <main class="home-main">
+    <AboutSection t={t} />
+    <ProjectsSection t={t} />
+    <ServicesToolsSection t={t} />
+    <ContactSection t={t} />
+    <FaqSection t={t} />
+  </main>
+</Layout>

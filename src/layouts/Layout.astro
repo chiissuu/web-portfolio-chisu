@@ -1,0 +1,482 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  bodyClass?: string;
+  lang?: string;
+}
+
+const {
+  title,
+  description = "",
+  bodyClass = "",
+  lang = "es",
+} = Astro.props as Props;
+
+const fontHref =
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Archivo+Black&family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={fontHref} />
+    <link rel="icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/assets/icons/logo-chiissuu.png`} type="image/png" />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>
+
+<script>
+  const reveals = document.querySelectorAll(".rd-reveal");
+
+  if ("IntersectionObserver" in window && reveals.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("rd-in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    reveals.forEach((el) => observer.observe(el));
+  } else {
+    reveals.forEach((el) => el.classList.add("rd-in"));
+  }
+</script>
+
+<style is:global>
+  :where(*) {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :where(html) {
+    scroll-behavior: smooth;
+  }
+
+  :where(img) {
+    max-width: 100%;
+    display: block;
+  }
+
+  :where(a) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :where(button) {
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .redesign {
+    /* primitives */
+    --p-black: #08090b;
+    --p-gray-950: #0e0f13;
+    --p-gray-900: #15171c;
+    --p-gray-800: #1d2027;
+    --p-gray-600: #3a3e48;
+    --p-gray-400: #71757f;
+    --p-gray-200: #c3c6cf;
+    --p-gray-100: #e7e8ec;
+    --p-white: #ffffff;
+    --p-gold-700: #8a6a1f;
+    --p-gold-500: #b8902c;
+    --p-gold-300: #e8d3a0;
+    --p-pink-500: #ef6cae;
+
+    /* semantic */
+    --color-bg: #d5cfbe;
+    --color-surface: var(--p-white);
+    --color-surface-2: var(--p-gray-200);
+    --color-border: rgba(8, 9, 11, 0.1);
+    --color-text: var(--p-black);
+    --color-text-muted: var(--p-gray-600);
+    --color-text-dim: var(--p-gray-400);
+    --color-accent: var(--p-gold-700);
+    --color-accent-soft: rgba(138, 106, 31, 0.14);
+    --color-accent-2: var(--p-gold-500);
+    --color-accent-3: var(--p-pink-500);
+
+    /* CHIISSUU brand tokens — single source of truth for the hero */
+    --color-brand-gold: #e0c58b;
+    --color-brand-gold-strong: #8a6420;
+    --color-ink: #1a1919;
+    --color-paper: #f8f7f3;
+    --color-line: rgb(26 25 25 / 14%);
+
+    --font-display: "Space Grotesk", sans-serif;
+    --font-wordmark: "Archivo Black", "Space Grotesk", sans-serif;
+    --font-title: "Inter Tight", "Inter", sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    /* Editorial body copy across the redesigned sections. The licensed
+       woff2 isn't in this project (see the @font-face below) — until it's
+       added, every one of these falls through to "Inter", which is already
+       loaded above. */
+    --font-editorial: "PP Neue Montreal Book", "PP Neue Montreal", "Inter", Arial, sans-serif;
+
+    /* Dark section gradient (Sobre mí / Servicios y Tools / FAQ) —
+       provisional values, centralized here so they're a single edit once a
+       final reference image is provided. */
+    --section-dark-start: #050505;
+    --section-dark-center: #1b1b1f;
+    --section-dark-end: #050505;
+
+    --container: 1240px;
+
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+
+  /* Reserves room for HeroExperience's persistent, `position: fixed`
+     compact sidebar on the real homepage only (`bodyClass="redesign
+     redesign-home"`, set in src/pages/index.astro — other redesigned pages
+     don't render that sidebar and must not get this compensation). Single
+     source of truth for the sidebar's width: HeroExperience.astro's
+     `.hx-compact-sidebar` reads this same `--hx-sidebar-width` variable
+     (inherited down from `<body>`), so the sidebar and the space reserved
+     for it here can never drift out of sync.
+
+     IMPORTANT: the compensation goes on `.section-inner` (defined below),
+     NOT on `.home-main`/the outer `.section-theme-warm`/`.section-theme-dark`
+     wrapper. Those outer elements must stay full-width so their background
+     paints edge-to-edge, including the strip behind the fixed sidebar —
+     shifting THAT container would pull the background itself away from
+     that edge, breaking the theme boundary/sidebar transition (see
+     `.hx-sidebar-article` and `data-bg-theme` in HeroExperience.astro).
+     `.section-inner` has no background of its own — only a content-width
+     constraint — so it's safe to reposition however's clearest; below
+     that's a `margin-inline-start`/`margin-inline-end: auto` pair rather
+     than relying on `.section-inner`'s own `margin: 0 auto` centering
+     (which sizes itself off the FULL viewport width, independent of where
+     the sidebar actually ends — that mismatch was the real cause of the
+     content start position not tracking the sidebar's real width). */
+  body.redesign-home {
+    --hx-sidebar-width: clamp(15.5rem, 22vw, 19.5rem);
+    /* Horizontal breathing room between the fixed sidebar's right edge and
+       where home-page content actually starts — see the sidebar
+       compensation rule on `.section-inner` below, which computes content
+       start as sidebar-left(0) + `--hx-sidebar-width` + this gap, not a
+       fixed/measured-at-one-viewport-size offset. */
+    --sidebar-content-gap: clamp(4.5rem, 6vw, 7.5rem);
+  }
+
+  /* PP Neue Montreal Book — licensed font, not bundled with this project.
+     Point this at the real file once it's added under
+     `public/assets/fonts/`; until then the request 404s silently and every
+     `var(--font-editorial)` consumer falls back to "Inter" (already loaded
+     via Google Fonts above). Root-relative on purpose, matching this
+     project's unset `base` — if `base` is ever configured this path needs
+     to move to a BASE_URL-aware injection instead. */
+  @font-face {
+    font-family: "PP Neue Montreal Book";
+    src: url("/assets/fonts/PPNeueMontreal-Book.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(*) {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    :where(html) {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* ============================================================
+     Shared section theme system (redesigned home sections only —
+     ServicesPageContent/ToolsPageContent on the /servicios and /tools
+     sub-pages keep using `.rd-section` below, untouched).
+
+     Every section is TWO nested elements: an outer `.section-theme-warm`
+     or `.section-theme-dark` (full-bleed background, no max-width) and an
+     inner `.section-inner` (the actual content-width limit). Both themes
+     expose the same `--theme-*` custom properties so components can stay
+     theme-agnostic and just read `var(--theme-text)` etc.
+     ============================================================ */
+  .section-theme-warm,
+  .section-theme-dark {
+    width: 100%;
+  }
+
+  .section-theme-warm {
+    background: var(--color-bg);
+    --theme-text: var(--color-ink);
+    --theme-text-muted: rgba(26, 25, 25, 0.62);
+    --theme-border: var(--color-line);
+    --theme-surface: rgb(255 255 255 / 55%);
+    --theme-surface-strong: rgb(255 255 255 / 85%);
+  }
+
+  .section-theme-dark {
+    background: linear-gradient(
+      180deg,
+      var(--section-dark-start) 0%,
+      var(--section-dark-center) 50%,
+      var(--section-dark-end) 100%
+    );
+    --theme-text: #f8f7f3;
+    --theme-text-muted: rgb(248 247 243 / 66%);
+    --theme-border: rgb(255 255 255 / 14%);
+    --theme-surface: rgb(255 255 255 / 6%);
+    --theme-surface-strong: rgb(255 255 255 / 10%);
+  }
+
+  .section-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: clamp(4.5rem, 8vw, 7rem) clamp(1.25rem, 6vw, 4rem);
+    color: var(--theme-text);
+  }
+
+  /* The actual sidebar compensation (see the long comment above
+     `body.redesign-home` near the top of this file) — home page only
+     (`.section-inner` is exclusively used by the 5 redesigned home
+     sections — About/Projects/Servicios y Tools/Contacto/FAQ — never by
+     `/servicios` or `/tools`, which use the separate, untouched
+     `.rd-section`), desktop only (the sidebar doesn't exist on mobile,
+     see `.hx-compact-sidebar`'s `display: none` under `max-width: 899px`
+     in HeroExperience.astro; below 900px this rule simply doesn't apply
+     and `.section-inner`'s own `margin: 0 auto` centering — untouched —
+     takes back over). Content start = the sidebar's own left edge (0,
+     it's `inset-inline-start: 0`) + its real rendered width
+     (`--hx-sidebar-width`) + a fixed gap (`--sidebar-content-gap`, set
+     above) — never a `translateX` and never a value measured at one
+     specific viewport size. `margin-inline-end: auto` (not a second fixed
+     value) absorbs whatever space is left on the right, same as the
+     un-compensated centering did. */
+  @media (min-width: 900px) {
+    body.redesign-home .section-inner {
+      margin-inline-start: calc(var(--hx-sidebar-width) + var(--sidebar-content-gap));
+      margin-inline-end: auto;
+    }
+  }
+
+  /* Shared "cristal opaco" (glass) surface — the exact finish
+     `SectionHeadingCard`'s title card already uses (translucent
+     `--theme-surface-strong` background, thin `--theme-border`, low
+     border-radius), extracted here so every card that needs this look
+     (the hero's metric/chip cards, the compact sidebar's articles) shares
+     ONE definition instead of separate approximations. Backdrop-filter and
+     a contained shadow are additive on top of what `SectionHeadingCard`
+     already had. Falls back to sensible warm-theme values when nested
+     outside any `.section-theme-warm`/`.section-theme-dark`/`data-bg-theme`
+     scope (same fallback chain `SectionHeadingCard` already used). */
+  .glass-panel {
+    background: var(--theme-surface-strong, var(--theme-surface, rgb(255 255 255 / 55%)));
+    border: 1px solid var(--theme-border, var(--color-line));
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(8, 9, 11, 0.1);
+    color: var(--theme-text, var(--color-ink));
+    transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+  }
+
+  /* Editorial body copy — the font system requested for every redesigned
+     section's paragraph text. Headings use `--font-display`/`--font-title`
+     as before; this is specifically for prose. */
+  .editorial-text {
+    font-family: var(--font-editorial);
+    font-weight: 400;
+    line-height: 1.6;
+    font-size: clamp(1rem, 1.25vw, 1.2rem);
+    max-width: 70ch;
+    color: var(--theme-text, var(--color-text));
+  }
+
+  .editorial-text-muted {
+    color: var(--theme-text-muted, var(--color-text-muted));
+  }
+
+  /* Shared section/typography primitives reused by every redesign section component */
+  .rd-section {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: clamp(4.5rem, 8vw, 7rem) clamp(1.25rem, 6vw, 4rem);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .rd-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+  }
+
+  /* `--color-accent` (#8a6a1f) is tuned for the warm background; on a dark
+     section it reads low-contrast, so swap to the lighter brand gold. */
+  .section-theme-dark .rd-eyebrow {
+    color: var(--color-brand-gold);
+  }
+
+  .rd-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.4vw, 2.7rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 1.75rem;
+  }
+
+  .rd-note {
+    max-width: 62ch;
+    color: var(--color-text-dim);
+    font-size: 0.92rem;
+    margin-bottom: 2rem;
+  }
+
+  .rd-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rd-btn-primary {
+    background: var(--color-accent);
+    color: var(--p-black);
+  }
+
+  .rd-btn-ghost {
+    border-color: var(--color-border);
+    color: var(--color-text);
+    background: rgba(8, 9, 11, 0.03);
+  }
+
+  .rd-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .rd-reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .rd-reveal.rd-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Shared form primitives reused by ContactForm and ServicesForm */
+  .rd-form {
+    display: grid;
+    gap: 1rem;
+    max-width: 720px;
+  }
+
+  .rd-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .rd-field {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .rd-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .rd-field label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--color-text-dim);
+  }
+
+  .rd-field input,
+  .rd-field select,
+  .rd-field textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.72rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  .rd-field textarea {
+    min-height: 130px;
+    resize: vertical;
+  }
+
+  .rd-field input:focus,
+  .rd-field select:focus,
+  .rd-field textarea:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+    border-color: var(--color-accent);
+  }
+
+  .rd-field[data-invalid="true"] input,
+  .rd-field[data-invalid="true"] select,
+  .rd-field[data-invalid="true"] textarea {
+    border-color: var(--color-accent-3);
+  }
+
+  .rd-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .rd-form-status {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    min-height: 1.2em;
+  }
+
+  .rd-form[data-status="error"] .rd-form-status {
+    color: var(--color-accent-3);
+  }
+
+  .rd-form[data-status="success"] .rd-form-status {
+    color: var(--color-accent);
+  }
+
+  .rd-form[data-status="loading"] .rd-btn-primary {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  @media (max-width: 700px) {
+    .rd-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

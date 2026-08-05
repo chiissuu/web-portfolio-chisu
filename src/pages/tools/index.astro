@@ -1,0 +1,18 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SimpleNav from "../../components/SimpleNav.astro";
+import ToolsPageContent from "../../components/ToolsPageContent.astro";
+import { content } from "../../content/site.js";
+
+const t = content.es;
+---
+
+<Layout
+  title={`${t.tools.page.title} | ${t.seo.title}`}
+  description={t.tools.page.intro}
+  bodyClass="redesign"
+  lang="es"
+>
+  <SimpleNav t={t} />
+  <ToolsPageContent t={t} />
+</Layout>

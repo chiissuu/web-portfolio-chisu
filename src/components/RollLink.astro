@@ -1,0 +1,64 @@
+---
+// Masked vertical text rollover ("vertical text swap") for nav links.
+// Accessible pattern: the visible duplicated text is aria-hidden and the
+// anchor itself carries the accessible name via aria-label, so screen
+// readers announce the link once, not twice.
+interface Props {
+  href: string;
+  label: string;
+  class?: string;
+}
+
+const { href, label, class: className = "" } = Astro.props;
+---
+
+<a class:list={["roll-link", className]} href={href} aria-label={label}>
+  <span class="roll-mask" aria-hidden="true">
+    <span class="roll-current">{label}</span>
+    <span class="roll-clone">{label}</span>
+  </span>
+</a>
+
+<style>
+  .roll-link {
+    position: relative;
+    display: inline-block;
+  }
+
+  .roll-mask {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+
+  .roll-current,
+  .roll-clone {
+    display: block;
+    white-space: nowrap;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .roll-clone {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    transform: translateY(110%);
+  }
+
+  .roll-link:hover .roll-current,
+  .roll-link:focus-visible .roll-current {
+    transform: translateY(-110%);
+  }
+
+  .roll-link:hover .roll-clone,
+  .roll-link:focus-visible .roll-clone {
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roll-current,
+    .roll-clone {
+      transition: none;
+    }
+  }
+</style>

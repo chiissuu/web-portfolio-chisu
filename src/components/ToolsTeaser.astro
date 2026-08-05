@@ -1,0 +1,19 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { ToolsSectionContent } from "../lib/content-types";
+
+interface Props {
+  t: ToolsSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const href = withBase("/tools/");
+---
+
+<section class="rd-section rd-tools" id="tools">
+  <p class="rd-eyebrow">{t.tools.eyebrow}</p>
+  <h2 class="rd-title">{t.tools.title}</h2>
+  <p class="rd-note">{t.tools.intro}</p>
+
+  <a class="rd-btn rd-btn-primary" href={href}>{t.tools.cta}</a>
+</section>

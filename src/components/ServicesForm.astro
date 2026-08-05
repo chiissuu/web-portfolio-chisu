@@ -1,0 +1,137 @@
+---
+import type { ServicesSectionContent } from "../lib/content-types";
+
+interface Props {
+  t: ServicesSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const f = t.services.page.form;
+const fields = f.fields;
+---
+
+<form
+  class="rd-form"
+  id="services-form"
+  data-status="idle"
+  data-msg-loading={f.submitLoading}
+  data-msg-success={f.submitSuccess}
+  data-msg-error={f.submitError}
+  novalidate
+>
+  <h3 class="rd-form-title">{f.title}</h3>
+
+  <div class="rd-form-grid">
+    <div class="rd-field" data-field="name">
+      <label for="services-name">{fields.name}</label>
+      <input id="services-name" name="name" type="text" autocomplete="name" required />
+    </div>
+
+    <div class="rd-field" data-field="email">
+      <label for="services-email">{fields.email}</label>
+      <input id="services-email" name="email" type="email" autocomplete="email" required />
+    </div>
+
+    <div class="rd-field" data-field="company">
+      <label for="services-company">{fields.company}</label>
+      <input id="services-company" name="company" type="text" />
+    </div>
+
+    <div class="rd-field" data-field="serviceType">
+      <label for="services-type">{fields.serviceType}</label>
+      <select id="services-type" name="serviceType" required>
+        <option value="" selected disabled>{fields.serviceType}</option>
+        {fields.serviceOptions.map((option) => <option value={option}>{option}</option>)}
+      </select>
+    </div>
+
+    <div class="rd-field" data-field="budget">
+      <label for="services-budget">{fields.budget}</label>
+      <input id="services-budget" name="budget" type="text" />
+    </div>
+
+    <div class="rd-field" data-field="timeline">
+      <label for="services-timeline">{fields.timeline}</label>
+      <input id="services-timeline" name="timeline" type="text" />
+    </div>
+
+    <div class="rd-field rd-field-full" data-field="problem">
+      <label for="services-problem">{fields.problem}</label>
+      <textarea id="services-problem" name="problem" required></textarea>
+    </div>
+
+    <div class="rd-field rd-field-full" data-field="message">
+      <label for="services-message">{fields.message}</label>
+      <textarea id="services-message" name="message"></textarea>
+    </div>
+  </div>
+
+  <div class="rd-form-actions">
+    <button class="rd-btn rd-btn-primary" type="submit">{f.submitIdle}</button>
+    <p class="rd-form-status" data-role="status" role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+<style>
+  .rd-form-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+</style>
+
+<script>
+  import type { ServicesFormData } from "../lib/forms/types";
+  import { validateServicesForm } from "../lib/forms/validate";
+  import { submitFormPlaceholder } from "../lib/forms/submit";
+
+  const form = document.getElementById("services-form") as HTMLFormElement | null;
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const statusEl = form.querySelector<HTMLElement>('[data-role="status"]');
+    const formData = new FormData(form);
+
+    const data: ServicesFormData = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      company: String(formData.get("company") ?? ""),
+      serviceType: String(formData.get("serviceType") ?? ""),
+      budget: String(formData.get("budget") ?? ""),
+      timeline: String(formData.get("timeline") ?? ""),
+      problem: String(formData.get("problem") ?? ""),
+      message: String(formData.get("message") ?? ""),
+    };
+
+    form.querySelectorAll("[data-field]").forEach((field) => {
+      field.removeAttribute("data-invalid");
+    });
+
+    const errors = validateServicesForm(data);
+
+    if (errors.length > 0) {
+      form.dataset.status = "error";
+      if (statusEl) statusEl.textContent = form.dataset.msgError ?? "";
+
+      errors.forEach((error) => {
+        const field = form.querySelector(`[data-field="${error.field}"]`);
+        field?.setAttribute("data-invalid", "true");
+      });
+
+      return;
+    }
+
+    form.dataset.status = "loading";
+    if (statusEl) statusEl.textContent = form.dataset.msgLoading ?? "";
+
+    const result = await submitFormPlaceholder(data);
+
+    form.dataset.status = result.ok ? "success" : "error";
+    if (statusEl) {
+      statusEl.textContent = result.ok
+        ? form.dataset.msgSuccess ?? ""
+        : form.dataset.msgError ?? "";
+    }
+  });
+</script>

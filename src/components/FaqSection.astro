@@ -1,0 +1,78 @@
+---
+import type { FaqSectionContent } from "../lib/content-types";
+import SectionHeadingCard from "./SectionHeadingCard.astro";
+
+interface Props {
+  t: FaqSectionContent;
+}
+
+const { t } = Astro.props as Props;
+---
+
+<section class="section-theme-dark" id="faq">
+  <div class="section-inner">
+    <p class="rd-eyebrow">{t.faq.eyebrow}</p>
+    <SectionHeadingCard text={t.faq.title} as="h2" size="lg" />
+
+    <div class="rd-faq-list">
+      {t.faq.items.map((item) => (
+        <details class="rd-faq-item rd-reveal">
+          <summary>{item.q}</summary>
+          <p>{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .rd-faq-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .rd-faq-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    background: var(--theme-surface);
+    color: var(--theme-text);
+  }
+
+  .rd-faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+  }
+
+  .rd-faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .rd-faq-item summary::after {
+    content: "+";
+    float: right;
+    color: var(--color-brand-gold);
+  }
+
+  .rd-faq-item[open] summary::after {
+    content: "–";
+  }
+
+  .rd-faq-item p {
+    margin-top: 0.85rem;
+    color: var(--theme-text-muted);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 700px) {
+    .rd-faq-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
