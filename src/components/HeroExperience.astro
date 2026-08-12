@@ -264,11 +264,18 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   </article>
 </aside>
 
-<button class="hx-mobile-toggle" id="hx-mobile-toggle" aria-expanded="false" aria-controls="hx-mobile-nav">
+<button
+  type="button"
+  class="hx-mobile-toggle"
+  id="hx-mobile-toggle"
+  aria-expanded="false"
+  aria-controls="hx-mobile-nav"
+  aria-label="Abrir menú"
+>
   <span></span><span></span><span></span>
 </button>
 
-<nav class="hx-mobile-nav" id="hx-mobile-nav" aria-label="Mobile navigation">
+<nav class="hx-mobile-nav" id="hx-mobile-nav" aria-label="Mobile navigation" aria-hidden="true" inert>
   {navItems.map((item) => (
     <a href={item.href}>{item.label}</a>
   ))}
@@ -1464,26 +1471,153 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       background: var(--color-ink);
     }
 
+    /* Hamburger -> X, computed from the bars' own dimensions right above
+       (18px wide, 2px tall, 4px gap between each): the middle bar's
+       center sits exactly `height + gap` = 6px below the first bar's
+       center and 6px above the third's, so translateY(6px)/translateY(-6px)
+       lands the outer two bars exactly on the middle bar's line before
+       rotating -- not an arbitrary guessed offset. */
+    .hx-mobile-toggle.hx-open span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    /* Closed state: kept in `display: flex` (never `display: none`) so the
+       open/close transition below can actually animate -- visibility +
+       opacity + pointer-events is the toggle mechanism instead. The
+       unscoped `.hx-mobile-toggle, .hx-mobile-nav { display: none; }`
+       base rule (further up this file, outside any media query) still
+       hides both completely at >=900px, untouched. */
     .hx-mobile-nav {
       position: fixed;
       inset: 0;
       z-index: 105;
-      display: none;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1.5rem;
-      background: rgb(213 207 190 / 96%);
-      backdrop-filter: blur(10px);
+      gap: clamp(1rem, 4svh, 1.75rem);
+      padding: 2rem 1.5rem;
+      /* Was rgb(213 207 190 / 96%) -- pushed closer to opaque so the busy
+         Hero content behind it never distracts through the panel. */
+      background: rgb(213 207 190 / 98%);
+      backdrop-filter: blur(14px);
       font-family: var(--font-body);
-      font-size: 1.2rem;
-      font-weight: 600;
       color: var(--color-ink);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .hx-mobile-nav.hx-open {
-      display: flex;
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
     }
+
+    .hx-mobile-nav a {
+      width: 100%;
+      max-width: 22rem;
+      min-height: clamp(52px, 8svh, 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: var(--font-title);
+      font-weight: 700;
+      /* Was a flat 1.2rem/600 on the old container-level rule. */
+      font-size: clamp(1.5rem, 6svh, 2.2rem);
+      color: var(--color-ink);
+      /* Thin separators between links instead of individual cards --
+         first link has none, so the stack reads as one sober list, not a
+         set of boxes. */
+      border-top: 1px solid var(--color-line);
+    }
+
+    .hx-mobile-nav a:first-child {
+      border-top: none;
+    }
+
+    .hx-mobile-nav a:hover {
+      color: var(--color-brand-gold);
+    }
+
+    .hx-mobile-nav a:focus-visible {
+      outline: 2px solid var(--color-brand-gold);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+  }
+
+  /* Motion (fade + slight rise + stagger) is opt-in behind `no-preference`
+     only -- under `prefers-reduced-motion: reduce` none of these
+     `transition`/opacity-offset declarations apply at all, so the panel,
+     links and toggle bars simply snap between their open/closed end
+     states instantly (those end states -- the X shape, visible links --
+     are unconditional above, since they're the actual UI state, not the
+     animation). Nothing extra to strip out under `reduce`. */
+  @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
+    .hx-mobile-toggle span {
+      transition: transform 220ms ease, opacity 220ms ease;
+    }
+
+    .hx-mobile-nav {
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    .hx-mobile-nav a {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease, color 180ms ease;
+    }
+
+    .hx-mobile-nav.hx-open a {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(1) {
+      transition-delay: 40ms;
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(2) {
+      transition-delay: 80ms;
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(3) {
+      transition-delay: 120ms;
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(4) {
+      transition-delay: 160ms;
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(5) {
+      transition-delay: 200ms;
+    }
+
+    .hx-mobile-nav.hx-open a:nth-child(6) {
+      transition-delay: 240ms;
+    }
+  }
+
+  /* Scroll lock: applied globally to <html>/<body> (outside this
+     component's own scoped style, hence `:global`) while the mobile menu
+     is open. Toggled from the <script> below via a plain class -- no
+     `position: fixed` on body, no manual scrollY math, no ScrollTrigger
+     involvement (it isn't even active below 900px -- see
+     `isDesktopViewport()`/`evaluateMode()` further down). */
+  :global(html.hx-mobile-nav-open),
+  :global(body.hx-mobile-nav-open) {
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
@@ -1622,18 +1756,183 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
 
   const mobileToggle = document.getElementById("hx-mobile-toggle");
   const mobileNav = document.getElementById("hx-mobile-nav");
+  const mobileLinks = mobileNav ? Array.from(mobileNav.querySelectorAll("a")) : [];
+
+  const MOBILE_MENU_QUERY = "(max-width: 899px)";
+  const SCROLL_LOCK_CLASS = "hx-mobile-nav-open";
+  const TOGGLE_OPEN_LABEL = "Cerrar menú";
+  const TOGGLE_CLOSED_LABEL = "Abrir menú";
+  const mobileMenuMediaQuery = window.matchMedia(MOBILE_MENU_QUERY);
+
+  // .hx-wrap and main.home-main (see src/pages/index.astro) are the only
+  // two top-level siblings that make up the rest of the page around the
+  // toggle/panel -- the toggle and panel are never inside either one, so
+  // they can never end up inert themselves here.
+  const backgroundInertTargets = [".hx-wrap", "main.home-main"]
+    .map((selector) => document.querySelector(selector))
+    .filter((el): el is HTMLElement => el !== null);
+  const backgroundInertPriorState = new Map<HTMLElement, boolean>();
+  let lastFocusedBeforeOpen: Element | null = null;
+
+  function lockBackgroundScroll() {
+    document.documentElement.classList.add(SCROLL_LOCK_CLASS);
+    document.body.classList.add(SCROLL_LOCK_CLASS);
+  }
+
+  function unlockBackgroundScroll() {
+    document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
+    document.body.classList.remove(SCROLL_LOCK_CLASS);
+  }
+
+  function setBackgroundInert(makeInert: boolean) {
+    backgroundInertTargets.forEach((el) => {
+      if (makeInert) {
+        backgroundInertPriorState.set(el, el.hasAttribute("inert"));
+        el.setAttribute("inert", "");
+      } else {
+        const hadInertBefore = backgroundInertPriorState.get(el) ?? false;
+        if (!hadInertBefore) {
+          el.removeAttribute("inert");
+        }
+        backgroundInertPriorState.delete(el);
+      }
+    });
+  }
+
+  function getMenuFocusOrder(): HTMLElement[] {
+    return mobileToggle ? [mobileToggle, ...mobileLinks] : mobileLinks;
+  }
+
+  // Only attached while the panel is actually open (see openMobileMenu /
+  // closeMobileMenu below) -- not a permanent document-wide listener.
+  function handleMenuKeydown(event: KeyboardEvent) {
+    if (!mobileNav?.classList.contains("hx-open")) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMobileMenu({ returnFocus: true });
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const order = getMenuFocusOrder();
+    if (!order.length) return;
+    const first = order[0];
+    const last = order[order.length - 1];
+
+    // Only the two true wrap-around edges need an explicit intercept
+    // (Tab forward off the last link back to the toggle, Shift+Tab back
+    // off the toggle to the last link) -- Tab forward from the toggle and
+    // Shift+Tab back from the first link already land correctly on their
+    // own, since the toggle and the first link are DOM-adjacent siblings.
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  // Clicking the panel's own empty background (not a link) closes it --
+  // `event.target` is the <nav> itself only when the click didn't land on
+  // a descendant link.
+  function handleOverlayClick(event: MouseEvent) {
+    if (event.target === mobileNav) {
+      closeMobileMenu({ returnFocus: true });
+    }
+  }
+
+  function openMobileMenu() {
+    if (!mobileToggle || !mobileNav) return;
+    if (!mobileMenuMediaQuery.matches) return;
+    if (mobileNav.classList.contains("hx-open")) return;
+
+    lastFocusedBeforeOpen = document.activeElement;
+
+    mobileNav.removeAttribute("inert");
+    mobileNav.setAttribute("aria-hidden", "false");
+    mobileNav.classList.add("hx-open");
+    mobileToggle.classList.add("hx-open");
+    mobileToggle.setAttribute("aria-expanded", "true");
+    mobileToggle.setAttribute("aria-label", TOGGLE_OPEN_LABEL);
+
+    lockBackgroundScroll();
+    setBackgroundInert(true);
+
+    document.addEventListener("keydown", handleMenuKeydown);
+    mobileNav.addEventListener("click", handleOverlayClick);
+
+    const firstLink = mobileLinks[0];
+    if (firstLink) {
+      requestAnimationFrame(() => {
+        firstLink.focus();
+      });
+    }
+  }
+
+  function closeMobileMenu(options?: { returnFocus?: boolean }) {
+    const returnFocus = options?.returnFocus === true;
+    if (!mobileToggle || !mobileNav) return;
+    if (!mobileNav.classList.contains("hx-open")) return;
+
+    // Move focus out of the panel BEFORE aria-hidden/inert are (re)applied
+    // -- hiding/inert-ing a subtree that still contains the active focus
+    // triggers a browser console warning and can strand keyboard focus.
+    if (document.activeElement instanceof HTMLElement && mobileNav.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+
+    mobileNav.classList.remove("hx-open");
+    mobileToggle.classList.remove("hx-open");
+    mobileToggle.setAttribute("aria-expanded", "false");
+    mobileToggle.setAttribute("aria-label", TOGGLE_CLOSED_LABEL);
+    mobileNav.setAttribute("aria-hidden", "true");
+    mobileNav.setAttribute("inert", "");
+
+    unlockBackgroundScroll();
+    setBackgroundInert(false);
+
+    document.removeEventListener("keydown", handleMenuKeydown);
+    mobileNav.removeEventListener("click", handleOverlayClick);
+
+    if (returnFocus) {
+      mobileToggle.focus();
+    }
+    lastFocusedBeforeOpen = null;
+  }
+
+  function toggleMobileMenu() {
+    if (mobileNav?.classList.contains("hx-open")) {
+      closeMobileMenu({ returnFocus: true });
+    } else {
+      openMobileMenu();
+    }
+  }
 
   mobileToggle?.addEventListener("click", () => {
-    const isOpen = mobileNav?.classList.toggle("hx-open");
-    mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    toggleMobileMenu();
   });
 
-  mobileNav?.querySelectorAll("a").forEach((link) => {
+  mobileLinks.forEach((link) => {
     link.addEventListener("click", () => {
-      mobileNav.classList.remove("hx-open");
-      mobileToggle?.setAttribute("aria-expanded", "false");
+      // Anchor navigation is never prevented here -- the link's default
+      // action (jumping to its #hash target) proceeds exactly as before;
+      // this only resets the menu's own open state alongside it.
+      closeMobileMenu({ returnFocus: false });
     });
   });
+
+  const handleMobileMenuViewportChange = (event: MediaQueryListEvent) => {
+    if (event.matches) return; // still <900px, nothing to clean up
+    if (!mobileNav?.classList.contains("hx-open")) return;
+    // The toggle itself is `display: none` at this width (the unscoped
+    // >=900px base rule), so it's never a valid focus target here --
+    // close without trying to move focus onto it.
+    closeMobileMenu({ returnFocus: false });
+  };
+  mobileMenuMediaQuery.addEventListener("change", handleMobileMenuViewportChange);
 
   const prefersReducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let prefersReducedMotion = prefersReducedMotionQuery.matches;
