@@ -35,7 +35,7 @@ const es = {
     displayWordmark: "CHISU",
     siteName: "CHIISSUU",
     sidebarMark: "CHISU®",
-    title: ["Software Engineer", "Data Science", "Aplicado visualmente."],
+    title: ["Software Engineer", "Data Science", "GFX"],
     primaryCta: "Ver Proyectos",
     secondaryCta: "Sobre Mí",
     imageAlt: "Retrato recortado provisional de Jesús León",
@@ -46,6 +46,8 @@ const es = {
       { value: "10+", label: "proyectos académicos y personales" },
     ],
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
+    personalNote:
+      "Fuera del código, me interesan la inversión, los mercados financieros y el análisis de negocio.",
   },
   about: {
     aboutMe: {

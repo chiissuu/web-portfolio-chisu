@@ -82,6 +82,10 @@ export interface HeroContent {
   tagline: string;
   metrics: readonly HeroMetric[];
   chips: readonly string[];
+  /** Short secondary personal note shown bottom-left in the hero (desktop
+   * composition only), separate from `tagline` (bottom-right). No card,
+   * no background — plain text, 2-3 lines max. */
+  personalNote: string;
 }
 
 /** `HeroExperience.astro`'s full `Props.t` shape — the wordmark/nav/portrait/

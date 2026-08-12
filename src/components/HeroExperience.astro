@@ -159,6 +159,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
             ))}
           </div>
 
+          <p class="hx-personal-note">{t.hero.personalNote}</p>
+
           <div class="hx-aside-right">
             <div class="hx-chip-card hx-frosted-card">
               {t.hero.chips.map((chip) => (
@@ -476,14 +478,25 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     text-align: center;
     font-family: var(--font-title);
     font-weight: 700;
-    /* Bigger than the previous clamp(1.2rem, 2.4vw, 2rem). */
-    font-size: clamp(1.5rem, 3vw, 2.6rem);
+    /* Was clamp(1.5rem, 3vw, 2.6rem); scaled up ~27% for the previous
+       pass, then +8% again here (clamp(1.9rem, 3.8vw, 3.3rem) ->
+       clamp(2.05rem, 4.1vw, 3.56rem)) — font-family/weight/color/stroke/
+       paint-order/line-height/highlight all untouched. */
+    font-size: clamp(2.05rem, 4.1vw, 3.56rem);
     letter-spacing: -0.01em;
     line-height: 1.15;
-    /* Sits over the torso — light paper tone with a dark, soft shadow for
-       contrast instead of dark-ink-on-light-halo. */
+    /* Sits over the torso — light paper tone. Contrast against the
+       portrait now comes ONLY from the thin `-webkit-text-stroke` below
+       (see `.hx-title-line:not(.hx-title-highlight)`); the previous
+       `text-shadow` here (a 26px-blur, 55%-opacity dark halo) was the
+       actual source of the "dirty gray shadow" behind "Software
+       Engineer" / "GFX" — it was inherited by every line, including the
+       two non-highlighted ones, since text-shadow isn't scoped by
+       `.hx-title-highlight`. Removed outright rather than just
+       re-scoped: nothing in this spec calls for any shadow on line 2
+       either, since the `<mark>` background already provides its own
+       contrast. */
     color: var(--color-paper);
-    text-shadow: 0 10px 26px rgba(26, 25, 25, 0.55), 0 2px 8px rgba(26, 25, 25, 0.4);
   }
 
   .hx-title-mask {
@@ -501,6 +514,23 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     padding: 0.05em 0.35em;
     border-radius: 4px;
     box-decoration-break: clone;
+  }
+
+  /* Thin, near-imperceptible dark outline on the two non-highlighted title
+     lines only (line 2 already gets contrast from the gold `<mark>` above).
+     Purely a legibility aid against the portrait — no box, no background,
+     no glow, no text-shadow, no filter. `:not(.hx-title-highlight)` keeps
+     this off the highlighted line so its own treatment is untouched.
+     `paint-order: stroke fill` paints the stroke BEHIND the fill instead
+     of the (browser-default) fill-then-stroke, which is what was
+     clogging tight glyph interiors/terminals on letters like `t`, `f`,
+     `e` — with fill-on-top the stroke reads as a clean thin outline
+     instead of doubling the ink at every curve. Narrowed 0.5px -> 0.4px
+     at the same time for extra safety on small glyph details; the fill
+     stays fully solid `var(--color-paper)` either way. */
+  .hx-title-line:not(.hx-title-highlight) {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 0.4px var(--color-ink);
   }
 
   .hx-metrics {
@@ -1086,7 +1116,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   .hx-pin.hx-static .hx-title-block,
   .hx-pin.hx-static .hx-metrics,
   .hx-pin.hx-static .hx-aside-right,
-  .hx-pin.hx-static .hx-actions {
+  .hx-pin.hx-static .hx-actions,
+  .hx-pin.hx-static .hx-personal-note {
     position: relative;
     inset: auto;
     left: auto;
@@ -1128,6 +1159,11 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     text-align: center;
   }
 
+  .hx-pin.hx-static .hx-personal-note {
+    max-width: 32ch;
+    text-align: center;
+  }
+
   /* Tablet / small-desktop tier: a deliberately different composition, not a
      uniform shrink of the desktop-large layout. */
   @media (min-width: 900px) and (max-width: 1599px) {
@@ -1149,6 +1185,24 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     .hx-chip-card {
       padding: 0.85rem 1rem;
     }
+
+    /* Portrait: intermediate "torso/waist up" crop for tablet — bigger
+       than the mobile/base full-body figure, smaller than the >=1600px
+       desktop tier below. Anchored by `top` instead of the base rule's
+       `inset-block-end: 0`, with `height` deliberately taller than the
+       visible span so the excess (the legs/feet) runs past `.hx-pin`'s
+       own bottom edge and gets cut off by its EXISTING `overflow: clip`
+       (see `.hx-pin` above) — no `transform: scale`, no new clipping
+       mechanism. Estimated crop ratio (the image isn't measured, so this
+       is reasoned from the reference screenshot, not exact) — nudge the
+       `height` value if the real photo's waist line sits higher/lower
+       than expected once you see it live. Base (<900px) rule is
+       untouched, so mobile stays full-body exactly as before. */
+    .hx-portrait {
+      top: clamp(0.5rem, 2svh, 1.5rem);
+      inset-block-end: auto;
+      height: min(140svh, 1250px);
+    }
   }
 
   /* Laptop tier — between the tablet composition above and the
@@ -1160,6 +1214,20 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   @media (min-width: 1600px) and (max-width: 1919px) {
     .hx-pin {
       --hx-wordmark-font-size: clamp(5rem, 17vw, 12rem);
+    }
+  }
+
+  /* Desktop portrait tier — reuses the same 1600px threshold as the
+     laptop wordmark tier above (open-ended, so it also covers >=1920px
+     ultra-wide, unlike that tier's own 1919px cap) rather than inventing
+     a new breakpoint. Same top-anchor + oversized-height + existing-clip
+     technique as the tablet tier, just a bigger `height` for more
+     presence — "retrato protagonista" per the reference. */
+  @media (min-width: 1600px) {
+    .hx-portrait {
+      top: clamp(0.5rem, 2svh, 1.5rem);
+      inset-block-end: auto;
+      height: min(195svh, 1700px);
     }
   }
 
@@ -1232,6 +1300,139 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       min-height: 42px;
       padding-block: 0.4rem;
       margin-top: 0.125rem;
+    }
+  }
+
+  /* Desktop/tablet-only static composition pass: shares the metrics'
+     horizontal band with the left nav, the traits card's band with the
+     right nav, and keeps the tagline + new personal note anchored at the
+     bottom (mirroring `.hx-actions`' own bottom clamp). Scoped to
+     `min-width: 900px` — the site's existing desktop threshold — so the
+     `max-width: 899px` mobile tier below (nav hidden, `.hx-mobile-nav`
+     used instead) is completely untouched. `--hx-metrics-offset` /
+     `--hx-traits-offset` (see below) are reasoned estimates of each nav
+     group's rendered width (fixed text, `white-space: nowrap`, near-
+     constant `~0.92-1.05rem` font-size) rather than per-viewport magic
+     numbers — nudge either one independently if a real browser shows too
+     much or too little clearance next to "Contacto" / "Tools". */
+  @media (min-width: 900px) {
+    .hx-pin {
+      /* Two INDEPENDENT offsets, not one shared constant — the two nav
+         groups ("INICIO · SOBRE MÍ · CONTACTO" vs "PROYECTOS · SERVICIOS
+         · TOOLS") aren't the same rendered width, and `.hx-metrics` isn't
+         the same width as `.hx-chip-card`, so a single shared value could
+         never center both badges in their own free space at once — that
+         was the previous bug (both badges pushed to the SAME distance
+         from their nav, which read as "too close to center" once the
+         title grew). Each one is still a flat rem estimate (nav text is
+         fixed-width, doesn't scale with `vw` — see the previous fix),
+         calibrated against the visual reference you gave (~107px left /
+         ~70px right at ~1918px) rather than a from-scratch glyph-width
+         guess, since that's the more reliable signal without a live
+         browser. Nudge either value independently if it's still off. */
+      --hx-metrics-offset: 22.625rem;
+      --hx-traits-offset: 23.125rem;
+    }
+
+    .hx-metrics {
+      top: var(--hx-nav-top);
+      /* Anchored off `.hx-nav-left`'s own `left: clamp(1.5rem, 4vw,
+         2.8vw)` (not `--hx-aside-inset`, a different/unrelated clamp) so
+         the gap to the nav stays consistent across viewport widths. */
+      left: calc(clamp(1.5rem, 4vw, 2.8vw) + var(--hx-metrics-offset));
+    }
+
+    .hx-personal-note {
+      position: absolute;
+      left: var(--hx-aside-inset);
+      bottom: clamp(2.25rem, 6.5vh, 3.75rem);
+      z-index: 4;
+      max-width: 32ch;
+      text-align: left;
+      /* Was 0.86rem. */
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--color-ink);
+      opacity: 0.7;
+    }
+
+    /* `.hx-tagline`'s own base font-size (0.86rem, further down this
+       file) stays untouched — it's unscoped and also used by the mobile
+       `.hx-static` fallback. This override only applies >=900px, so
+       mobile keeps its current size. */
+    .hx-tagline {
+      font-size: 0.95rem;
+    }
+
+    /* `.hx-aside-right` still wraps the chip card + tagline as one unit
+       (unchanged DOM, unchanged GSAP entrance target — still has a real
+       box/height for the entrance timeline to animate) and still spans
+       from the nav row down to the actions' bottom clamp. Its own `right`
+       is now flush with `.hx-nav-right`'s own inset — that's `.hx-tagline`'s
+       target edge, not the traits card's. `.hx-chip-card` gets pulled out
+       to its own independent horizontal anchor below instead of sharing
+       this container's `align-items: flex-end` edge, which is what was
+       dragging the tagline along with it whenever the traits offset
+       changed. `justify-content: flex-end` (was `space-between`) because
+       `.hx-tagline` is now the only in-flow flex child — this pins it to
+       the bottom of the span, its original visual position. */
+    .hx-aside-right {
+      top: var(--hx-nav-top);
+      bottom: clamp(2.25rem, 6.5vh, 3.75rem);
+      right: clamp(1.5rem, 4vw, 2.8vw);
+      justify-content: flex-end;
+    }
+
+    /* Independent anchor, relative to `.hx-aside-right`'s own box (still
+       `position: absolute`, so this doesn't escape it) — a fixed offset
+       from the container's (=nav-right's) edge, same value/role as
+       `--hx-metrics-offset` on the left. Taking this out of the flex flow
+       (rather than `align-self`) sidesteps the container auto-width vs.
+       `max-width: 18rem` conflict a large `margin-right` would have hit. */
+    .hx-chip-card {
+      position: absolute;
+      top: 0;
+      right: var(--hx-traits-offset);
+    }
+  }
+
+  /* Small-tablet portrait, 641-899px. CORRECTED: real-browser measurement
+     at 768x1024 (Ctrl+R reload, no reduced-motion) showed `.hx-static`
+     is NOT active on normal load in this range — `tabletRule: true`,
+     `staticMode: false`, `.hx-portrait` still `position: absolute`,
+     height 860px = the UNSCOPED base rule's `min(92svh, 860px)`. The
+     previous version of this block only targeted `.hx-pin.hx-static
+     .hx-portrait`, which is why it had no visible effect. Two separate,
+     clearly-labeled rules now: NORMAL load uses `.hx-pin:not(.hx-static)`
+     (below), matching the same top-anchor + oversized-height + existing
+     `.hx-pin` `overflow: clip` technique already used at >=900px — same
+     `position: absolute` and `transform: translateX(-50%)` centering
+     from the base rule, untouched. `.hx-static` (the `prefers-reduced-
+     motion` fallback — still reachable in this width range via that
+     media feature, just not on a normal load) keeps its own separate
+     rules further below as a real, working fallback, not repurposed. */
+  @media (min-width: 641px) and (max-width: 899px) {
+    .hx-pin:not(.hx-static) .hx-portrait {
+      top: clamp(0.5rem, 2svh, 1.5rem);
+      inset-block-end: auto;
+      height: min(185svh, 1900px);
+    }
+
+    /* `prefers-reduced-motion` fallback only — NOT what a normal load
+       uses in this range (see diagnosis above). Kept as a working
+       fallback since `.hx-static`'s own architecture (wrapper height
+       fixed at 40vh, flex-centered, `transform: none`) is fully separate
+       from the normal/absolute-positioned rule above. */
+    .hx-pin.hx-static .hx-portrait {
+      overflow: clip;
+    }
+
+    .hx-pin.hx-static .hx-portrait img {
+      height: 185%;
+      width: auto;
+      display: block;
+      margin-inline: auto;
+      object-position: 50% 0%;
     }
   }
 
