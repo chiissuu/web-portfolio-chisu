@@ -54,6 +54,56 @@ const fontHref =
   } else {
     reveals.forEach((el) => el.classList.add("rd-in"));
   }
+
+  // Middle-click auto-scroll guard -- redesign home only.
+  //
+  // Scope: only `body.redesign-home` (set via `bodyClass="redesign
+  // redesign-home"` in src/pages/index.astro -- the same stable class this
+  // layout's own CSS already keys off of, e.g. `body.redesign-home
+  // .section-inner` further down). No URL string comparison.
+  //
+  // A single `mousedown` listener (not `auxclick`/`mouseup`/`wheel`) is
+  // the standard way to suppress the browser's native middle-click
+  // auto-scroll affordance: that pan mode arms itself on the mousedown
+  // that carries `button === 1`, so calling `preventDefault()` there
+  // (registered `{ passive: false }`, since a passive listener cannot
+  // call it) stops the icon/pan mode before it appears, while leaving the
+  // wheel, keyboard scroll, scrollbar, anchor navigation, and the
+  // `scroll-behavior: smooth` above completely untouched -- none of them
+  // fire through this listener at all.
+  //
+  // Elements whose native middle-click behavior must be preserved (real
+  // links opening in a new tab, form controls, contenteditable, ARIA
+  // links) are excluded via `Element.closest()` against this selector,
+  // so the guard only ever fires over non-interactive areas of the page.
+  //
+  // Touch/mobile is unaffected without any device sniffing: touch input
+  // has no `button === 1`, so the early return below already excludes it.
+  //
+  // Idempotency: this project has no Astro view transitions (no
+  // `astro:page-load`/`astro:before-swap`, no `<ClientRouter />` --
+  // confirmed absent from astro.config.mjs and this layout's <head>), so
+  // every navigation is a full page load and this module-script listener
+  // is naturally attached exactly once per page -- no extra lifecycle
+  // wiring needed.
+  const PRESERVE_MIDDLE_CLICK_SELECTOR =
+    'a[href], area[href], input, textarea, select, option, [contenteditable]:not([contenteditable="false"]), [role="link"]';
+
+  document.addEventListener(
+    "mousedown",
+    (event) => {
+      if (event.button !== 1) return;
+      if (!document.body.classList.contains("redesign-home")) return;
+
+      const target = event.target;
+      const preservesMiddleClick =
+        target && typeof target.closest === "function" && target.closest(PRESERVE_MIDDLE_CLICK_SELECTOR);
+      if (preservesMiddleClick) return;
+
+      event.preventDefault();
+    },
+    { passive: false }
+  );
 </script>
 
 <style is:global>

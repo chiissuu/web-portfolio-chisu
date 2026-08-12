@@ -1485,6 +1485,124 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       display: flex;
     }
   }
+
+  /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
+     query -- does not touch HTML, <script>, GSAP/ScrollTrigger, .hx-wrap,
+     .hx-pin, the mobile nav/toggle, the 641-899px tier, or the >=900px
+     tier. .hx-portrait / .hx-portrait img and the side-card horizontal
+     distribution (.hx-metrics, .hx-chip-card) are intentionally left
+     untouched per explicit approval -- only the vertical architecture of
+     .hx-aside-right (chip-card vs tagline) changes here.
+
+     "First configuration" per real measurements supplied from 390x844
+     (post-animation-settle), targeting the 5 reported collisions:
+     "Software Engineer" x 2nd metric card, "Software Engineer" x
+     tagline, "Data Science" x tagline, personal note x wordmark, and
+     mobile toggle x wordmark. Starting values to visually validate, not
+     guaranteed-final. */
+  @media (max-width: 640px) {
+    .hx-wordmark {
+      /* Was --hx-wordmark-top (4vh, ~34px at 844px tall) -- pushed down
+         so its top clears the mobile toggle's own bottom edge (~60px).
+         Centering (justify-content: center on the base rule) and all
+         type/color/z-index untouched. */
+      top: 4rem;
+    }
+
+    .hx-title-block {
+      /* Was top: 44% -- moved down so it starts below the metrics/traits
+         cards instead of overlapping them. Horizontal centering
+         (left: var(--hx-figure-x) + transform: translateX(-50%)) is the
+         base rule's existing mechanism and is left untouched here. */
+      top: 51%;
+      /* Base rule has no explicit width (shrink-to-fit); bounding it lets
+         the title wrap onto its existing multi-line structure instead of
+         overflowing the 390px viewport. */
+      width: calc(100% - 2rem);
+      max-width: 22rem;
+      /* Was clamp(2.05rem, 4.1vw, 3.56rem) -- shrunk for this width so
+         "Software Engineer" fits on one line at max-width without
+         wrapping mid-word. font-family/weight/color/stroke/paint-order/
+         line-height/highlight all untouched. */
+      font-size: clamp(1.7rem, 7.2vw, 2rem);
+    }
+
+    .hx-title-line {
+      white-space: nowrap;
+    }
+
+    /* .hx-chip-card (traits) is intentionally NOT overridden here -- its
+       position stays governed by the base/unscoped .hx-aside-right flex
+       flow, per explicit approval. Only the container is stretched
+       downward so `justify-content: space-between` can push .hx-tagline
+       (the second flex child) toward the container's own bottom edge,
+       away from the traits card and clear of the title above it, without
+       moving .hx-chip-card. */
+    .hx-aside-right {
+      bottom: 20vh;
+      justify-content: space-between;
+      /* Widen the container so it spans symmetrically between the same
+         inset used on the right (--hx-aside-inset) mirrored on the left,
+         centering the container itself on the viewport's horizontal
+         center. max-width: none prevents the existing 18rem cap from
+         forcing the box back to a smaller width, which would otherwise
+         shift `right` (and with it .hx-chip-card's anchored edge) via
+         the browser's absolute-positioning over-constraint resolution.
+         .hx-chip-card is untouched: align-items: flex-end (unchanged,
+         inherited from the base rule) keeps it flush with the
+         container's right edge, which stays at the same `right` inset
+         as before -- so its position is unaffected by this change. */
+      left: var(--hx-aside-inset);
+      max-width: none;
+    }
+
+    /* Only .hx-tagline is pulled out of the flex-end alignment inherited
+       from .hx-aside-right; align-self: center centers its own box
+       within the now-wider container (which is itself centered on the
+       viewport), and text-align: center centers its line(s) inside that
+       box. Width/max-width (20ch), font-size, line-height, color, and
+       opacity are all untouched -- only the box's horizontal position
+       and its internal text alignment change. */
+    .hx-tagline {
+      align-self: center;
+      text-align: center;
+    }
+
+    .hx-actions {
+      /* Was bottom: clamp(2.25rem, 6.5vh, 3.75rem) -- raised slightly to
+         clear the personal note below it. */
+      bottom: 4.75rem;
+      /* Was gap: 1rem. */
+      gap: 0.75rem;
+      /* Was flex-wrap: wrap, which is why the two buttons were stacking
+         vertically at this width; forced onto a single row instead.
+         Button design/height/colors/text/links/hover/focus untouched. */
+      flex-wrap: nowrap;
+    }
+
+    .hx-personal-note {
+      /* No unscoped base rule exists for this selector at all below
+         900px (confirmed by direct read of the source) -- it was
+         rendering in normal document flow at the very top of the Hero,
+         colliding with the wordmark. Given an explicit position here,
+         plus the same font-size/line-height/color/opacity already used
+         by the >=900px rule, so it reads exactly like the desktop/tablet
+         copy instead of unstyled browser-default text. Centered via
+         inset-inline + margin-inline: auto (not transform), per spec. */
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0.5rem;
+      z-index: 4;
+      width: calc(100% - 2rem);
+      max-width: 22rem;
+      margin-inline: auto;
+      text-align: center;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--color-ink);
+      opacity: 0.7;
+    }
+  }
 </style>
 
 <script>
