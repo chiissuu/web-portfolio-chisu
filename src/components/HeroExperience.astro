@@ -64,13 +64,17 @@ const sidebarNavItems = [
 // scroll-driven blur (see --portrait-blur) touches this image.
 const portraitSrc = `${base}/assets/images/profile-cutout-alt.png`;
 
-// `displayWordmark` ("CHISU") is the giant decorative hero mark — NOT the
-// site's real name. It's split into independent letters (not a single SVG
-// <text>) so each one can be staggered individually by the GSAP entrance
-// timeline. The container's accessible name is `siteName` ("CHIISSUU", the
-// real brand), not this decorative string; every letter span is
-// aria-hidden.
-const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
+// `displayWordmark` ("CHISU") is the giant decorative hero mark's
+// accessible name — NOT the site's real name (that's `siteName`,
+// "CHIISSUU", used as `.hx-compact-mark`'s real text elsewhere). The mark
+// itself is now a single raster image (public/assets/images/
+// hero-wordmark-gold.png, trimmed to its opaque bounds, transparent
+// background preserved) instead of per-letter spans. GSAP's entrance
+// tween (the <script> below, untouched) still finds it via the same
+// `.hx-wordmark-letter` selector — it now matches exactly one element
+// instead of five, so the same wipe-in tween applies to the image as a
+// whole with no JS change needed.
+const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 ---
 
 <section class="hx-wrap section-theme-warm" id="home">
@@ -109,12 +113,20 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     -->
     <div class="hx-full-hero-scroll-motion" id="hx-scroll-motion">
       <div class="hx-full-hero-intro-motion" id="hx-intro-motion">
-        <div class="hx-wordmark" id="hx-wordmark" role="img" aria-label={t.hero.displayWordmark} data-morph-source="brand">
-          <div class="hx-wordmark-row" id="hx-wordmark-row">
-            {wordmarkLetters.map((letter) => (
-              <span class="hx-wordmark-letter" aria-hidden="true">{letter}</span>
-            ))}
-          </div>
+        <div class="hx-wordmark" id="hx-wordmark" role="img" aria-label={t.hero.displayWordmark}>
+          <img
+            class="hx-wordmark-letter hx-wordmark-image"
+            src={wordmarkSrc}
+            data-morph-source="brand"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+            draggable="false"
+            width="2142"
+            height="815"
+          />
         </div>
 
         <nav class="hx-nav hx-nav-left" aria-label="Primary">
@@ -215,7 +227,19 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   aria-hidden="true"
 >
   <article class="hx-sidebar-article hx-glass hx-sidebar-brand" data-theme="warm">
-    <a class="hx-compact-mark" href="#home" data-morph-target="brand">{t.hero.sidebarMark}</a>
+    <a class="hx-compact-mark" href="#home" aria-label={t.hero.sidebarMark}>
+      <img
+        class="hx-compact-wordmark-image"
+        src={wordmarkSrc}
+        data-morph-target="brand"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+        width="2142"
+        height="815"
+      />
+      <span class="hx-compact-mark-registered" aria-hidden="true">&reg;</span>
+    </a>
     <p class="hx-compact-tagline" data-morph-target="tagline">{t.hero.tagline}</p>
   </article>
 
@@ -300,20 +324,62 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   .hx-wrap {
     position: relative;
     height: 100svh;
+    /* Fixes a pale/ivory horizontal band exposed during the gold<->black
+       crossfade (both scroll directions), reported against a real
+       recording. ROOT CAUSE, confirmed via a Playwright reproduction of
+       this exact DOM/CSS wired to the real GSAP + ScrollTrigger pin
+       (same `trigger: wrapEl, start: "top top", end: () =>
+       `+=${window.innerHeight}`, pin: pinEl, pinSpacing: false` config as
+       the <script> below, untouched here): `.hx-wrap` inherits
+       `background: var(--color-bg)` (#d5cfbe, pale) from the shared
+       `.section-theme-warm` class (Layout.astro) -- reused here only for
+       its `--theme-*` custom properties, never because this background
+       was meant to be visible. Normally it never is: `.hx-pin` (this
+       element's only child) is fully opaque and exactly covers it the
+       entire time. But for the final ~23% of the scroll timeline
+       (75%-98%, see the `.hx-pin-fade`/`.hx-glow` opacity tween further
+       down in the <script>), `.hx-pin` is still `position: fixed`
+       (still pinned) while its own fade layers go transparent -- and in
+       the vertical strip still ABOVE `AboutSection`'s current
+       (still-sliding-up) top edge, nothing else sits behind `.hx-pin` in
+       the paint order except `.hx-wrap`'s own background. Pixel-level
+       screenshots confirmed the leaked color measured ~rgb(211,202,179)
+       against `--color-bg`'s rgb(213,207,190) -- a near-exact match --
+       appearing only in that region/timing and gone once
+       `AboutSection`'s top reaches this element's own top (0) or once
+       `.hx-pin-fade` is fully opaque again -- exactly the reported
+       symptom, reproducible in both scroll directions since it's a pure
+       function of scroll progress. Fix: give `.hx-wrap` itself the same
+       dark tone already used by both `.hx-pin-fade`'s own fallback and
+       `AboutSection`'s flat background (both `var(--section-dark-start)`
+       -- see the analogous, already-established override pattern in
+       AboutSection.astro's own scoped `.section-theme-dark` rule), so
+       anything that leaks through during the crossfade reads as
+       consistent dark instead of a jarring pale flash. Astro's automatic
+       style scoping means this rule still only ever matches the ONE
+       `.hx-wrap` this component renders -- Layout.astro's shared
+       `.section-theme-warm` rule (and every other section reusing it)
+       is untouched. */
+    background: var(--section-dark-start);
   }
 
   .hx-pin {
     /* Wordmark geometry drives the nav position below it — keep every
        consumer of "where does the wordmark end" reading from these custom
        properties instead of a hardcoded number. `--hx-wordmark-font-size`
-       is overwritten inline by the JS auto-fit pass once fonts are ready,
-       and every calc() below re-evaluates live off that same variable. */
+       was overwritten inline by the JS auto-fit pass once fonts were
+       ready; that pass (`fitWordmarkWidth()` in the <script> below,
+       untouched) now no-ops harmlessly instead (it measures
+       `.hx-wordmark-row`, which no longer exists now that the wordmark is
+       a single image, and returns early) — geometry is driven by
+       `--hx-wordmark-height` below instead, off the image's own real
+       aspect ratio via CSS alone, no JS involved. */
     --hx-wordmark-top: 4vh;
-    --hx-wordmark-font-size: clamp(5.5rem, 19vw, 15rem);
+    --hx-wordmark-height: min(38svh, 36vw, 24rem);
     --hx-wordmark-line-height: 0.86;
     --hx-nav-gap: clamp(1rem, 2vw, 2rem);
     --hx-nav-top: calc(
-      var(--hx-wordmark-top) + (var(--hx-wordmark-font-size) * var(--hx-wordmark-line-height)) + var(--hx-nav-gap)
+      var(--hx-wordmark-top) + var(--hx-wordmark-height) + var(--hx-nav-gap)
     );
     --hx-figure-x: 50%;
     /* Pulled in from the viewport edge (was clamp(2rem,9vw,5.5rem)) so the
@@ -325,6 +391,19 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
        tweened via a proxy object, same pattern as `--portrait-blur`, since
        a `::after` pseudo-element can't be a direct GSAP tween target. */
     --nav-sep-opacity: 1;
+
+    /* Local black-gold palette for this first visual-harmonization pass.
+       Scoped to `.hx-pin` only (not Layout.astro or any shared token) so
+       nothing outside the Hero is affected. Purely visual — none of these
+       drive geometry, position, or any existing variable above. */
+    --hx-ui-black: #12100c;
+    --hx-ui-black-warm: #2a1c09;
+    --hx-ui-ivory: #fff2cf;
+    --hx-ui-gold: #efc65b;
+    --hx-ui-gold-line: rgb(249 211 119 / 46%);
+    --hx-ui-dark-glass: rgb(16 13 8 / 74%);
+    --hx-ui-dark-glass-soft: rgb(22 16 8 / 58%);
+    --hx-ui-shadow: rgb(35 20 0 / 28%);
 
     /* No longer `position: sticky` — ScrollTrigger's own `pin: pinEl`
        option (see the <script> below) now does the fixing. `top: auto`
@@ -350,7 +429,22 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: var(--color-bg);
+    /* Solid fallback underneath the image below (shows through if the
+       image is still loading, fails to load, or doesn't fully cover a
+       given viewport) — matches `--section-dark-start`, the exact color
+       AboutSection's own dark gradient begins at, so the gold-to-black
+       crossfade (see the <script> below) never risks revealing a
+       beige/light flash underneath the background image. */
+    background: var(--section-dark-start);
+    /* First pass of the new Hero background art. Same file the user
+       verified byte-for-byte (public/assets/images/hero-background-gold.png,
+       untouched PNG, no recompression/format conversion). Root-relative
+       path, matching how every other `public/assets/...` asset in this
+       component is already referenced. */
+    background-image: url(/assets/images/hero-background-gold-alternative.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     pointer-events: none;
   }
 
@@ -394,14 +488,14 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
      `CHIISSUU` — see `t.hero.displayWordmark` vs `t.hero.siteName` in
      content-types.ts for why these are separate fields. */
   /* Outer positioning shell only — spans the full width so it can CENTER
-     the compact word row inside it via `justify-content: center`. This
-     element itself is never measured for sizing; `fitWordmarkWidth()` in
-     the <script> below measures `.hx-wordmark-row` (the actual word),
-     never this container. */
+     the wordmark image inside it via `justify-content: center`. `height`
+     drives `--hx-nav-top` below it (see `.hx-pin` above) instead of the
+     old font-size-derived formula. */
   .hx-wordmark {
     position: absolute;
     inset-inline: 0;
     top: var(--hx-wordmark-top);
+    height: var(--hx-wordmark-height);
     z-index: 0;
     display: flex;
     justify-content: center;
@@ -409,13 +503,10 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     pointer-events: none;
   }
 
-  /* The actual word: `width: max-content` makes it shrink-to-fit its own
-     letters (never stretched by the outer container), so `CHISU` always
-     renders as ONE continuous, compact word — never individually
-     positioned letters, never `space-between`/`flex-grow`. `gap: 0` +
-     `letter-spacing: 0` on the letters below means there is zero
-     deliberate spacing anywhere in this row; the outer `.hx-wordmark`'s
-     `justify-content: center` centers this whole row as a unit. */
+  /* Orphaned by the image swap below (no element matches this selector
+     anymore — the wordmark is a single <img>, not a row of letter spans)
+     but left in place rather than removed: harmless dead CSS, not part of
+     this task's authorized scope. */
   .hx-wordmark-row {
     display: inline-flex;
     width: max-content;
@@ -423,20 +514,22 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     white-space: nowrap;
   }
 
-  .hx-wordmark-letter {
-    font-family: var(--font-wordmark);
-    font-weight: 900;
-    font-size: var(--hx-wordmark-font-size);
-    line-height: var(--hx-wordmark-line-height);
-    letter-spacing: 0;
-    /* Translucent brand-gold-strong "watermark" tone. The previous flat
-       --color-brand-gold (#e0c58b) sat almost exactly on top of
-       --color-bg (#d5cfbe) — the giant mark existed in the DOM but was
-       effectively invisible against the background. This reads as a
-       clearly legible background wordmark without competing with the
-       foreground title/portrait. */
-    color: rgba(138, 100, 32, 0.32);
-    text-shadow: 0 1px 2px rgba(26, 25, 25, 0.12);
+  /* `.hx-wordmark-letter` no longer carries any of its own typography —
+     every property on the old rule (font-family, font-weight, font-size,
+     line-height, letter-spacing, color, text-shadow) only ever made sense
+     for the text spans it used to select; none of it has any effect on an
+     `<img>`. The class name itself stays on the new image element purely
+     so the existing GSAP entrance-tween selector (`.hx-wordmark-letter`,
+     in the untouched <script> below) still finds it — now matching one
+     element instead of five, so the same wipe-in tween applies to the
+     whole image with zero JS changes. All actual visual sizing now comes
+     from this new, image-specific class instead. */
+  .hx-wordmark-image {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 94.4vw;
+    object-fit: contain;
   }
 
   .hx-portrait {
@@ -476,7 +569,7 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   .hx-title-block {
     position: absolute;
     left: var(--hx-figure-x);
-    top: 44%;
+    top: calc(44% + clamp(2.9rem, 6.5svh, 3.75rem));
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -503,7 +596,10 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
        re-scoped: nothing in this spec calls for any shadow on line 2
        either, since the `<mark>` background already provides its own
        contrast. */
-    color: var(--color-paper);
+    color: var(--hx-ui-black);
+    text-shadow:
+      0 1px 0 rgb(255 242 207 / 24%),
+      0 8px 24px rgb(35 20 0 / 18%);
   }
 
   .hx-title-mask {
@@ -516,10 +612,18 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   }
 
   .hx-title-highlight mark {
-    background: rgba(224, 197, 139, 0.78);
-    color: var(--color-ink);
+    background: linear-gradient(
+      135deg,
+      rgb(18 16 12 / 96%),
+      rgb(42 28 9 / 92%)
+    );
+    color: var(--hx-ui-gold);
     padding: 0.05em 0.35em;
-    border-radius: 4px;
+    border-radius: 7px;
+    border: 1px solid var(--hx-ui-gold-line);
+    box-shadow:
+      0 10px 24px rgb(35 20 0 / 24%),
+      inset 0 1px 0 rgb(255 242 207 / 10%);
     box-decoration-break: clone;
   }
 
@@ -538,6 +642,18 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   .hx-title-line:not(.hx-title-highlight) {
     paint-order: stroke fill;
     -webkit-text-stroke: 0.4px var(--color-ink);
+  }
+
+  /* Scoped to `:not(.hx-static)` so the reduced-motion/narrow-viewport
+     fallback's own explicit reset (`.hx-pin.hx-static .hx-title-block`
+     -- plain `--color-ink`, no shadow) stays completely untouched; this
+     new warm-black/gold-shadow treatment only applies to the normal
+     scroll-jacked composition. */
+  .hx-pin:not(.hx-static) .hx-title-line:not(.hx-title-highlight) {
+    color: #17130b;
+    text-shadow:
+      0 1px 0 rgba(224, 197, 139, 0.65),
+      0 4px 14px rgba(0, 0, 0, 0.35);
   }
 
   .hx-metrics {
@@ -578,12 +694,18 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
      tuned to read clearly against the busy portrait/background instead
      of the sidebar's much lower, near-invisible `.hx-glass` opacity. */
   .hx-frosted-card {
-    background: rgb(213 207 190 / 62%);
-    border: 1px solid rgb(255 255 255 / 20%);
+    background: linear-gradient(
+      145deg,
+      var(--hx-ui-dark-glass),
+      rgb(42 28 9 / 64%)
+    );
+    border: 1px solid var(--hx-ui-gold-line);
     border-radius: 8px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 12px 30px rgb(26 25 25 / 8%);
+    backdrop-filter: blur(14px) saturate(115%);
+    -webkit-backdrop-filter: blur(14px) saturate(115%);
+    box-shadow:
+      0 18px 42px var(--hx-ui-shadow),
+      inset 0 1px 0 rgb(255 242 207 / 12%);
     color: var(--color-ink);
   }
 
@@ -603,14 +725,14 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 1.5rem;
-    color: var(--color-ink);
+    color: var(--hx-ui-gold);
   }
 
   .hx-metric-label {
     font-size: 0.72rem;
     line-height: 1.3;
-    color: var(--color-ink);
-    opacity: 0.66;
+    color: rgb(255 242 207 / 78%);
+    opacity: 1;
   }
 
   /* Groups chip-card + tagline into one flowing stack — their combined
@@ -644,8 +766,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     font-family: var(--font-mono);
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--color-ink);
-    opacity: 0.82;
+    color: rgb(255 242 207 / 90%);
+    opacity: 1;
     white-space: nowrap;
   }
 
@@ -653,7 +775,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--color-brand-gold);
+    background: var(--hx-ui-gold);
+    box-shadow: 0 0 0 3px rgb(239 198 91 / 14%);
   }
 
   .hx-tagline {
@@ -661,8 +784,20 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     text-align: right;
     font-size: 0.86rem;
     line-height: 1.55;
-    color: var(--color-ink);
-    opacity: 0.7;
+    color: rgba(248, 240, 220, 0.82);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.38);
+    opacity: 1;
+  }
+
+  /* No base rule existed for `.hx-personal-note` before this pass (only
+     `.hx-pin.hx-static`/responsive position overrides) — it inherited its
+     color from an ancestor. Added here, matching `.hx-tagline`'s new
+     treatment, since it needs the same dark-on-gold contrast and the task
+     calls for both to share this exact color/opacity. */
+  .hx-personal-note {
+    color: rgba(248, 240, 220, 0.82);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.38);
+    opacity: 1;
   }
 
   .hx-actions {
@@ -706,6 +841,59 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     transform: translateY(-2px);
   }
 
+  /* Scoped to `.hx-actions` only — `.hx-btn`/`.hx-btn-primary`/
+     `.hx-btn-ghost` are shared with the compact sidebar's own CTA
+     (`.hx-compact-cta`), so unscoped edits here would leak into it. */
+  .hx-actions .hx-btn {
+    border-radius: 12px;
+    font-weight: 700;
+    transition:
+      transform 0.2s ease,
+      color 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .hx-actions .hx-btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--hx-ui-black),
+      var(--hx-ui-black-warm)
+    );
+    color: var(--hx-ui-gold);
+    border-color: rgb(249 211 119 / 55%);
+    box-shadow:
+      0 12px 30px rgb(35 20 0 / 28%),
+      inset 0 1px 0 rgb(255 242 207 / 10%);
+  }
+
+  .hx-actions .hx-btn-ghost {
+    background: var(--hx-ui-dark-glass-soft);
+    color: var(--hx-ui-ivory);
+    border-color: rgb(249 211 119 / 32%);
+    box-shadow: 0 10px 26px rgb(35 20 0 / 18%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .hx-actions .hx-btn-primary:hover {
+    background: var(--hx-ui-gold);
+    color: var(--hx-ui-black);
+    border-color: var(--hx-ui-gold);
+  }
+
+  .hx-actions .hx-btn-ghost:hover {
+    background: rgb(18 14 8 / 78%);
+    color: var(--hx-ui-gold);
+    border-color: rgb(249 211 119 / 58%);
+  }
+
+  .hx-actions .hx-btn:focus-visible {
+    outline: 2px solid var(--hx-ui-ivory);
+    outline-offset: 3px;
+  }
+
   .hx-nav {
     position: absolute;
     top: var(--hx-nav-top);
@@ -719,7 +907,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     font-weight: 600;
     letter-spacing: 0.01em;
     text-transform: uppercase;
-    color: var(--color-ink);
+    color: rgba(248, 240, 220, 0.92);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.38);
     white-space: nowrap;
   }
 
@@ -750,11 +939,13 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     line-height: 1;
     opacity: var(--nav-sep-opacity, 1);
     font-weight: 400;
-    color: var(--color-ink);
+    color: rgba(224, 197, 139, 0.62);
   }
 
-  .hx-nav :global(a:hover) {
-    color: var(--color-brand-gold-strong);
+  .hx-nav :global(a:hover),
+  .hx-nav :global(a:focus-visible) {
+    color: #e0c58b;
+    text-shadow: 0 2px 10px rgb(18 12 2 / 48%);
   }
 
   /* --- Compact sidebar: its own composition, a `position: fixed` sibling
@@ -862,24 +1053,45 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     transition: border-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Boxed brand mark ("CHISU®") — same gold as the Contacto CTA
-     (`--color-brand-gold`, NOT `--color-brand-gold-strong`, which is a
-     different token), always solid black text regardless of the article's
-     warm/dark theme (the gold background provides its own contrast either
-     way), contained radius (not a pill). `align-self: flex-start` keeps it
-     shrink-wrapped to the text instead of stretching to the article's full
-     width (the article is a column flexbox with default stretch). */
+  /* Brand mark — now the same gold wordmark image used in the hero
+     (`hero-wordmark-gold.png`), not a boxed text treatment: the image is
+     already gold, so no background/padding/typography is needed anymore.
+     `align-self: flex-start` keeps it shrink-wrapped to the image instead
+     of stretching to the article's full width (the article is a column
+     flexbox with default stretch). `position: relative` gives the small
+     (R) mark below a positioning context scoped to just this element. */
   .hx-compact-mark {
     display: inline-flex;
     align-self: flex-start;
-    font-family: var(--font-wordmark);
-    font-weight: 900;
-    font-size: 1.5rem;
-    letter-spacing: -0.01em;
-    padding: 0.3rem 0.65rem;
-    border-radius: 7px;
-    background: var(--color-brand-gold);
-    color: #000;
+    position: relative;
+  }
+
+  /* Sized to ~8.25rem max width, intrinsic 2142x815 ratio preserved via
+     `height: auto` — never deforms, never upscaled past its own natural
+     size on a smaller container thanks to the `min()`. This is also the
+     morph TARGET box (`data-morph-target="brand"` lives on this image
+     directly, not the surrounding link/article), so its rendered rect is
+     exactly the visible wordmark — nothing wider to compensate for. */
+  .hx-compact-wordmark-image {
+    display: block;
+    width: min(8.25rem, 100%);
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Small, independent (R) mark — visually anchored to the wordmark
+     image's top-right corner via absolute positioning (so it never
+     inflates `.hx-compact-mark`'s own box, which stays tightly fit to the
+     image above). `aria-hidden` since the link's own `aria-label` already
+     carries the full accessible name ("CHISU®") for the mark as a whole. */
+  .hx-compact-mark-registered {
+    position: absolute;
+    top: -0.05rem;
+    right: -0.7rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-brand-gold);
   }
 
   .hx-compact-tagline {
@@ -1176,13 +1388,20 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
   @media (min-width: 900px) and (max-width: 1599px) {
     .hx-pin {
       --hx-wordmark-top: 3.2vh;
-      --hx-wordmark-font-size: clamp(4.5rem, 16vw, 10rem);
       --hx-aside-inset: clamp(1.25rem, 5vw, 3rem);
     }
 
     .hx-title-block {
-      top: 40%;
+      top: calc(40% + clamp(2.9rem, 6.5svh, 3.75rem));
       font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+    }
+
+    .hx-title-line:not(.hx-title-highlight) {
+      font-size: clamp(1.51rem, 2.78vw, 2.2rem);
+    }
+
+    .hx-title-highlight mark {
+      font-size: clamp(1.61rem, 2.98vw, 2.36rem);
     }
 
     .hx-metrics {
@@ -1218,12 +1437,6 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
      the exact px value on load/resize regardless, but every tier still
      gets its own explicit starting point rather than relying on one
      clamp() to cover both 1600px and 3000px viewports. */
-  @media (min-width: 1600px) and (max-width: 1919px) {
-    .hx-pin {
-      --hx-wordmark-font-size: clamp(5rem, 17vw, 12rem);
-    }
-  }
-
   /* Desktop portrait tier — reuses the same 1600px threshold as the
      laptop wordmark tier above (open-ended, so it also covers >=1920px
      ultra-wide, unlike that tier's own 1919px cap) rather than inventing
@@ -1235,6 +1448,14 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       top: clamp(0.5rem, 2svh, 1.5rem);
       inset-block-end: auto;
       height: min(195svh, 1700px);
+    }
+
+    .hx-title-line:not(.hx-title-highlight) {
+      font-size: clamp(2.38rem, 4.76vw, 4.13rem);
+    }
+
+    .hx-title-highlight mark {
+      font-size: clamp(2.54rem, 5.08vw, 4.41rem);
     }
   }
 
@@ -1359,8 +1580,7 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       /* Was 0.86rem. */
       font-size: 0.95rem;
       line-height: 1.55;
-      color: var(--color-ink);
-      opacity: 0.7;
+      color: rgba(248, 240, 220, 0.82);
     }
 
     /* `.hx-tagline`'s own base font-size (0.86rem, further down this
@@ -1403,7 +1623,66 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
     }
   }
 
-  /* Small-tablet portrait, 641-899px. CORRECTED: real-browser measurement
+  /* Small-tablet portrait, 641-899px.
+  /* Narrow-desktop collision fix (e.g. 1280x720, 1366x768): at this width
+     the metrics card's left edge and the traits card's right edge start
+     overlapping the title (measured empirically via a Playwright
+     reproduction of this exact CSS, since `astro dev`/`build` can't run in
+     this environment -- real-browser confirmation still needed). Two
+     independent levers, both scoped to ONLY this tier:
+     1) `--hx-metrics-offset`/`--hx-traits-offset` are pulled in from their
+        >=900px values using a `clamp()` whose middle `vw` term is a linear
+        fit between two calibrated endpoints -- the maximum safe shift at
+        1280px (leaves a small but real clearance from the nav text; a flat
+        constant was tested and found to collide with the nav from ~1320px
+        up, since the nav's own rendered width keeps growing with vw while
+        a flat offset doesn't -- hence the taper) and a much smaller shift
+        at 1399px (the collision is far milder there, so less correction is
+        both sufficient and keeps a wide nav margin). Below 1280px the
+        `clamp()` floors to the 1280px value -- still safe (verified, nav
+        margin stays flat ~4px/~31px down to 900px) but the base collision
+        there is severe enough (up to -173px measured at 900px) that it
+        isn't fully eliminated -- out of scope, since only 1280x720 and
+        1366x768 were specified as target viewports.
+     2) A small additional font-size reduction (~6.5%, applied identically
+        to both non-highlighted lines and the `Data Science` mark, so the
+        highlighted line stays visually dominant per the existing
+        hierarchy) on top of this tier's own existing sizing further down
+        -- needed because the card-shift lever alone caps out a few px
+        short of the requested minimum on the tighter (left) side.
+     Together: leftGap/rightGap measured (Playwright, fallback system font
+     since the real "Inter Tight"/"Inter" webfonts aren't reachable from
+     this environment) at 16.3px/19.5px at 1280x720 and ~19px/~35px at
+     1366x768, both with a positive (non-colliding) nav margin throughout
+     1280-1399px. 1440x900 and 1918x907 fall outside `max-width: 1399px`
+     and are untouched.
+     NOTE ON PLACEMENT: this tier must stay positioned AFTER the general
+     `@media (min-width: 900px)` offsets block above (not before, where it
+     originally was) -- both set `--hx-metrics-offset`/`--hx-traits-offset`
+     on the same `.hx-pin` selector (identical specificity), and both
+     media queries match at 900-1399px widths, so without this ordering
+     the general block's later `22.625rem`/`23.125rem` values would win
+     the cascade tie and silently cancel this fix's offsets. Verified via
+     Playwright: before this reordering, computed
+     `--hx-metrics-offset`/`--hx-traits-offset` at 1280px resolved to
+     `22.625rem`/`23.125rem` (the un-corrected values) despite this block
+     being present; after moving it here, they correctly resolve to the
+     clamp()-tapered values. */
+  @media (min-width: 900px) and (max-width: 1399px) {
+    .hx-pin {
+      --hx-metrics-offset: clamp(17.875rem, calc(-276.598px + 43.9529vw), 21.144rem);
+      --hx-traits-offset: clamp(21rem, calc(-29.714px + 28.5714vw), 23.125rem);
+    }
+
+    .hx-title-line:not(.hx-title-highlight) {
+      font-size: clamp(1.412rem, 2.599vw, 2.057rem);
+    }
+
+    .hx-title-highlight mark {
+      font-size: clamp(1.505rem, 2.786vw, 2.207rem);
+    }
+  }
+ CORRECTED: real-browser measurement
      at 768x1024 (Ctrl+R reload, no reduced-motion) showed `.hx-static`
      is NOT active on normal load in this range — `tabletRule: true`,
      `staticMode: false`, `.hx-portrait` still `position: absolute`,
@@ -1419,6 +1698,10 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
      media feature, just not on a normal load) keeps its own separate
      rules further below as a real, working fallback, not repurposed. */
   @media (min-width: 641px) and (max-width: 899px) {
+    .hx-pin {
+      --hx-wordmark-height: min(26svh, 32vw, 14rem);
+    }
+
     .hx-pin:not(.hx-static) .hx-portrait {
       top: clamp(0.5rem, 2svh, 1.5rem);
       inset-block-end: auto;
@@ -1635,6 +1918,10 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
      mobile toggle x wordmark. Starting values to visually validate, not
      guaranteed-final. */
   @media (max-width: 640px) {
+    .hx-pin {
+      --hx-wordmark-height: min(18svh, 30vw, 8rem);
+    }
+
     .hx-wordmark {
       /* Was --hx-wordmark-top (4vh, ~34px at 844px tall) -- pushed down
          so its top clears the mobile toggle's own bottom edge (~60px).
@@ -2006,6 +2293,85 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       // right with a blur(10px)->0 wipe, 2) portrait rising from below,
       // 3) title lines revealed through a mask, 4) nav / cards / buttons
       // settling in last.
+      // ---- Entrance / scroll-timeline handoff state --------------------
+      // `playEntrance()` and `bootScrollTimeline()` are two independent
+      // async chains that both eventually touch the same intro-motion
+      // elements. Without an explicit handoff, a fast scroll right after
+      // F5 could let `buildScrollTimeline()` (built by
+      // `bootScrollTimeline()`) start writing scroll-driven
+      // `opacity`/`transform` on those elements before the entrance's own
+      // completion has cleared its OWN inline styles off them -- whichever
+      // one runs last silently undoes the other, leaving
+      // portrait/actions/personalNote stuck at full opacity over
+      // `AboutSection`. `entranceSettled` is the single gate:
+      // `bootScrollTimeline()` never constructs the scroll timeline until
+      // this resolves, and it only ever resolves AFTER the entrance has
+      // genuinely finished writing to the DOM -- whether by playing out
+      // naturally, being skipped before it ever built a timeline, or being
+      // interrupted mid-play.
+      type EntranceState = "pending" | "playing" | "completed" | "interrupted";
+      let entranceState: EntranceState = "pending";
+      let entranceTl: gsap.core.Timeline | null = null;
+      let entranceAllTargets: HTMLElement[] = [];
+      let entranceSkipRequested = false;
+      let entranceDisposed = false;
+      let resolveEntranceSettled: (() => void) | null = null;
+      const entranceSettled: Promise<void> = new Promise((resolve) => {
+        resolveEntranceSettled = resolve;
+      });
+
+      // Active only while still awaiting fonts/decode -- i.e. before the
+      // entrance has decided whether to play or skip. Records INTENT only:
+      // never touches GSAP, never resolves `entranceSettled`, never moves
+      // `entranceState` to a terminal value.
+      function handleAwaitSkipRequest() {
+        if (window.scrollY <= 0) return; // ignore non-movement/synthetic events
+        entranceSkipRequested = true;
+        window.removeEventListener("scroll", handleAwaitSkipRequest);
+      }
+      function attachAwaitSkipListener() {
+        window.addEventListener("scroll", handleAwaitSkipRequest, { passive: true });
+      }
+      function detachAwaitSkipListener() {
+        window.removeEventListener("scroll", handleAwaitSkipRequest);
+      }
+
+      // Active only while the entrance timeline is the current owner
+      // (`entranceState === "playing"`).
+      function handlePlayingInterrupt() {
+        if (window.scrollY <= 0) return;
+        finishPlayingEntrance("interrupted");
+      }
+      function attachPlayingInterruptListener() {
+        window.addEventListener("scroll", handlePlayingInterrupt, { passive: true });
+      }
+      function detachPlayingInterruptListener() {
+        window.removeEventListener("scroll", handlePlayingInterrupt);
+      }
+
+      // The single idempotent hand-off point for the "playing" branch --
+      // covers natural completion (`onComplete`), a genuine mid-play
+      // interrupt, and the zero-duration edge case. Only ever does real
+      // work if `entranceState === "playing"` at the time it's called, so
+      // whichever of those three sources reaches it first wins and every
+      // other one becomes a guaranteed no-op.
+      function finishPlayingEntrance(reason: "completed" | "interrupted") {
+        if (entranceState !== "playing") return;
+        detachPlayingInterruptListener();
+        entranceState = reason;
+        if (entranceTl) {
+          entranceTl.pause();
+          if (entranceTl.progress() !== 1) {
+            entranceTl.progress(1, true); // suppressEvents -- onComplete never re-fires from this jump
+          }
+          entranceTl.kill();
+          entranceTl = null;
+        }
+        gsap.set(entranceAllTargets, { clearProps: "transform,opacity,filter" });
+        resolveEntranceSettled?.();
+        resolveEntranceSettled = null;
+      }
+
       async function playEntrance() {
         const letters = Array.from(wordmarkEl.querySelectorAll<HTMLElement>(".hx-wordmark-letter"));
         const portraitImg = introMotionEl.querySelector<HTMLElement>(".hx-portrait img");
@@ -2017,18 +2383,30 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
         const closingTargets = [...navLinks, metrics, asideRight, actions].filter(
           (el): el is HTMLElement => el !== null
         );
+        // `.hx-personal-note` has no wrapping container inside
+        // `closingTargets` (unlike `.hx-tagline`, which piggybacks on
+        // `.hx-aside-right`'s own entry there) -- queried separately so it
+        // can get its own equivalent "from" state below, without adding it
+        // to `closingTargets`' existing array/stagger/count.
+        const personalNote = introMotionEl.querySelector<HTMLElement>(".hx-personal-note");
 
-        // If the page didn't load at the top, or the user asked for
-        // reduced motion, the intro must resolve to its end state
-        // instantly rather than play — never leave letters/portrait/title
-        // stuck in their hidden "from" state.
-        const skipToEnd = prefersReducedMotion || window.scrollY > 0;
+        // Computed BEFORE any `await` -- guarantees `entranceAllTargets` is
+        // always populated, even if an unexpected error aborts this
+        // function early (see the `.catch()` on `playEntrance()` below).
+        const allTargets = [...letters, portraitImg, ...titleLines, ...closingTargets, personalNote].filter(
+          (el): el is HTMLElement => el !== null
+        );
+        entranceAllTargets = allTargets;
+
+        attachAwaitSkipListener();
 
         try {
           await document.fonts.ready;
         } catch {
           // Older browsers without document.fonts — proceed anyway.
         }
+
+        if (entranceDisposed) return;
 
         fitWordmarkWidth();
 
@@ -2041,19 +2419,29 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
           }
         }
 
-        const allTargets = [...letters, portraitImg, ...titleLines, ...closingTargets].filter(
-          (el): el is HTMLElement => el !== null
-        );
+        detachAwaitSkipListener();
+
+        if (entranceDisposed) return;
+
+        const shouldSkip = prefersReducedMotion || window.scrollY > 0 || entranceSkipRequested;
+
+        if (shouldSkip) {
+          // No timeline is ever constructed on this path -- nothing to
+          // `.from()`, so there is no immediateRender "from" state to
+          // worry about at all.
+          gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
+          entranceState = "interrupted";
+          resolveEntranceSettled?.();
+          resolveEntranceSettled = null;
+          return;
+        }
 
         const tl = gsap.timeline({
           defaults: { ease: "power3.out" },
           paused: true,
-          onComplete: () => {
-            // No inline transform/opacity/filter left behind that could
-            // conflict with the scroll timeline below.
-            gsap.set(allTargets, { clearProps: "transform,opacity,filter" });
-          },
+          onComplete: () => finishPlayingEntrance("completed"),
         });
+        entranceTl = tl;
 
         if (letters.length) {
           tl.from(
@@ -2075,22 +2463,74 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
           tl.from(titleLines, { yPercent: 110, duration: 0.6, stagger: 0.08 }, "-=0.3");
         }
 
+        // Labels the exact timeline position `closingTargets` itself starts
+        // from ("-=0.2" relative to the timeline's end at THIS point, before
+        // either tween below is added). GSAP resolves a bare "-=0.2" against
+        // the timeline's end AT THE MOMENT OF INSERTION -- a second "-=0.2"
+        // added after the 9-element, 0.05-stagger `closingTargets` tween
+        // (effective span ~0.9s) would resolve 0.9s later than this label,
+        // not at the same instant, which is what previously put
+        // `.hx-personal-note` ~0.7s behind `.hx-aside-right` (0.9s later
+        // start, minus the shared 0.2s pull-back, minus the 0.35s offset
+        // both were already accounting for). Anchoring both tweens below to
+        // this one label keeps them mathematically tied to the same instant
+        // regardless of `closingTargets`' own span.
+        tl.addLabel("closingStart", "-=0.2");
+
         if (closingTargets.length) {
-          tl.from(closingTargets, { y: 16, opacity: 0, duration: 0.5, stagger: 0.05 }, "-=0.2");
+          tl.from(closingTargets, { y: 16, opacity: 0, duration: 0.5, stagger: 0.05 }, "closingStart");
+        }
+
+        if (personalNote) {
+          // Replicates `.hx-aside-right`'s exact effective entrance --
+          // `.hx-tagline` gets its own entrance for free by being a visual
+          // descendant of that container, which IS one of the
+          // `closingTargets` (same y/opacity/duration, same inherited
+          // `power3.out` timeline default ease). Anchored to the
+          // `closingStart` label above -- the SAME instant `closingTargets`
+          // itself starts from -- with `asideRightDelay` (reproducing
+          // `.hx-aside-right`'s own stagger-computed offset: its index
+          // within `closingTargets` times that tween's own 0.05 stagger
+          // amount) applied via the label's own position math, so both
+          // phrases land on the same frame without touching
+          // `closingTargets` itself in any way.
+          const asideRightIndex = asideRight ? closingTargets.indexOf(asideRight) : -1;
+          const asideRightDelay = asideRightIndex >= 0 ? asideRightIndex * 0.05 : 0;
+          tl.from(personalNote, { y: 16, opacity: 0, duration: 0.5 }, `closingStart+=${asideRightDelay}`);
+        }
+
+        if (entranceDisposed) {
+          tl.kill();
+          entranceTl = null;
+          return;
         }
 
         // The entrance must end EXACTLY at scroll progress 0 — it never
         // runs while scrolled, and its resting state (post clearProps) is
         // the same "natural" CSS state the scroll timeline treats as its
         // own progress-0 baseline, so there's no visual pop at the handoff.
-        if (skipToEnd || tl.duration() === 0) {
-          tl.progress(1);
-        } else {
-          tl.play();
+        entranceState = "playing";
+        attachPlayingInterruptListener();
+
+        if (tl.duration() === 0) {
+          finishPlayingEntrance("completed");
+          return;
         }
+
+        tl.play();
       }
 
-      void playEntrance();
+      playEntrance().catch((err) => {
+        console.error("[HeroExperience] playEntrance failed:", err);
+        detachAwaitSkipListener();
+        detachPlayingInterruptListener();
+        entranceTl?.kill();
+        entranceTl = null;
+        gsap.set(entranceAllTargets, { clearProps: "transform,opacity,filter" });
+        entranceState = "interrupted";
+        resolveEntranceSettled?.();
+        resolveEntranceSettled = null;
+      });
 
       // ---- Scroll timeline (individual FLIP-style morph, sidebar
       // persistence) ------------------------------------------------------
@@ -2113,7 +2553,7 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       // combined with `.hx-wrap`'s shorter height (see the <style>
       // comment above `.hx-wrap`), this closes the gap both
       // proportionally and in absolute scroll distance.
-      const SIDEBAR_ACTIVATE_AT = 0.66;
+      const SIDEBAR_ACTIVATE_AT = 0.58;
 
       // Union of a node's *children* rects rather than the node's own
       // `getBoundingClientRect()`. Needed because `.hx-wordmark` (and a few
@@ -2163,11 +2603,52 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       // compact mark). Scale is capped at 1 — every sidebar target is
       // smaller than its hero source, never larger — and uses the smaller
       // of the two axis ratios so text never stretches unevenly.
+      //
+      // Reproduced and confirmed with an isolated Playwright test before
+      // this change: this center-to-center formula, with the default
+      // `transform-origin: 50% 50%`, converges within a fraction of a
+      // pixel — NOT a formula or origin bug. The real cause is a race:
+      // `playEntrance()` and `bootScrollTimeline()` are two independent
+      // async functions with no explicit ordering between them, and
+      // `playEntrance()`'s very first tween (`tl.from(letters, {xPercent:
+      // 60, ...})`) applies its FROM state — the wordmark translated 60%
+      // of its own width to the right — the instant it's created
+      // (`immediateRender`), before `.play()` even runs. If
+      // `buildScrollTimeline()` happens to build (and therefore measure
+      // this source) while that state is still applied, `sourceRect` is
+      // captured offset ~60% of the wordmark's own width away from its
+      // true resting position — in the reproduction, a 719px-wide source
+      // measured there threw the computed `x` off by ~431px, sending the
+      // source flying past its target and off the left edge of the
+      // viewport once the tween played, exactly matching the reported
+      // bug. `playEntrance()` itself is frozen (out of scope to touch),
+      // so instead of trying to sequence around it, the source is forced
+      // back to its true resting geometry immediately before it's
+      // measured — synchronously, so nothing can race between the clear
+      // and the read — regardless of what playEntrance (or a killed prior
+      // scroll timeline) may have left on it. If playEntrance's own tween
+      // is still actively ticking, it simply overwrites this again on its
+      // very next frame — this can never desync or interfere with it.
       function computeMorph(source: HTMLElement, target: HTMLElement) {
+        gsap.set(source, { clearProps: "transform" });
         const sourceRect = contentRect(source);
         const targetRect = contentRect(target);
+        // `.hx-pin` is still `position: relative` (unpinned) whenever this
+        // runs -- buildScrollTimeline() always executes before
+        // ScrollTrigger.refresh() ever engages the pin (see the <script>
+        // comment above buildScrollTimeline()). At scrollY=0 that
+        // coincidentally matches the pinned frame, but after an F5 with a
+        // restored non-zero scrollY, `sourceRect` (still inside natural
+        // document flow) is offset by exactly -scrollY while `targetRect`
+        // (position: fixed) is not, contaminating every computed `y` by
+        // that same scrollY. Subtracting `pinRect.top` normalizes the
+        // source's vertical position back to "where it sits inside the
+        // pin", which is scroll-invariant -- matching the frame the pin
+        // will actually occupy once ScrollTrigger does engage it (trigger
+        // uses `start: "top top"`).
+        const pinRect = pinEl.getBoundingClientRect();
         const sourceCenterX = sourceRect.left + sourceRect.width / 2;
-        const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+        const sourceCenterY = sourceRect.top - pinRect.top + sourceRect.height / 2;
         const targetCenterX = targetRect.left + targetRect.width / 2;
         const targetCenterY = targetRect.top + targetRect.height / 2;
         const scale = Math.max(
@@ -2186,7 +2667,16 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
         const titleBlock = introMotionEl.querySelector<HTMLElement>(".hx-title-block");
         const chipCard = introMotionEl.querySelector<HTMLElement>(".hx-chip-card");
         const actionsEl = introMotionEl.querySelector<HTMLElement>(".hx-actions");
-        return [portraitImg, titleBlock, chipCard, actionsEl].filter((el): el is HTMLElement => el !== null);
+        // Previously missing from every group -- it had no data-morph-source
+        // and wasn't listed here either, so the scroll timeline never
+        // touched it: it stayed at full opacity for the whole transition,
+        // including visually behind the sidebar once revealed. It has no
+        // sidebar equivalent, so it belongs in this fade-only group, same
+        // treatment as the portrait/title/chip-card/actions.
+        const personalNote = introMotionEl.querySelector<HTMLElement>(".hx-personal-note");
+        return [portraitImg, titleBlock, chipCard, actionsEl, personalNote].filter(
+          (el): el is HTMLElement => el !== null
+        );
       }
 
       const blurProxy = { blur: 0 };
@@ -2196,6 +2686,7 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
         const morphPairs = collectMorphPairs();
         const noTargetGroup = collectNoTargetGroup();
         const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
+        const glowEl = pinEl.querySelector<HTMLElement>(".hx-glow");
 
         // Structural fix (not another height/timing tweak): `.hx-wrap`/
         // `.hx-pin` are now both exactly one viewport tall (see the
@@ -2232,13 +2723,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
 
         // State A — 0% to 12%: hero completely still, only the portrait
         // starts blurring (0px -> ~12px). Sidebar stays fully invisible.
-        // Shortened from 0-20% so the central elements stay in their
-        // settled state for less "dead" time up front — the previous
-        // pacing (fixed positions carried over from a taller 240svh/
-        // 300svh wrap) front-loaded stillness and back-loaded the fade,
-        // leaving a visibly quiet stretch right before the sidebar
-        // reveal. Every position below is rebalanced together so motion
-        // continues practically the entire way through the timeline.
+        // Unchanged by this pass — every other position below was
+        // rebalanced around it, not this.
         tl.fromTo(
           blurProxy,
           { blur: 0 },
@@ -2250,73 +2736,100 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
           0
         );
 
-        // State B — 12% to 70%: every source with a sidebar equivalent
-        // travels (translate + scale, computed above) toward its target,
-        // then fades out right at the end of its own travel — never as a
-        // group, always toward the left-hand sidebar, never rightward.
-        // `brand` (CHISU -> CHIISSUU) goes through this exact same
-        // mechanism: it travels/scales toward the sidebar's brand slot
-        // like every other source, then fades out while the sidebar
-        // (revealed in State C below) crossfades the different text
-        // (CHIISSUU) in — a crossfade between two distinct strings, never
-        // a letter-by-letter morph between them. The travel itself runs
-        // longer (0.12->0.60) and the fade-out is pushed later
-        // (0.55->0.70) than before, so the central elements stay visible
-        // longer instead of disappearing early and leaving a quiet
-        // stretch before the sidebar takes over.
-        morphPairs.forEach(({ source, target }) => {
-          const morph = computeMorph(source, target);
-          tl.to(source, { x: morph.x, y: morph.y, scale: morph.scale, duration: 0.48 }, 0.12);
-          tl.to(source, { opacity: 0, duration: 0.15 }, 0.55);
-        });
-
-        // Elements with NO sidebar equivalent: stay put through state A,
-        // then fade fully out with at most a small leftward drift —
-        // never rightward, never re-styled. Slower/later fade (was
-        // 0.22->0.62, now 0.15->0.70) for the same "don't disappear too
-        // soon" reason as the morph pairs above.
-        if (noTargetGroup.length) {
-          tl.to(noTargetGroup, { x: -18, opacity: 0, duration: 0.55 }, 0.15);
-        }
-
-        // Nav separators ("|") have no sidebar equivalent either — faded
-        // via the CSS custom property instead of animating the
-        // `::after` content directly.
+        // Nav separators ("|") have no sidebar equivalent and no position
+        // tween of their own (only the surrounding nav-item TEXT travels) —
+        // so they used to linger, visibly stationary, while the text
+        // around them moved away, reading as orphaned floating bars.
+        // Faded quickly and early (10%->28%) instead, so they're gone
+        // before the nav items have travelled far.
         tl.fromTo(
           navSepProxy,
           { opacity: 1 },
           {
             opacity: 0,
-            duration: 0.4,
+            duration: 0.18,
             onUpdate: () => pinEl.style.setProperty("--nav-sep-opacity", navSepProxy.opacity.toFixed(3)),
           },
-          0.12
+          0.1
         );
 
-        // State C — 66% to 100%: the sidebar's own container/background
-        // appears via OPACITY ONLY (no `x`, so it never reads as sliding
-        // in from the left) while its targets — positioned all along,
-        // just hidden by the container's own opacity/visibility — crossfade
-        // into view along with it. `.is-active` (visibility/pointer-events/
-        // aria-hidden) is handled in `onUpdate` above, keyed off the same
-        // 0.66 threshold this tween starts at, and it deliberately starts
-        // BEFORE State B's fade-out fully finishes (0.66 vs. 0.70) so the
-        // two crossfade into each other with no gap between them. Ends at
-        // 1.0, the exact moment `pinEl` releases per the pin geometry
-        // above (the thing that actually guarantees no leftover gap now —
-        // this timing just keeps the sidebar's own settle in sync with it).
-        tl.fromTo(compactSidebarEl, { opacity: 0 }, { opacity: 1, duration: 0.34 }, 0.66);
+        // Elements with NO sidebar equivalent (portrait, title, chip
+        // card, actions, personal note): fade out early and quickly
+        // (10%->40%), well before the sidebar starts activating at
+        // `SIDEBAR_ACTIVATE_AT` (58%) — clears the composition instead of
+        // colliding with the morphing elements still travelling through
+        // the same space.
+        if (noTargetGroup.length) {
+          tl.to(noTargetGroup, { x: -18, opacity: 0, duration: 0.3 }, 0.1);
+        }
 
-        // Warm backdrop crossfade — fades ONLY `.hx-pin-fade` (never
-        // `pinEl`'s own background, which no longer exists — see the
-        // <style> comment above `.hx-pin`), in the final 12% of the
-        // timeline. By this point `AboutSection`'s real dark background
-        // has already scrolled up to sit directly beneath the fixed pin
-        // (per `pinSpacing: false` above), so fading this single layer
-        // reveals it smoothly instead of the hard cut that would happen
-        // the instant the pin releases with no fade at all.
+        // Every source with a sidebar equivalent travels (translate +
+        // scale, computed above) toward its target — never as a group,
+        // always toward the left-hand sidebar, never rightward — finishing
+        // its travel (10%->60%) just as the sidebar itself starts
+        // appearing (58%, see below), i.e. the sidebar reveals "while the
+        // morphs are still finishing". Opacity is untouched here — the
+        // source stays fully visible, sitting exactly on its destination,
+        // until the fade-out tween below.
+        morphPairs.forEach(({ source, target }) => {
+          const morph = computeMorph(source, target);
+          tl.to(source, { x: morph.x, y: morph.y, scale: morph.scale, duration: 0.5 }, 0.1);
+        });
+
+        // Sources only start hiding once their sidebar targets are
+        // already visibly appearing (62%, i.e. after `SIDEBAR_ACTIVATE_AT`
+        // has already been underway for a few points and after the travel
+        // above has fully landed at 60%) — closing the old gap where the
+        // source had already faded out before the sidebar had begun
+        // showing anything at all. `brand` (CHISU -> CHIISSUU) goes
+        // through this exact same mechanism: it travels/scales toward the
+        // sidebar's brand slot like every other source, sits there fully
+        // formed for a couple of points, then fades out while the
+        // sidebar's own compact wordmark image (revealed in State C below)
+        // crossfades in — a true crossfade, never a moment where both
+        // copies are simultaneously fully opaque, never a moment where
+        // neither is visible.
+        morphPairs.forEach(({ source }) => {
+          tl.to(source, { opacity: 0, duration: 0.24 }, 0.62);
+        });
+
+        // State C — sidebar reveal: starts at `SIDEBAR_ACTIVATE_AT` (58%),
+        // deliberately before State B's morph travel fully finishes (60%)
+        // and well before the sources start fading (62%) — the sidebar's
+        // own container/background appears via OPACITY ONLY (no `x`, so it
+        // never reads as sliding in from the left) while its targets —
+        // positioned all along, just hidden by the container's own
+        // opacity/visibility — crossfade into view along with it.
+        // `.is-active` (visibility/pointer-events/aria-hidden) is handled
+        // in `onUpdate` above, keyed off this same constant. Ends at 90%,
+        // settled well before the pin actually releases at 100%.
+        tl.fromTo(
+          compactSidebarEl,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.32 },
+          SIDEBAR_ACTIVATE_AT
+        );
+
+        // Warm-to-black backdrop crossfade — fades `.hx-pin-fade` (the
+        // gold background image) AND `.hx-glow` (the warm radial
+        // highlights layered on top of it) together, so no warm-toned
+        // layer is left lingering once the base beneath them is already
+        // black. Spans the final 23% of the timeline (75%->98%), clearly
+        // perceptible rather than the previous few visual tenths, and
+        // finishes 2 points before the pin actually releases at 100% —
+        // fully settled before the unpin, not exactly coincident with it.
+        // By this point `AboutSection`'s real dark background has already
+        // scrolled up to sit directly beneath the fixed pin (per
+        // `pinSpacing: false` above), and `.hx-pin-fade`'s own solid base
+        // color now matches `--section-dark-start` exactly (see the
+        // <style> comment above `.hx-pin-fade`), so fading these two
+        // layers reveals it smoothly with no beige/light flash at any
+        // point along the way.
         if (pinFadeEl) {
-          tl.to(pinFadeEl, { opacity: 0, duration: 0.12 }, 0.88);
+          tl.to(pinFadeEl, { opacity: 0, duration: 0.23 }, 0.75);
+        }
+        if (glowEl) {
+          tl.to(glowEl, { opacity: 0, duration: 0.23 }, 0.75);
         }
 
         // If this (re)build happens mid-scroll (e.g. a resize while already
@@ -2342,6 +2855,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
         gsap.set(compactSidebarEl, { clearProps: "opacity" });
         const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
         if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity" });
+        const glowEl = pinEl.querySelector<HTMLElement>(".hx-glow");
+        if (glowEl) gsap.set(glowEl, { clearProps: "opacity" });
         // Explicit `display: none` fallback for reduced-motion/mobile static
         // mode (see `.hx-wrap.hx-static + .hx-compact-sidebar` in the
         // <style> above) — this just resets the class/attribute state that
@@ -2399,6 +2914,8 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
           }
         }
         fitWordmarkWidth();
+        await entranceSettled;
+        if (entranceDisposed) return;
         ctx.add(() => evaluateMode());
         // Initial sync in case the page loads already scrolled mid-way
         // through a dark section (e.g. a deep link/anchor, or a reload
@@ -2623,6 +3140,22 @@ const wordmarkLetters: string[] = Array.from(t.hero.displayWordmark);
       }
 
       return () => {
+        entranceDisposed = true;
+        detachAwaitSkipListener();
+        detachPlayingInterruptListener();
+        if (entranceTl) {
+          entranceTl.pause();
+          entranceTl.kill();
+          entranceTl = null;
+        }
+        // Resolving here (in addition to the `if (entranceDisposed) return;`
+        // check inside `bootScrollTimeline()`) unblocks a `playEntrance()`
+        // that was disposed while still "pending" (still awaiting
+        // fonts/decode) -- without this, `await entranceSettled` in
+        // `bootScrollTimeline()` would never resolve and that async chain
+        // would hang forever instead of reaching its own disposed check.
+        resolveEntranceSettled?.();
+        resolveEntranceSettled = null;
         window.clearTimeout(resizeTimer);
         window.removeEventListener("resize", onResize);
         prefersReducedMotionQuery.removeEventListener("change", onMotionPrefChange);

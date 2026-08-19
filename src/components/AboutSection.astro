@@ -109,6 +109,32 @@ const about = t.about;
 </section>
 
 <style>
+  /* Layout.astro's shared `.section-theme-dark` background (`is:global`)
+     is a 3-stop vertical gradient (dark -> slightly lighter center ->
+     dark) computed against EACH section's own total height. About is by
+     far the tallest `.section-theme-dark` section (7 stacked content
+     blocks), and that combination produces a visible horizontal
+     discontinuity partway down, around the "Más allá de la Ingeniería
+     del Software" block. The shared rule itself lives in Layout.astro,
+     outside this pass's authorized file scope, and editing it directly
+     would also repaint Projects/Servicios y Tools/Contacto/FAQ — none of
+     which were reported as broken and none of which are in scope here.
+     Astro's automatic style scoping solves both problems at once: a
+     same-selector rule written in THIS component's own <style> block
+     only ever matches the <section> this component itself renders (Astro
+     attaches a component-specific attribute to it), so it can never
+     affect the other four sections that reuse the same shared class, and
+     it never touches Layout.astro. Replacing the height-dependent
+     gradient with its own solid start/end color is the one change that
+     provably guarantees zero internal seam regardless of the section's
+     total height — a flat color has no internal variation to produce a
+     discontinuity from. The decorative center-lightening effect is
+     dropped rather than reproduced in another form, since guaranteed
+     continuity was the explicit requirement, not preserving the vignette. */
+  .section-theme-dark {
+    background: var(--section-dark-start);
+  }
+
   .ab-inner {
     display: flex;
     flex-direction: column;

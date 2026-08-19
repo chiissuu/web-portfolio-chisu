@@ -97,7 +97,7 @@ const fontHref =
 
       const target = event.target;
       const preservesMiddleClick =
-        target && typeof target.closest === "function" && target.closest(PRESERVE_MIDDLE_CLICK_SELECTOR);
+        target instanceof Element && target.closest(PRESERVE_MIDDLE_CLICK_SELECTOR);
       if (preservesMiddleClick) return;
 
       event.preventDefault();
