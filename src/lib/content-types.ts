@@ -131,23 +131,22 @@ export interface AboutMeCopy {
   paragraphs: readonly string[];
 }
 
-export interface BeyondSoftwareEngineeringCopy {
-  heading: string;
-  paragraphs: readonly string[];
-  gfxButtonLabel: string;
+/** A single narrative chapter (01-04) in the new editorial structure --
+ * replaces the old fixed `beyondSoftwareEngineering`/`personalBackground`/
+ * `currentFocus` triplet with a typed collection so chapters can be
+ * authored as data instead of one hardcoded block per topic. `cta` is
+ * optional -- only chapters 03 and 04 currently carry a link. */
+export interface AboutChapterCta {
+  label: string;
+  ariaLabel: string;
+  href: string;
 }
 
-export interface PersonalBackgroundCopy {
+export interface AboutChapter {
+  number: string;
   heading: string;
-  paragraphs: readonly string[];
-  esportsButtonLabel: string;
-  esportsHref: string;
-  closingParagraph: string;
-}
-
-export interface CurrentFocusCopy {
-  heading: string;
-  items: readonly string[];
+  paragraphs: string[];
+  cta?: AboutChapterCta;
 }
 
 export interface FormacionEntry {
@@ -167,10 +166,7 @@ export interface IdiomasCopy {
 
 export interface AboutContent {
   aboutMe: AboutMeCopy;
-  beyondSoftwareEngineering: BeyondSoftwareEngineeringCopy;
-  personalBackground: PersonalBackgroundCopy;
-  currentFocus: CurrentFocusCopy;
-  designArchiveHref: string;
+  chapters: AboutChapter[];
   skillsTitle: string;
   skillGroups: SkillGroup[];
   formacion: FormacionCopy;

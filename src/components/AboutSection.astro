@@ -22,47 +22,41 @@ const about = t.about;
       </div>
     </header>
 
-    <!-- 2. Beyond Software Engineering -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-beyond-heading">
-      <h3 id="ab-beyond-heading" class="ab-subheading">{about.beyondSoftwareEngineering.heading}</h3>
-      <div class="ab-prose editorial-text">
-        {about.beyondSoftwareEngineering.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-      </div>
-      <a class="ab-cta-btn" href={about.designArchiveHref} target="_blank" rel="noopener noreferrer">
-        {about.beyondSoftwareEngineering.gfxButtonLabel}
-      </a>
-    </section>
+    <!-- 2. Capítulos narrativos (01-04) — replaces the old fixed
+         beyondSoftwareEngineering/personalBackground/currentFocus triplet.
+         Each chapter is real data (about.chapters), rendered as its own
+         semantic <section>, two-column on desktop (number | body) via
+         .ab-chapter in the <style> below. No tabs/accordion/"leer más" —
+         every chapter stays fully in the document, in linear reading
+         order. -->
+    <div class="ab-chapters">
+      {about.chapters.map((chapter) => (
+        <section class="ab-chapter rd-reveal" aria-labelledby={`ab-chapter-${chapter.number}-heading`}>
+          <p class="ab-chapter-number" aria-hidden="true">{chapter.number}</p>
+          <div class="ab-chapter-body">
+            <h3 id={`ab-chapter-${chapter.number}-heading`} class="ab-subheading">
+              {chapter.heading}
+            </h3>
+            <div class="ab-prose editorial-text">
+              {chapter.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            </div>
+            {chapter.cta && (
+              <a
+                class="ab-cta-btn"
+                href={chapter.cta.href}
+                aria-label={chapter.cta.ariaLabel}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {chapter.cta.label}
+              </a>
+            )}
+          </div>
+        </section>
+      ))}
+    </div>
 
-    <!-- 3. Personal Background -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-background-heading">
-      <h3 id="ab-background-heading" class="ab-subheading">{about.personalBackground.heading}</h3>
-      <div class="ab-prose editorial-text">
-        {about.personalBackground.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-      </div>
-      <a
-        class="ab-cta-btn"
-        href={about.personalBackground.esportsHref}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {about.personalBackground.esportsButtonLabel}
-      </a>
-      <div class="ab-prose editorial-text ab-prose-after-cta">
-        <p>{about.personalBackground.closingParagraph}</p>
-      </div>
-    </section>
-
-    <!-- 4. Current Focus -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-focus-heading">
-      <h3 id="ab-focus-heading" class="ab-subheading">{about.currentFocus.heading}</h3>
-      <ul class="ab-focus-grid">
-        {about.currentFocus.items.map((item) => (
-          <li class="ab-focus-item editorial-text">{item}</li>
-        ))}
-      </ul>
-    </section>
-
-    <!-- 5. Skills — content/organization unchanged, only the presentation. -->
+    <!-- 3. Skills — content/organization unchanged, only the presentation. -->
     <section class="ab-block rd-reveal" aria-labelledby="ab-skills-heading">
       <SectionHeadingCard text={about.skillsTitle} as="h3" size="md" />
       <div class="ab-skills-grid">
@@ -82,7 +76,7 @@ const about = t.about;
       </div>
     </section>
 
-    <!-- 6. Formación -->
+    <!-- 4. Formación -->
     <section class="ab-block rd-reveal" aria-labelledby="ab-formacion-heading">
       <SectionHeadingCard text={about.formacion.title} as="h3" size="md" />
       <a
@@ -96,7 +90,7 @@ const about = t.about;
       </a>
     </section>
 
-    <!-- 7. Idiomas -->
+    <!-- 5. Idiomas -->
     <section class="ab-block rd-reveal" aria-labelledby="ab-idiomas-heading">
       <SectionHeadingCard text={about.idiomas.title} as="h3" size="md" />
       <ul class="ab-languages">
@@ -112,10 +106,10 @@ const about = t.about;
   /* Layout.astro's shared `.section-theme-dark` background (`is:global`)
      is a 3-stop vertical gradient (dark -> slightly lighter center ->
      dark) computed against EACH section's own total height. About is by
-     far the tallest `.section-theme-dark` section (7 stacked content
-     blocks), and that combination produces a visible horizontal
-     discontinuity partway down, around the "Más allá de la Ingeniería
-     del Software" block. The shared rule itself lives in Layout.astro,
+     far the tallest `.section-theme-dark` section (intro + 4 narrative
+     chapters + Skills/Formación/Idiomas), and that combination produces a
+     visible horizontal discontinuity partway down. The shared rule itself
+     lives in Layout.astro,
      outside this pass's authorized file scope, and editing it directly
      would also repaint Projects/Servicios y Tools/Contacto/FAQ — none of
      which were reported as broken and none of which are in scope here.
@@ -167,10 +161,6 @@ const about = t.about;
     margin-top: 1.1rem;
   }
 
-  .ab-prose-after-cta {
-    margin-top: 1.5rem;
-  }
-
   .ab-cta-btn {
     display: inline-flex;
     align-items: center;
@@ -194,33 +184,41 @@ const about = t.about;
     border-color: var(--color-brand-gold);
   }
 
-  .ab-focus-grid {
-    list-style: none;
+  /* Chapters 01-04 -- narrow decorative-number column + main body column
+     on desktop, collapsing to a single column under 900px (same
+     breakpoint already used by .ab-skills-grid below). A top border
+     between consecutive chapters is the "clear separation" called for;
+     the first chapter has none since .ab-chapters already sits below the
+     intro via .ab-inner's own gap. No fixed heights, no overflow/clip --
+     every chapter grows freely with its own content. */
+  .ab-chapters {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ab-chapter {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.85rem;
+    grid-template-columns: minmax(0, 3.5rem) minmax(0, 1fr);
+    gap: clamp(1rem, 2.5vw, 2rem);
+    padding-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--theme-border);
   }
 
-  .ab-focus-item {
-    max-width: none;
-    padding: 0.9rem 1.1rem;
-    border: 1px solid var(--theme-border);
-    border-radius: 10px;
-    background: var(--theme-surface);
-    color: var(--theme-text-muted);
-    position: relative;
-    padding-left: 1.6rem;
+  .ab-chapter:first-child {
+    padding-top: 0;
+    border-top: none;
   }
 
-  .ab-focus-item::before {
-    content: "";
-    position: absolute;
-    left: 0.9rem;
-    top: 1.15rem;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-brand-gold);
+  .ab-chapter-number {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-gold);
+  }
+
+  .ab-chapter-body {
+    min-width: 0;
   }
 
   .ab-skills-grid {
@@ -319,8 +317,11 @@ const about = t.about;
   }
 
   @media (max-width: 900px) {
-    .ab-skills-grid,
-    .ab-focus-grid {
+    .ab-skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ab-chapter {
       grid-template-columns: 1fr;
     }
   }
