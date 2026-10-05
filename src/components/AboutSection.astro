@@ -1,6 +1,5 @@
 ---
 import type { AboutSectionContent } from "../lib/content-types";
-import SectionHeadingCard from "./SectionHeadingCard.astro";
 
 interface Props {
   t: AboutSectionContent;
@@ -9,156 +8,528 @@ interface Props {
 const { t } = Astro.props as Props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const about = t.about;
+
+// Local accent colors for the four scenes — never a global/shared token,
+// only ever read inside this component via `--ab-tone`, set inline per
+// scene from `scene.tone`. About now runs on the warm/beige theme (see the
+// corrective pass), so these are darkened/saturated versions of the
+// original dark-background set — light cyan/violet/gold/coral would all
+// but disappear against `--color-bg`. Gold mirrors the portfolio's own
+// `--color-brand-gold-strong` (Layout.astro) rather than inventing a new
+// hex, per the "reuse, don't invent" instruction.
+const TONE_COLORS: Record<string, string> = {
+  cyan: "#0E7490",
+  violet: "#6D28D9",
+  gold: "#8A6420",
+  coral: "#C2410C",
+};
+
+// Pure display transformation — breaks a long paragraph into shorter
+// visual blocks at sentence boundaries so About reads as short editorial
+// passages instead of one dense block. Never changes words, order, or
+// content. Splits only on whitespace that immediately follows `.`/`!`/`?`
+// (via `String.split`, which by construction can never drop characters —
+// unlike a `match()`-based approach, it can't silently lose a whole
+// sentence when a period has no trailing space, e.g. "MegatronixOS.").
+function splitIntoBlocks(text: string, sentencesPerBlock = 2): string[] {
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  const blocks: string[] = [];
+  for (let i = 0; i < sentences.length; i += sentencesPerBlock) {
+    blocks.push(sentences.slice(i, i + sentencesPerBlock).join(" "));
+  }
+  return blocks;
+}
+
+const formacionFacts = [
+  { label: about.formacion.labels.institution, value: about.formacion.entry.institution },
+  { label: about.formacion.labels.program, value: about.formacion.entry.program },
+  { label: about.formacion.labels.specialization, value: about.formacion.entry.specialization },
+  { label: about.formacion.labels.status, value: about.formacion.entry.status },
+];
 ---
 
-<section class="section-theme-dark" id="about">
+<section class="section-theme-warm" id="about">
   <div class="section-inner ab-inner">
-    <!-- 1. Sobre mí / About Me -->
-    <header class="ab-block ab-intro rd-reveal">
-      <p class="ab-eyebrow">{about.aboutMe.eyebrow}</p>
-      <SectionHeadingCard text={about.aboutMe.title} as="h2" size="lg" />
-      <div class="ab-prose editorial-text">
-        {about.aboutMe.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <!-- Body grid: a real, permanently reserved rail column (col 1) next to
+         a SINGLE content column (col 2) holding the cover, the four scenes,
+         "Mi base actual" and Skills together — so all of them share the
+         exact same left edge. Before this corrective pass the cover/
+         foundation/skills sat directly in `.ab-inner` (unindented) while
+         the scenes sat inside this grid's 2nd column (indented by the rail
+         width), producing three different left edges down the section;
+         moving every block into the same grid column fixes that in one
+         place instead of hand-matching paddings. Below 900px the grid
+         collapses to a single block and the rail hides — see the rail's
+         own comment for why it's still safe to keep in the DOM there. -->
+    <div class="ab-body">
+      <div class="ab-rail" aria-hidden="true">
+        <div class="ab-rail-track"><div class="ab-rail-fill"></div></div>
+        <ul class="ab-rail-nodes">
+          {about.scenes.map((scene, i) => (
+            <li
+              class:list={["ab-rail-node", i === 0 && "is-active"]}
+              style={`--ab-tone: ${TONE_COLORS[scene.tone]}`}
+            >
+              <span class="ab-rail-dot"></span>
+              <span class="ab-rail-label">{scene.railLabel}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-    </header>
 
-    <!-- 2. Capítulos narrativos (01-04) — replaces the old fixed
-         beyondSoftwareEngineering/personalBackground/currentFocus triplet.
-         Each chapter is real data (about.chapters), rendered as its own
-         semantic <section>, two-column on desktop (number | body) via
-         .ab-chapter in the <style> below. No tabs/accordion/"leer más" —
-         every chapter stays fully in the document, in linear reading
-         order. -->
-    <div class="ab-chapters">
-      {about.chapters.map((chapter) => (
-        <section class="ab-chapter rd-reveal" aria-labelledby={`ab-chapter-${chapter.number}-heading`}>
-          <p class="ab-chapter-number" aria-hidden="true">{chapter.number}</p>
-          <div class="ab-chapter-body">
-            <h3 id={`ab-chapter-${chapter.number}-heading`} class="ab-subheading">
-              {chapter.heading}
-            </h3>
-            <div class="ab-prose editorial-text">
-              {chapter.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-            </div>
-            {chapter.cta && (
-              <a
-                class="ab-cta-btn"
-                href={chapter.cta.href}
-                aria-label={chapter.cta.ariaLabel}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {chapter.cta.label}
-              </a>
-            )}
-          </div>
-        </section>
-      ))}
-    </div>
-
-    <!-- 3. Skills — content/organization unchanged, only the presentation. -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-skills-heading">
-      <SectionHeadingCard text={about.skillsTitle} as="h3" size="md" />
-      <div class="ab-skills-grid">
-        {about.skillGroups.map((group) => (
-          <div class="ab-skill-card">
-            <p class="ab-skill-card-title">{group.title}</p>
-            <div class="ab-skill-tags">
-              {group.items.map(([name, icon]) => (
-                <span>
-                  {icon && <img src={`${base}/assets/skills/${icon}`} alt="" aria-hidden="true" />}
-                  {name}
+      <div class="ab-content">
+        <!-- 1. Typographic cover — no card/button treatment, no
+             SectionHeadingCard. `SOBRE MÍ`/`ABOUT ME` is an editorial
+             eyebrow label, not a second heading; the single semantic <h2>
+             is the stacked 3-line title. Two columns at desktop (heading
+             block | prose) so the first paragraph fills the width the
+             title doesn't use, instead of both being squeezed into one
+             narrow column with empty space to the right. -->
+        <header class="ab-cover rd-reveal">
+          <div class="ab-cover-heading">
+            <p class="ab-eyebrow">{about.aboutMe.eyebrow}</p>
+            <h2 class="ab-title">
+              {about.aboutMe.titleLines.map((line) => (
+                <span class="ab-title-line">
+                  {line.map((seg) => (
+                    <span class:list={["ab-title-seg", seg.tone && `ab-tone-${seg.tone}`]}>{seg.text}</span>
+                  ))}
                 </span>
               ))}
+            </h2>
+            <p class="ab-language-line">{about.aboutMe.languageLine}</p>
+          </div>
+          <div class="ab-cover-prose editorial-text">
+            {splitIntoBlocks(about.aboutMe.paragraphs[0]).map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        </header>
+
+        <!-- 2. The four editorial scenes. Rail activation is a single
+             IntersectionObserver scoped to this component (see <script>
+             below) — no GSAP/ScrollTrigger/global listeners/rAF loops. -->
+        <div class="ab-scenes">
+          {about.scenes.map((scene) => (
+            <section
+              class="ab-scene rd-reveal"
+              id={`about-scene-${scene.id}`}
+              aria-labelledby={`ab-scene-${scene.id}-heading`}
+              style={`--ab-tone: ${TONE_COLORS[scene.tone]}`}
+            >
+              <div class="ab-scene-head">
+                <span class="ab-scene-emoji" aria-hidden="true">{scene.emoji}</span>
+                <h3 id={`ab-scene-${scene.id}-heading`} class="ab-scene-title">{scene.title}</h3>
+              </div>
+              <p class="ab-scene-highlight">{scene.highlight}</p>
+              <div class="ab-scene-grid">
+                <div class="ab-scene-prose editorial-text">
+                  {scene.paragraphs.flatMap((paragraph) => splitIntoBlocks(paragraph)).map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                  {scene.cta && (
+                    <a
+                      class="ab-cta-btn"
+                      href={scene.cta.href}
+                      aria-label={scene.cta.ariaLabel}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {scene.cta.label}
+                    </a>
+                  )}
+                </div>
+
+                <!-- Hub-and-branches "org chart", built entirely from plain
+                     flow layout + borders (no absolute coordinates, no
+                     SVG) — a vertical connector under the hub meets a
+                     horizontal spine (the branch row's own top border), and
+                     each branch has a short tick (its own top border)
+                     dropping from that spine. Every line is anchored to a
+                     real element's own box, so it can never end up
+                     "orphaned" or drift out of place when the row reflows
+                     at a different width. -->
+                <div class="ab-scene-visual">
+                  {scene.networkBranches && (
+                    <div class="ab-network">
+                      <p class="ab-network-hub">{scene.networkHub}</p>
+                      <div class="ab-network-branches">
+                        {scene.networkBranches.map((branch) => (
+                          <div class="ab-network-branch">
+                            <p class="ab-network-tech">{branch.tech}</p>
+                            <p class="ab-network-project">{branch.project}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {scene.pipeline && (
+                    <div class="ab-pipeline">
+                      {scene.pipeline.flatMap((stage, i) =>
+                        i < scene.pipeline!.length - 1
+                          ? [
+                              <span class="ab-pipeline-stage">{stage}</span>,
+                              <span class="ab-pipeline-arrow" aria-hidden="true">&#8595;</span>,
+                            ]
+                          : [<span class="ab-pipeline-stage">{stage}</span>]
+                      )}
+                    </div>
+                  )}
+
+                  {scene.triangleVertices && (
+                    <div class="ab-triangle">
+                      <svg class="ab-triangle-shape" viewBox="0 0 100 88" preserveAspectRatio="none" aria-hidden="true">
+                        <polygon points="50,4 8,82 92,82"></polygon>
+                      </svg>
+                      <span class="ab-triangle-vertex ab-triangle-top">{scene.triangleVertices[0]}</span>
+                      <span class="ab-triangle-vertex ab-triangle-left">{scene.triangleVertices[1]}</span>
+                      <span class="ab-triangle-vertex ab-triangle-right">{scene.triangleVertices[2]}</span>
+                      <span class="ab-triangle-center">{scene.triangleCenter}</span>
+                    </div>
+                  )}
+
+                  {scene.words && (
+                    <ul class="ab-word-cluster">
+                      {scene.words.map((word) => <li class="ab-word">{word}</li>)}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </section>
+          ))}
+        </div>
+
+        <!-- 3. Formación + Idiomas — closes the personal-profile half of
+             the section before Skills takes over as the visual culmination. -->
+        <section class="ab-foundation rd-reveal" aria-labelledby="ab-foundation-heading">
+          <h3 id="ab-foundation-heading" class="ab-section-title">{about.foundationTitle}</h3>
+          <div class="ab-foundation-grid">
+            <a
+              class="ab-formacion-card"
+              href={about.formacion.entry.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <p class="ab-foundation-label">{about.formacion.title}</p>
+              <dl class="ab-formacion-facts">
+                {formacionFacts.map((fact) => (
+                  <div class="ab-formacion-fact">
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <span class="ab-formacion-arrow" aria-hidden="true">&#8599;</span>
+            </a>
+
+            <div class="ab-idiomas-card">
+              <p class="ab-foundation-label">{about.idiomas.title}</p>
+              <ul class="ab-languages">
+                {about.idiomas.items.map((item) => (
+                  <li class="ab-language-chip">
+                    <span class="ab-language-name">{item.language}</span>
+                    <span class="ab-language-level">{item.level}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        ))}
+        </section>
+
+        <!-- 4. Skills — the section's bento culmination and closing block.
+             No CTA after this — About ends here and Proyectos begins
+             immediately (see the corrective pass's CTA removal). -->
+        <section class="ab-skills rd-reveal" aria-labelledby="ab-skills-heading">
+          <h3 id="ab-skills-heading" class="ab-section-title">{about.skillsTitle}</h3>
+          <div class="ab-bento">
+            {about.skillGroups.map((group) => (
+              <div class={`ab-bento-card ab-bento-${group.id}`}>
+                <p class="ab-bento-title">{group.title}</p>
+                <div class="ab-bento-tags">
+                  {group.items.map(([name, icon]) => (
+                    <span class="ab-bento-tag">
+                      {icon && <img src={`${base}/assets/skills/${icon}`} alt="" aria-hidden="true" />}
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
-    </section>
-
-    <!-- 4. Formación -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-formacion-heading">
-      <SectionHeadingCard text={about.formacion.title} as="h3" size="md" />
-      <a
-        class="ab-formacion-card"
-        href={about.formacion.entry.href}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="editorial-text">{about.formacion.entry.text}</span>
-        <span class="ab-formacion-arrow" aria-hidden="true">&#8599;</span>
-      </a>
-    </section>
-
-    <!-- 5. Idiomas -->
-    <section class="ab-block rd-reveal" aria-labelledby="ab-idiomas-heading">
-      <SectionHeadingCard text={about.idiomas.title} as="h3" size="md" />
-      <ul class="ab-languages">
-        {about.idiomas.items.map((item) => (
-          <li class="ab-language-chip">{item}</li>
-        ))}
-      </ul>
-    </section>
+    </div>
   </div>
 </section>
 
+<script>
+  // Scoped exclusively to this component's own markup (`.ab-scene`/
+  // `.ab-rail-node` only ever exist inside AboutSection.astro, rendered
+  // once on the home page) — a single IntersectionObserver, no GSAP/
+  // ScrollTrigger, no global scroll listeners, no requestAnimationFrame
+  // loop. If IntersectionObserver isn't supported, the rail simply stays
+  // in its default state (still visible, just not highlighted) — every
+  // scene's real content (headings/paragraphs/visuals) is always in the
+  // DOM regardless, so nothing depends on this script to be readable.
+  const aboutScenes = document.querySelectorAll<HTMLElement>(".ab-scene");
+  const railNodes = document.querySelectorAll<HTMLElement>(".ab-rail-node");
+  const railFill = document.querySelector<HTMLElement>(".ab-rail-fill");
+
+  if ("IntersectionObserver" in window && aboutScenes.length && railNodes.length) {
+    const setActive = (index: number) => {
+      railNodes.forEach((node, i) => node.classList.toggle("is-active", i === index));
+      if (railFill) {
+        railFill.style.setProperty("--ab-rail-progress", String((index + 1) / aboutScenes.length));
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (!visible.length) return;
+        const closest = visible.reduce((a, b) =>
+          Math.abs(a.boundingClientRect.top) < Math.abs(b.boundingClientRect.top) ? a : b
+        );
+        const index = Array.from(aboutScenes).indexOf(closest.target as HTMLElement);
+        if (index !== -1) setActive(index);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+    );
+
+    aboutScenes.forEach((scene) => observer.observe(scene));
+  }
+</script>
+
 <style>
-  /* Layout.astro's shared `.section-theme-dark` background (`is:global`)
-     is a 3-stop vertical gradient (dark -> slightly lighter center ->
-     dark) computed against EACH section's own total height. About is by
-     far the tallest `.section-theme-dark` section (intro + 4 narrative
-     chapters + Skills/Formación/Idiomas), and that combination produces a
-     visible horizontal discontinuity partway down. The shared rule itself
-     lives in Layout.astro,
-     outside this pass's authorized file scope, and editing it directly
-     would also repaint Projects/Servicios y Tools/Contacto/FAQ — none of
-     which were reported as broken and none of which are in scope here.
-     Astro's automatic style scoping solves both problems at once: a
-     same-selector rule written in THIS component's own <style> block
-     only ever matches the <section> this component itself renders (Astro
-     attaches a component-specific attribute to it), so it can never
-     affect the other four sections that reuse the same shared class, and
-     it never touches Layout.astro. Replacing the height-dependent
-     gradient with its own solid start/end color is the one change that
-     provably guarantees zero internal seam regardless of the section's
-     total height — a flat color has no internal variation to produce a
-     discontinuity from. The decorative center-lightening effect is
-     dropped rather than reproduced in another form, since guaranteed
-     continuity was the explicit requirement, not preserving the vignette. */
-  .section-theme-dark {
-    background: var(--section-dark-start);
+  .ab-inner {
+    display: block;
   }
 
-  .ab-inner {
+  .ab-body {
+    display: block;
+  }
+
+  .ab-content {
     display: flex;
     flex-direction: column;
-    gap: clamp(3rem, 6vw, 4.5rem);
+    gap: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  /* ---------------------------------------------------------------------
+     Rail — a real column reserved between the sidebar and the content
+     column (never a negative margin reaching into
+     `--sidebar-content-gap`, never overlapping the fixed sidebar, since it
+     never leaves its own grid track). Rebuilt from scratch in this
+     corrective pass: the previous version absolutely-positioned four
+     `writing-mode: vertical-rl` labels at fixed top percentages (4/36/64/
+     92%) sized to fit a much taller `.ab-scenes` column — vertical text is
+     as TALL as it is long, so "DIRECCIÓN" (9 characters) rendered far
+     taller than the ~28% gap between two of those percentage marks, and
+     every label overlapped the next. Horizontal labels in a plain flex
+     column with a fixed, generous `gap` can never do that: their height is
+     just their own font-size, entirely decoupled from how tall the
+     content column happens to be.
+
+     `display: none` below 900px lives ONLY inside the `@media (max-width:
+     899px)` block further down, never as a bare unguarded `.ab-rail`
+     rule here — this component's dev server was observed serving just
+     the `@media (min-width: 900px)` variant of this exact selector and
+     silently dropping an unguarded same-selector base rule, which left
+     the rail visible (as a plain bulleted list) below 900px. Two
+     media-guarded rules for the same selector don't hit that. -->
+  .ab-rail-track {
+    position: relative;
+    width: 2px;
+    background: var(--theme-border);
+  }
+
+  .ab-rail-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(var(--ab-rail-progress, 0) * 100%);
+    background: var(--color-brand-gold-strong);
+    transition: height 0.4s ease;
+  }
+
+  .ab-rail-nodes {
+    list-style: none;
+  }
+
+  .ab-rail-node {
+    display: flex;
+    align-items: center;
+  }
+
+  .ab-rail-dot {
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--theme-surface-strong);
+    border: 2px solid var(--theme-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ab-rail-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+    white-space: nowrap;
+    transition: color 0.3s ease, font-weight 0.3s ease;
+  }
+
+  .ab-rail-node.is-active .ab-rail-dot {
+    background: var(--ab-tone);
+    border-color: var(--ab-tone);
+    box-shadow: 0 0 8px 0 var(--ab-tone);
+  }
+
+  .ab-rail-node.is-active .ab-rail-label {
+    color: var(--ab-tone);
+    font-weight: 700;
+  }
+
+  /* ---------------------------------------------------------------------
+     Cover
+     --------------------------------------------------------------------- */
+  .ab-cover {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
   }
 
   .ab-eyebrow {
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--theme-text-muted);
-    margin-bottom: 1rem;
+    color: var(--color-brand-gold-strong);
+    margin: 0 0 1.1rem;
   }
 
-  .ab-subheading {
+  .ab-title {
+    margin: 0 0 1.25rem;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
-    letter-spacing: -0.01em;
-    margin-bottom: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+  }
+
+  .ab-title-line {
+    display: block;
+    font-size: clamp(2.1rem, 5.6vw, 3.9rem);
+  }
+
+  .ab-title-seg {
     color: var(--theme-text);
   }
 
-  .ab-prose p {
+  .ab-tone-cool {
+    background: linear-gradient(120deg, #0e7490, #4c3aa8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: #164e63;
+  }
+
+  .ab-tone-gold {
+    color: var(--color-brand-gold-strong);
+  }
+
+  .ab-language-line {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--theme-text-muted);
+    margin: 0;
+  }
+
+  .ab-cover-prose p {
+    color: var(--theme-text);
+    max-width: 62ch;
+  }
+
+  .ab-cover-prose p + p {
+    margin-top: 1rem;
+  }
+
+  /* ---------------------------------------------------------------------
+     Scenes
+     --------------------------------------------------------------------- */
+  .ab-scenes {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ab-scene {
+    display: flex;
+    flex-direction: column;
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  .ab-scenes .ab-scene:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .ab-scene-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .ab-scene-emoji {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(26, 25, 25, 0.06);
+    border: 1px solid var(--ab-tone);
+    box-shadow: 0 0 14px -4px var(--ab-tone);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  .ab-scene-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+    letter-spacing: -0.01em;
+    color: var(--theme-text);
+  }
+
+  .ab-scene-highlight {
+    margin: 0 0 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--ab-tone);
+    max-width: 60ch;
+    font-family: var(--font-editorial);
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    color: var(--theme-text);
+  }
+
+  .ab-scene-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .ab-scene-prose p {
     color: var(--theme-text-muted);
   }
 
-  .ab-prose p + p {
-    margin-top: 1.1rem;
+  .ab-scene-prose p + p {
+    margin-top: 1rem;
+  }
+
+  .ab-scene-visual {
+    display: flex;
+    align-items: center;
+    min-height: 200px;
   }
 
   .ab-cta-btn {
@@ -181,79 +552,481 @@ const about = t.about;
   .ab-cta-btn:hover,
   .ab-cta-btn:focus-visible {
     transform: translateY(-2px);
-    border-color: var(--color-brand-gold);
+    border-color: var(--ab-tone, var(--color-brand-gold-strong));
   }
 
-  /* Chapters 01-04 -- narrow decorative-number column + main body column
-     on desktop, collapsing to a single column under 900px (same
-     breakpoint already used by .ab-skills-grid below). A top border
-     between consecutive chapters is the "clear separation" called for;
-     the first chapter has none since .ab-chapters already sits below the
-     intro via .ab-inner's own gap. No fixed heights, no overflow/clip --
-     every chapter grows freely with its own content. */
-  .ab-chapters {
+  /* --- Scene 1: hub-and-branches diagram ------------------------------- */
+  .ab-network {
+    width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
-  .ab-chapter {
-    display: grid;
-    grid-template-columns: minmax(0, 3.5rem) minmax(0, 1fr);
-    gap: clamp(1rem, 2.5vw, 2rem);
-    padding-top: clamp(2rem, 4vw, 3rem);
-    border-top: 1px solid var(--theme-border);
+  .ab-network-hub {
+    position: relative;
+    margin: 0 0 1.75rem;
+    padding: 0.6rem 1.4rem;
+    border: 1px solid var(--ab-tone);
+    border-radius: 999px;
+    background: var(--theme-surface-strong);
+    color: var(--theme-text);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
   }
 
-  .ab-chapter:first-child {
-    padding-top: 0;
-    border-top: none;
+  .ab-network-hub::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -1.75rem;
+    width: 2px;
+    height: 1.75rem;
+    background: var(--ab-tone);
+    transform: translateX(-50%);
   }
 
-  .ab-chapter-number {
+  .ab-network-branches {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    padding-top: 1.75rem;
+    border-top: 2px solid var(--ab-tone);
+  }
+
+  .ab-network-branch {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.5rem 0.85rem;
+  }
+
+  .ab-network-branch::before {
+    content: "";
+    position: absolute;
+    top: -1.75rem;
+    left: 50%;
+    width: 2px;
+    height: 1.75rem;
+    background: var(--ab-tone);
+    transform: translateX(-50%);
+  }
+
+  .ab-network-tech {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    color: var(--color-brand-gold);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ab-tone);
   }
 
-  .ab-chapter-body {
-    min-width: 0;
+  .ab-network-project {
+    margin: 0;
+    max-width: 11rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: var(--theme-text-muted);
   }
 
-  .ab-skills-grid {
+  @media (max-width: 640px) {
+    .ab-network-hub {
+      margin-bottom: 1.25rem;
+    }
+
+    .ab-network-hub::after {
+      height: 1.25rem;
+      bottom: -1.25rem;
+    }
+
+    .ab-network-branches {
+      flex-direction: column;
+      align-items: stretch;
+      border-top: none;
+      border-left: 2px solid var(--ab-tone);
+      padding-top: 0;
+      padding-left: 1.25rem;
+      gap: 1.1rem;
+    }
+
+    .ab-network-branch {
+      align-items: flex-start;
+      text-align: left;
+      padding: 0;
+    }
+
+    .ab-network-branch::before {
+      display: none;
+    }
+
+    .ab-network-project {
+      max-width: none;
+    }
+  }
+
+  /* --- Scene 2: vertical pipeline — always a single column, at every
+         viewport, per the corrective brief ("sin cambio de orden en
+         responsive"). -------------------------------------------------- */
+  .ab-pipeline {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .ab-pipeline-stage {
+    padding: 0.75rem 1.1rem;
+    border: 1px solid var(--ab-tone);
+    border-radius: 10px;
+    background: var(--theme-surface);
+    color: var(--theme-text);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+  }
+
+  .ab-pipeline-arrow {
+    padding-left: 1.35rem;
+    color: var(--ab-tone);
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  /* --- Scene 3: triangle ------------------------------------------------ */
+  .ab-triangle {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+  }
+
+  .ab-triangle-shape {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ab-triangle-shape polygon {
+    fill: none;
+    stroke: var(--ab-tone);
+    stroke-width: 0.6;
+    opacity: 0.7;
+  }
+
+  .ab-triangle-vertex {
+    position: absolute;
+    max-width: 8rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--theme-text);
+    text-align: center;
+  }
+
+  .ab-triangle-top {
+    top: 4%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ab-triangle-left {
+    top: 93%;
+    left: 8%;
+    transform: translate(-8%, -50%);
+  }
+
+  .ab-triangle-right {
+    top: 93%;
+    left: 92%;
+    transform: translate(-92%, -50%);
+  }
+
+  .ab-triangle-center {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    background: var(--theme-surface-strong);
+    border: 1px solid var(--ab-tone);
+    color: var(--theme-text);
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 640px) {
+    .ab-triangle {
+      min-height: auto;
+    }
+
+    .ab-triangle-shape {
+      display: none;
+    }
+
+    .ab-triangle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .ab-triangle-vertex,
+    .ab-triangle-center {
+      position: static;
+      transform: none !important;
+      max-width: none;
+    }
+  }
+
+  /* --- Scene 4: word cluster — a stable grid, not floating chaos: a plain
+         flex-wrap row with deliberate size/opacity/color steps per word,
+         no rotation (removed in this corrective pass — a stray ±2deg tilt
+         read as "floating" rather than "hierarchical"). ------------------ */
+  .ab-word-cluster {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem 1rem;
+    padding: 1rem 0;
+  }
+
+  .ab-word {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--theme-text);
+    letter-spacing: -0.01em;
+  }
+
+  .ab-word:nth-child(6n + 1) {
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    color: var(--ab-tone);
+  }
+
+  .ab-word:nth-child(6n + 2) {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    opacity: 0.75;
+  }
+
+  .ab-word:nth-child(6n + 3) {
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    opacity: 0.92;
+  }
+
+  .ab-word:nth-child(6n + 4) {
+    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+    opacity: 0.65;
+  }
+
+  .ab-word:nth-child(6n + 5) {
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    color: var(--ab-tone);
+    opacity: 0.85;
+  }
+
+  .ab-word:nth-child(6n + 6) {
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    opacity: 0.7;
+  }
+
+  /* ---------------------------------------------------------------------
+     Formación + Idiomas
+     --------------------------------------------------------------------- */
+  .ab-section-title {
+    margin: 0 0 1.75rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    letter-spacing: -0.01em;
+    color: var(--theme-text);
+  }
+
+  .ab-foundation-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
   }
 
-  .ab-skill-card {
-    padding: 1.1rem;
+  .ab-foundation-label {
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+  }
+
+  .ab-formacion-card {
+    display: block;
+    position: relative;
+    padding: 1.5rem 1.75rem;
     border: 1px solid var(--theme-border);
     border-radius: 12px;
     background: var(--theme-surface);
     transition: border-color 0.2s ease, transform 0.2s ease;
   }
 
-  .ab-skill-card:hover {
-    border-color: var(--color-brand-gold);
-    transform: translateY(-3px);
+  .ab-formacion-card:hover,
+  .ab-formacion-card:focus-visible {
+    border-color: var(--color-brand-gold-strong);
+    transform: translateY(-2px);
   }
 
-  .ab-skill-card-title {
-    font-weight: 700;
+  .ab-formacion-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 0;
+  }
+
+  .ab-formacion-fact dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .ab-formacion-fact dd {
+    margin: 0;
+    font-family: var(--font-editorial);
     font-size: 0.95rem;
-    margin-bottom: 0.85rem;
     color: var(--theme-text);
   }
 
-  .ab-skill-tags {
+  .ab-formacion-arrow {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.75rem;
+    font-size: 1.3rem;
+    color: var(--color-brand-gold-strong);
+  }
+
+  .ab-idiomas-card {
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    background: var(--theme-surface);
+  }
+
+  .ab-languages {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .ab-language-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 999px;
+    background: var(--theme-surface-strong);
+  }
+
+  .ab-language-name {
+    font-family: var(--font-editorial);
+    font-size: 0.92rem;
+    color: var(--theme-text);
+  }
+
+  .ab-language-level {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--color-brand-gold-strong);
+  }
+
+  /* ---------------------------------------------------------------------
+     Skills bento
+     --------------------------------------------------------------------- */
+  .ab-bento {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(90px, auto);
+    gap: 1rem;
+  }
+
+  .ab-bento-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 14px;
+    background: var(--theme-surface);
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .ab-bento-card:hover,
+  .ab-bento-card:focus-within {
+    border-color: var(--color-brand-gold-strong);
+    background: var(--theme-surface-strong);
+    box-shadow: 0 0 20px -10px var(--color-brand-gold-strong);
+  }
+
+  .ab-bento-software,
+  .ab-bento-data {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .ab-bento-web,
+  .ab-bento-databases {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  .ab-bento-tools,
+  .ab-bento-design {
+    grid-column: span 2;
+    grid-row: span 1;
+    padding: 1rem 1.1rem;
+  }
+
+  .ab-bento-title {
+    margin: 0 0 0.85rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--theme-text);
+  }
+
+  .ab-bento-software .ab-bento-title,
+  .ab-bento-data .ab-bento-title {
+    font-size: 1.1rem;
+  }
+
+  .ab-bento-tools .ab-bento-title,
+  .ab-bento-design .ab-bento-title {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .ab-bento-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    align-content: flex-start;
   }
 
-  .ab-skill-tags span {
+  .ab-bento-tag {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -264,65 +1037,116 @@ const about = t.about;
     font-size: 0.78rem;
   }
 
-  .ab-skill-tags img {
+  .ab-bento-tag img {
     width: 14px;
     height: 14px;
     object-fit: contain;
   }
 
-  .ab-formacion-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    border: 1px solid var(--theme-border);
-    border-radius: 12px;
-    background: var(--theme-surface);
-    transition: border-color 0.2s ease, transform 0.2s ease;
+  /* ---------------------------------------------------------------------
+     Desktop (>=900px, same threshold the sidebar itself already uses) —
+     rail becomes visible in its own reserved column, cover splits into
+     heading+prose, scenes move to a two-column grid, foundation adopts
+     its two-column layout.
+     --------------------------------------------------------------------- */
+  @media (min-width: 900px) {
+    .ab-body {
+      display: grid;
+      grid-template-columns: minmax(auto, 6.5rem) minmax(0, 1fr);
+      gap: clamp(1.25rem, 2.5vw, 2.5rem);
+      align-items: start;
+    }
+
+    .ab-rail {
+      display: block;
+      position: sticky;
+      top: clamp(2rem, 12vh, 6rem);
+      padding-top: 0.35rem;
+    }
+
+    .ab-rail-nodes {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .ab-rail-track {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      left: 4px;
+    }
+
+    .ab-rail-node {
+      position: relative;
+      z-index: 1;
+      gap: 0.7rem;
+    }
+
+    .ab-rail-dot {
+      width: 10px;
+      height: 10px;
+    }
+
+    .ab-rail-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+    }
+
+    .ab-cover {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
+      align-items: end;
+    }
+
+    .ab-scene-grid {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: center;
+    }
+
+    .ab-foundation-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
-  .ab-formacion-card:hover,
-  .ab-formacion-card:focus-visible {
-    border-color: var(--color-brand-gold);
-    transform: translateY(-2px);
-  }
+  @media (max-width: 899px) {
+    .ab-rail {
+      display: none;
+    }
 
-  .ab-formacion-card .editorial-text {
-    max-width: 60ch;
-    color: var(--theme-text);
-  }
-
-  .ab-formacion-arrow {
-    flex-shrink: 0;
-    font-size: 1.3rem;
-    color: var(--color-brand-gold);
-  }
-
-  .ab-languages {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .ab-language-chip {
-    padding: 0.7rem 1.1rem;
-    border: 1px solid var(--theme-border);
-    border-radius: 999px;
-    background: var(--theme-surface);
-    color: var(--theme-text);
-    font-family: var(--font-editorial);
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 900px) {
-    .ab-skills-grid {
+    .ab-formacion-facts {
       grid-template-columns: 1fr;
     }
 
-    .ab-chapter {
+    .ab-bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ab-bento-software,
+    .ab-bento-data,
+    .ab-bento-web,
+    .ab-bento-databases,
+    .ab-bento-tools,
+    .ab-bento-design {
+      grid-column: span 2;
+      grid-row: span 1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ab-bento {
       grid-template-columns: 1fr;
+    }
+
+    .ab-bento-software,
+    .ab-bento-data,
+    .ab-bento-web,
+    .ab-bento-databases,
+    .ab-bento-tools,
+    .ab-bento-design {
+      grid-column: span 1;
     }
   }
 </style>
