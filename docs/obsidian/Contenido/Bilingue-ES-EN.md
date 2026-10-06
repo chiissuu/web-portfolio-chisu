@@ -24,4 +24,4 @@ Ver [[Hallazgos-y-Pendientes]] ("Inglés incompleto y sin publicar", prioridad B
 
 ## Relacionado
 
-[[Contenido-por-Seccion]] · [[Hallazgos-y-Pendientes]] · [[Rutas-y-Navegacion]]
+[[Contenido-por-Seccion]] · [[Hallazgos-y-Pendientes]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]]

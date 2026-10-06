@@ -31,4 +31,4 @@ Si en el futuro se conecta un backend real, habrá que definir validación de se
 
 ## Relacionado
 
-[[Formularios]] · [[Conversor-de-Video]] · [[Arquitectura-y-Stack]] · [[Hallazgos-y-Pendientes]]
+[[Formularios]] · [[Conversor-de-Video]] · [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] · [[Hallazgos-y-Pendientes]]

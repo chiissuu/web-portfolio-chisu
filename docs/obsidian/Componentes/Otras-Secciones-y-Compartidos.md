@@ -12,13 +12,13 @@ Componentes más simples que Hero/About/Formularios/Conversor — aquí se agrup
 
 Tres tarjetas numeradas 01–03 (Full-stack, Data Science, Visual/UI). Cada una muestra categoría, título provisional, tags y «Próximamente». La nota de la sección explica expresamente que son plantillas. La zona visual es un recuadro CSS con un número grande, **no** una fotografía ni una captura real. No hay enlace, filtro, modal, repositorio ni página de detalle — `ProjectItem` ni siquiera define esos campos en el tipo, así que no es solo contenido pendiente, es que el contrato de datos no los contempla todavía.
 
-Actualmente usa el tema `.section-theme-dark` (se intercambió con About — ver [[Sistema-de-Diseno]]).
+Actualmente usa el tema `.section-theme-dark` (se intercambió con About — ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]]).
 
 ## Servicios/Tools en portada — [ServicesToolsSection.astro](../../../src/components/ServicesToolsSection.astro)
 
 Sección oscura con dos columnas y un separador central. La columna de Servicios usa segmentos de texto `{ text, strong? }` que se convierten en texto plano o en `<strong>` — nunca se inserta HTML crudo. La columna de Tools muestra como ejemplo `tools.page.items[0]`: ese ejemplo cambia automáticamente si se reordena la colección de herramientas, y su tarjeta de ejemplo no abre directamente el conversor al hacer clic. Los dos CTA llevan a las páginas completas de Servicios y Tools respectivamente. Si la lista de herramientas quedara vacía, el ejemplo desaparece pero los textos y el enlace de la columna permanecen.
 
-No lleva la clase `.rd-reveal` en su bloque actual (ver [[Accesibilidad-y-Movimiento]]).
+No lleva la clase `.rd-reveal` en su bloque actual (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]).
 
 ## Servicios: página independiente — [ServicesPageContent.astro](../../../src/components/ServicesPageContent.astro)
 
@@ -38,14 +38,14 @@ LinkedIn es enfocable y explica «Enlace todavía no disponible» mediante toolt
 
 ## FAQ — [FaqSection.astro](../../../src/components/FaqSection.astro)
 
-Cuatro preguntas (experiencia profesional, disponibilidad freelance, acceso al trabajo de diseño, mejor vía de contacto) usando `<details>/<summary>` nativos con signos +/−, permitiendo varias preguntas abiertas a la vez. La segunda respuesta es un placeholder; la cuarta menciona el formulario aunque este todavía no envíe nada real. La interacción de abrir/cerrar no necesita JS, pero la visibilidad **inicial** del bloque sí depende de `.rd-reveal` (ver [[Accesibilidad-y-Movimiento]]).
+Cuatro preguntas (experiencia profesional, disponibilidad freelance, acceso al trabajo de diseño, mejor vía de contacto) usando `<details>/<summary>` nativos con signos +/−, permitiendo varias preguntas abiertas a la vez. La segunda respuesta es un placeholder; la cuarta menciona el formulario aunque este todavía no envíe nada real. La interacción de abrir/cerrar no necesita JS, pero la visibilidad **inicial** del bloque sí depende de `.rd-reveal` (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]).
 
 ## Primitivas compartidas
 
 - [SectionHeadingCard.astro](../../../src/components/SectionHeadingCard.astro): título sobre un acabado de cristal. Permite h1/h2/h3, tamaños `lg`/`md` y clase opcional; valores por defecto h2/lg. La usan Proyectos, Servicios/Tools, Contacto y FAQ — About tiene su propio título y no la usa.
-- [RollLink.astro](../../../src/components/RollLink.astro): enlace con duplicación visual de texto para efecto de rollover. Ver [[Accesibilidad-y-Movimiento]] para su comportamiento accesible.
-- [SimpleNav.astro](../../../src/components/SimpleNav.astro): navegación sticky de las tres subpáginas. Ver [[Rutas-y-Navegacion]].
-- [Layout.astro](../../../src/layouts/Layout.astro): documento HTML, tokens, reveals, clic central. Ver [[Sistema-de-Diseno]] y [[Accesibilidad-y-Movimiento]].
+- [RollLink.astro](../../../src/components/RollLink.astro): enlace con duplicación visual de texto para efecto de rollover. Ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] para su comportamiento accesible.
+- [SimpleNav.astro](../../../src/components/SimpleNav.astro): navegación sticky de las tres subpáginas. Ver [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]].
+- [Layout.astro](../../../src/layouts/Layout.astro): documento HTML, tokens, reveals, clic central. Ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] y [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]].
 
 ## Componentes existentes pero sin montar en ninguna ruta
 
@@ -56,4 +56,4 @@ Cuatro preguntas (experiencia profesional, disponibilidad freelance, acceso al t
 
 ## Relacionado
 
-[[Contenido-por-Seccion]] · [[Formularios]] · [[Rutas-y-Navegacion]] · [[Sistema-de-Diseno]] · [[Hallazgos-y-Pendientes]]
+[[Contenido-por-Seccion]] · [[Formularios]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] · [[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[Hallazgos-y-Pendientes]]

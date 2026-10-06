@@ -16,7 +16,7 @@ fuente: [src/pages]
 | `/tools/` | [tools/index.astro](../../src/pages/tools/index.astro) | Layout + SimpleNav + ToolsPageContent |
 | `/tools/video-converter/` | [tools/video-converter/index.astro](../../src/pages/tools/video-converter/index.astro) | Layout + SimpleNav + VideoConverterPageContent + isla React |
 
-Todas usan `lang="es"` y `bodyClass="redesign"`. Solo la portada añade `redesign-home`, que activa la reserva de espacio del sidebar y la excepción de clic central (ver [[Accesibilidad-y-Movimiento]]). Los cambios de página son cargas completas — no se instala `ClientRouter`.
+Todas usan `lang="es"` y `bodyClass="redesign"`. Solo la portada añade `redesign-home`, que activa la reserva de espacio del sidebar y la excepción de clic central (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]). Los cambios de página son cargas completas — no se instala `ClientRouter`.
 
 No existen rutas `/en`, detalle de proyecto, Instagram checker, contacto independiente, política de privacidad, página de gracias ni 404 personalizada.
 
@@ -42,4 +42,4 @@ Detalle del sidebar (morph, temas, sección activa) en [[Hero-y-Sidebar]].
 
 ## Relacionado
 
-[[Hero-y-Sidebar]] · [[Otras-Secciones-y-Compartidos]] · [[Arquitectura-y-Stack]]
+[[Hero-y-Sidebar]] · [[Otras-Secciones-y-Compartidos]] · [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]]

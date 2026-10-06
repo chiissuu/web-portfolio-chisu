@@ -61,4 +61,4 @@ Corrección mínima propuesta (no aplicada): reparar los delimitadores del comen
 
 ## Relacionado
 
-[[Accesibilidad-y-Movimiento]] · [[Hero-y-Sidebar]] · [[Sobre-Mi]] · [[Hallazgos-y-Pendientes]]
+[[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[Hero-y-Sidebar]] · [[Sobre-Mi]] · [[Hallazgos-y-Pendientes]]

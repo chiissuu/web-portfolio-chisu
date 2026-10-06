@@ -32,7 +32,7 @@ Detalle completo por sección en [[Contenido-por-Seccion]].
 
 - Revisar primero el componente, los datos que consume (`site.js`) y su relación con el layout, antes de tocar nada.
 - Mantener los textos en [site.js](../../src/content/site.js) y actualizar su contrato en [content-types.ts](../../src/lib/content-types.ts) cuando cambie la forma de los datos. Editar este vault no cambia la web.
-- Conservar los IDs, claves de morph y tokens compartidos (ver [[Hero-y-Sidebar]] y [[Sistema-de-Diseno]]), o actualizar conjuntamente todos sus consumidores.
+- Conservar los IDs, claves de morph y tokens compartidos (ver [[Hero-y-Sidebar]] y [[03-Sistema-de-Diseno|Sistema-de-Diseno]]), o actualizar conjuntamente todos sus consumidores.
 - No confundir las tecnologías que aparecen como *habilidades personales* (sección Sobre mí) con dependencias reales del proyecto — Docker, Java, PostgreSQL o n8n aparecen como skills, no como stack implementado aquí.
 - No editar `dist/`, `.astro/`, `node_modules/` ni `public/ffmpeg/`: son salidas o dependencias regenerables, no fuente.
 - La carpeta hermana `portfolio-web-chiissuu-recovery/` es solo referencia histórica — nunca sustituir archivos actuales por copias de ahí sin comparar contenido, tipos, estilos y rutas. Detalle de qué difiere en la sección siguiente.
@@ -47,16 +47,16 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 - Lucide sí se usa y renderiza en el sidebar (la sospecha de dependencia sin uso quedó descartada).
 - El texto de depuración del conversor ya no existe en el proyecto activo.
 - Se añadió `vite.optimizeDeps.include: ["react-dom/client"]` en `astro.config.mjs` para resolver un fallo de hidratación en dev.
-- El build local funciona limpio: 0 errores, 0 warnings, 126 hints (ver [[Comandos-y-Pruebas]]).
+- El build local termina correctamente. El resumen de `astro check` indica 0 errores, 0 warnings y 126 hints; Vite emite además avisos de opciones obsoletas (ver [[Comandos-y-Pruebas]]).
 
 ## Mapa del vault
 
 **Arquitectura y producto**
-- [[Arquitectura-y-Stack]] — stack, dependencias, estructura de carpetas, diagrama
-- [[Rutas-y-Navegacion]] — las 4 rutas y las 3 navegaciones (deliberadamente distintas)
-- [[Sistema-de-Diseno]] — tokens, temas de color, breakpoints, fuentes
-- [[Accesibilidad-y-Movimiento]] — reveals, foco, reduced motion, clic central
-- [[SEO-Comunicaciones-Persistencia]] — metadatos, enlaces externos, almacenamiento
+- [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] — stack, dependencias, estructura de carpetas, diagrama
+- [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] — las 4 rutas y las 3 navegaciones (deliberadamente distintas)
+- [[03-Sistema-de-Diseno|Sistema-de-Diseno]] — tokens, temas de color, breakpoints, fuentes
+- [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] — reveals, foco, reduced motion, clic central
+- [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]] — metadatos, enlaces externos, almacenamiento
 
 **Componentes**
 - [[Hero-y-Sidebar]] — HeroExperience: entrada, morph de scroll, temas del sidebar, menú móvil
@@ -79,7 +79,7 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 
 ## Convenciones de este vault
 
-- Enlaces entre notas de este vault: wikilinks de Obsidian (doble corchete) usando el nombre de la nota destino.
+- Enlaces entre notas de este vault: wikilinks de Obsidian (doble corchete) usando el nombre real del archivo destino. Para mostrar un alias, usar `[[nombre-real|alias]]`; la propiedad `aliases` no sustituye el destino del enlace.
 - Enlaces a código real (fuera del vault): Markdown estándar con ruta relativa, como el que usa esta misma nota para enlazar a [site.js](../../src/content/site.js).
 - El contenido real de `content.es` **no se duplica** aquí (evita una segunda fuente que se desactualice): las notas de contenido explican estructura y texto en prosa/tablas y enlazan a [site.js](../../src/content/site.js) como única fuente.
 - Cada nota termina con `## Relacionado`.

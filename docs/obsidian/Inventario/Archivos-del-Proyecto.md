@@ -36,7 +36,7 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/components/VideoConverter/VideoConverter.tsx](../../../src/components/VideoConverter/VideoConverter.tsx) | Máquina de estados React — ver [[Conversor-de-Video]] |
 | [src/components/VideoConverter/video-converter.module.css](../../../src/components/VideoConverter/video-converter.module.css) | CSS Module del conversor, breakpoint 560px |
 | [src/content/site.js](../../../src/content/site.js) | Contenido español e inglés — ver [[Contenido-por-Seccion]] |
-| [src/layouts/Layout.astro](../../../src/layouts/Layout.astro) | HTML, fuentes, tokens, estilos, reveal y clic central — ver [[Sistema-de-Diseno]] |
+| [src/layouts/Layout.astro](../../../src/layouts/Layout.astro) | HTML, fuentes, tokens, estilos, reveal y clic central — ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
 | [src/lib/content-types.ts](../../../src/lib/content-types.ts) | Contratos de datos y props por componente |
 | [src/lib/forms/submit.ts](../../../src/lib/forms/submit.ts) | Simulación asíncrona de 500ms |
 | [src/lib/forms/types.ts](../../../src/lib/forms/types.ts) | Datos de ambos formularios y estado/resultado |
@@ -57,4 +57,4 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 
 ## Relacionado
 
-[[Recursos-Estaticos]] · [[Arquitectura-y-Stack]] · [[00-Empieza-Aqui]]
+[[Recursos-Estaticos]] · [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] · [[00-Empieza-Aqui]]

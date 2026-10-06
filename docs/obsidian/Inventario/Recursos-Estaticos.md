@@ -46,7 +46,7 @@ Tamaños exactos en bytes, tomados el 10 de septiembre de 2026. Todos los recurs
 | [public/assets/skills/scikit-learn.png](../../../public/assets/skills/scikit-learn.png) | 4.156 | Icono decorativo de habilidad |
 | [public/assets/skills/seaborn.png](../../../public/assets/skills/seaborn.png) | 70.810 | Icono decorativo de habilidad |
 | [public/assets/skills/windows.png](../../../public/assets/skills/windows.png) | 155.935 | Icono decorativo de habilidad |
-| `public/ffmpeg/ffmpeg-core.js` | 112.059 | Motor generado; carga bajo demanda — no versionado, ver [[Arquitectura-y-Stack]] |
+| `public/ffmpeg/ffmpeg-core.js` | 112.059 | Motor generado; carga bajo demanda — no versionado, ver [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] |
 | `public/ffmpeg/ffmpeg-core.wasm` | 32.232.419 | WASM generado; carga bajo demanda — no versionado |
 
 Los dos archivos de `public/ffmpeg/` no están en el repositorio Git (los regenera `npm run copy:ffmpeg-core`) — por eso no llevan enlace de archivo, a diferencia del resto de la tabla.

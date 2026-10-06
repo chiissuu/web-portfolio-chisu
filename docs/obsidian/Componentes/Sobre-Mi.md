@@ -14,7 +14,7 @@ La portada, las escenas, formación/idiomas y skills comparten una única column
 
 ## `splitIntoBlocks(text, 2)`
 
-Divide los textos por espacios tras `.`, `!` o `?`, y agrupa de dos en dos frases por párrafo visual. Preserva palabras y orden, pero normaliza los espacios en los puntos de unión — **una abreviatura con punto puede generar una separación no deseada** (p. ej. un punto dentro de "Node.js" a media frase).
+Divide los textos por espacios tras `.`, `!` o `?`, y agrupa de dos en dos frases por párrafo visual. Preserva palabras y orden, pero normaliza los espacios en los puntos de unión — **una abreviatura con punto puede generar una separación no deseada** (p. ej. "Dr. Pérez", porque hay un espacio tras el punto). "Node.js" no se divide por su punto interno, ya que no va seguido de un espacio.
 
 > [!tip] Caveat de uso real
 > La portada **solo** consume `aboutMe.paragraphs[0]`. Otros elementos añadidos al array no aparecerían nunca, y un array vacío rompería esa llamada. Las escenas, en cambio, sí recorren **todos** sus párrafos — comportamiento distinto entre la portada y las escenas, fácil de olvidar al editar contenido.
@@ -37,4 +37,4 @@ A ≤640px las ramas del diagrama de red se apilan y el triángulo se convierte 
 
 ## Relacionado
 
-[[Contenido-por-Seccion]] · [[Sistema-de-Diseno]] · [[Accesibilidad-y-Movimiento]] · [[Hero-y-Sidebar]]
+[[Contenido-por-Seccion]] · [[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[Hero-y-Sidebar]]

@@ -61,7 +61,7 @@ Cada artículo del sidebar calcula su solapamiento vertical con **todas** las se
 
 Por eso dos artículos del sidebar pueden tener temas distintos en una misma frontera de scroll — no es un bug, es el diseño. Textos, bordes y separadores interpolan durante 0,3s; con movimiento reducido el cambio es inmediato. Las métricas mantienen siempre su acento dorado, independiente del tema.
 
-Este mecanismo es genérico (detecta la clase `.section-theme-dark`, no un ID de sección concreto) — es por eso que intercambiar los temas de About y Proyectos (ver [[Sistema-de-Diseno]]) no requirió ningún cambio en este archivo.
+Este mecanismo es genérico (detecta la clase `.section-theme-dark`, no un ID de sección concreto) — es por eso que intercambiar los temas de About y Proyectos (ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]]) no requirió ningún cambio en este archivo.
 
 La sección activa se calcula con **seis** ScrollTriggers, de `top 45%` a `bottom 45%`, con eventos de entrada en ambos sentidos de scroll. `services-tools` activa a la vez los enlaces de Servicios y Tools. Solo los enlaces que empiezan por `#` reciben `aria-current="location"` — los enlaces a subpáginas pueden resaltarse visualmente pero nunca se anuncian como ubicación actual de esa otra página.
 
@@ -90,4 +90,4 @@ El menú usa fade de 220ms y entrada escalonada 40–240ms solo con `prefers-red
 
 ## Relacionado
 
-[[Sistema-de-Diseno]] · [[Rutas-y-Navegacion]] · [[Accesibilidad-y-Movimiento]] · [[Hallazgos-y-Pendientes]]
+[[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] · [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[Hallazgos-y-Pendientes]]

@@ -50,4 +50,4 @@ Un servicio externo de formularios puede recibir peticiones directamente desde u
 
 ## Relacionado
 
-[[Hallazgos-y-Pendientes]] · [[Accesibilidad-y-Movimiento]] · [[SEO-Comunicaciones-Persistencia]] · [[Otras-Secciones-y-Compartidos]]
+[[Hallazgos-y-Pendientes]] · [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]] · [[Otras-Secciones-y-Compartidos]]

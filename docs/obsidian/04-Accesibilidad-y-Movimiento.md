@@ -45,4 +45,4 @@ Detalles que importan si se toca este código:
 
 ## Relacionado
 
-[[Sistema-de-Diseno]] · [[Hero-y-Sidebar]] · [[Formularios]] · [[Hallazgos-y-Pendientes]]
+[[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[Hero-y-Sidebar]] · [[Formularios]] · [[Hallazgos-y-Pendientes]]

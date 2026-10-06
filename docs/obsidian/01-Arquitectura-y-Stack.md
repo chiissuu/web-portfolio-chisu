@@ -27,7 +27,7 @@ flowchart TD
 ## Estructura principal
 
 - `src/pages/`: cuatro rutas. No hay endpoints `.ts`/`.js` ni `pages/api` — no hay backend.
-- [Layout.astro](../../src/layouts/Layout.astro): documento HTML, metadatos, fuentes, tokens, estilos compartidos, reveals y comportamiento de clic central. Ver [[Sistema-de-Diseno]] y [[Accesibilidad-y-Movimiento]].
+- [Layout.astro](../../src/layouts/Layout.astro): documento HTML, metadatos, fuentes, tokens, estilos compartidos, reveals y comportamiento de clic central. Ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] y [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]].
 - `src/components/`: secciones, páginas de contenido y primitivas. `VideoConverter/` contiene siete componentes React y su CSS Module. Ver [[Hero-y-Sidebar]], [[Sobre-Mi]], [[Otras-Secciones-y-Compartidos]], [[Conversor-de-Video]].
 - [site.js](../../src/content/site.js): exporta `{ es, en }`. Cada ruta actual elige `content.es` y lo pasa como prop `t`. Ver [[Contenido-por-Seccion]] y [[Bilingue-ES-EN]].
 - [content-types.ts](../../src/lib/content-types.ts): contratos de contenido, secciones y locales. **No** es validación en tiempo de ejecución — solo tipos.
@@ -68,4 +68,4 @@ No hay Dockerfile, Compose, ORM, migraciones, servidor backend, cola de tareas, 
 
 ## Relacionado
 
-[[Rutas-y-Navegacion]] · [[Comandos-y-Pruebas]] · [[Archivos-del-Proyecto]]
+[[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] · [[Comandos-y-Pruebas]] · [[Archivos-del-Proyecto]]

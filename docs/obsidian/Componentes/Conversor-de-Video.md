@@ -88,4 +88,4 @@ Ver [[Hallazgos-y-Pendientes]] para las entradas de prioridad Media relacionadas
 
 ## Relacionado
 
-[[Hallazgos-y-Pendientes]] · [[Arquitectura-y-Stack]] · [[Rutas-y-Navegacion]]
+[[Hallazgos-y-Pendientes]] · [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]]
