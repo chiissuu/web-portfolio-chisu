@@ -40,12 +40,16 @@ Esta tabla prioriza futuras tareas. **No implica que se hayan corregido, ni que 
 | Comentarios históricos contradicen el código actual | Fuente editorial sí presente, About warm, CTA final eliminado, uso de Lucide, raster de marca | [[00-Empieza-Aqui]] |
 | Código y contenido no usados | Teasers, `ClosingStatement`, `fitWordmarkWidth`, `siteName`/SEO auxiliar según consumidor | [[Otras-Secciones-y-Compartidos]], [[Hero-y-Sidebar]] |
 | Diagnósticos ruidosos del check | Se analiza JS generado de `public/ffmpeg`; 126 hints, sin errores | [[Comandos-y-Pruebas]] |
-| Avisos de integración Vite | Opciones `esbuild` obsoletas indicadas por el plugin React; no cambiar dependencias sin tarea específica | [[01-Arquitectura-y-Stack|Arquitectura-y-Stack]] |
 | Limpieza para una posible navegación parcial futura | Listeners y observers fuera del contexto de GSAP; no hay `ClientRouter` hoy | [[Hero-y-Sidebar]] |
 
 > [!note]
 > Una FAQ con cuatro preguntas no es un defecto por no tener cinco. No se necesitan mapas, reseñas, esquema de negocio local ni pagos para que este portfolio cumpla su función — esas exigencias genéricas de una auditoría anterior quedaron descartadas.
 
+## Resueltos el 6 de octubre de 2026
+
+- Avisos de opciones esbuild obsoletas: actualización a Astro 7.3.5 y @astrojs/react 7.0.0; check, build y arranque dev sin esos avisos.
+- Error de escaneo de dependencias en HeroExperience: el escáner interpretaba menciones literales de la etiqueta de apertura de script dentro de comentarios como bloques ejecutables. Se sustituyeron únicamente esas menciones por texto, conservando el bloque real y la lógica.
+- Auditoría npm: fast-uri 3.1.8 y http-cache-semantics 4.3.0, actualizaciones transitivas compatibles; npm audit fix terminó con 0 vulnerabilidades notificadas.
 ## Relacionado
 
 [[00-Empieza-Aqui]] · [[Comandos-y-Pruebas]]

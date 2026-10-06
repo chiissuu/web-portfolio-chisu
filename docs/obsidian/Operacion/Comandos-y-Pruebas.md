@@ -24,7 +24,7 @@ npm run copy:ffmpeg-core
 
 Al publicar, `dist/` debe incluir las cuatro rutas, `_astro/`, `assets/` y `ffmpeg/`. Omitir el WASM permite que la página cargue pero rompe la conversión. No hay backend que arrancar aparte del propio servidor estático. `node_modules` debe instalarse en la misma plataforma donde se compila — una instalación hecha en Windows puede no servir en Linux por bindings nativos.
 
-## Última ejecución registrada (10 de septiembre de 2026)
+## Ejecución histórica (10 de septiembre de 2026)
 
 | Verificación | Resultado |
 |---|---|
@@ -41,6 +41,14 @@ El primer intento de `check` en el entorno restringido falló con `EPERM` al cre
 
 Esta ejecución **no** incluyó: conversión real en navegador, comprobación visual multi-viewport, lector de pantalla, ni medición de rendimiento. No se ha desplegado, hecho commit, push, instalado dependencias ni modificado código fuente como parte de esa revisión.
 
+## Verificación del 6 de octubre de 2026 tras actualizar dependencias
+
+- Astro 7.3.5, integración React 7.0.0 y check 0.9.10.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints.
+- `npm run build`: cuatro páginas, código de salida 0.
+- `npm audit fix`: 0 vulnerabilidades notificadas; fast-uri 3.1.8 y http-cache-semantics 4.3.0.
+- Arranque temporal mediante la API `dev` de Astro en el puerto 4322: reoptimización sin error de escaneo; GET de `/` y `/tools/video-converter/` con HTTP 200. Servidor temporal detenido al finalizar; el servidor del usuario no se detuvo.
+- No se probó la conversión real ni el aspecto visual en navegador. Reiniciar el servidor del usuario tras los cambios de dependencias.
 ## Recorrido de prueba manual para próximos cambios
 
 1. Cargar las cuatro rutas y verificar título, recursos y enlaces. En portada, recorrer las seis secciones y volver arriba.

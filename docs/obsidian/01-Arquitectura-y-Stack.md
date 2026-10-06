@@ -43,8 +43,8 @@ Versiones exactamente instaladas, no recomendaciones:
 
 | Dependencia | Versión | Uso |
 |---|---|---|
-| Astro | 7.1.3 | Generación del sitio |
-| `@astrojs/react` | 4.4.2 | Integración de la isla React |
+| Astro | 7.3.5 | Generación del sitio |
+| `@astrojs/react` | 7.0.0 | Integración de la isla React |
 | React / React DOM | 18.3.1 / 18.3.1 | Conversor de vídeo |
 | GSAP | 3.15.0 | Entrada, morph y ScrollTrigger del Hero |
 | `lucide-astro` | 0.469.0 | Siete iconos de navegación del sidebar |
@@ -52,9 +52,9 @@ Versiones exactamente instaladas, no recomendaciones:
 | `@ffmpeg/ffmpeg` | 0.12.15 | API del Worker |
 | `@ffmpeg/util` | 0.12.2 | Lectura de archivos y URLs del motor |
 | TypeScript | 5.9.3 | Tipos |
-| `@astrojs/check` | 0.9.9 | Diagnósticos de Astro |
+| `@astrojs/check` | 0.9.10 | Diagnósticos de Astro |
 | `@types/react` / `@types/react-dom` | 18.3.31 / 18.3.7 | Tipado React |
-| Vite / Rolldown | 8.1.5 / 1.1.5 | Herramientas transitivas de compilación |
+| Vite / Rolldown | 8.3.2 / 1.2.12 | Herramientas transitivas de compilación |
 
 ## Configuración
 

@@ -47,7 +47,7 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 - Lucide sí se usa y renderiza en el sidebar (la sospecha de dependencia sin uso quedó descartada).
 - El texto de depuración del conversor ya no existe en el proyecto activo.
 - Se añadió `vite.optimizeDeps.include: ["react-dom/client"]` en `astro.config.mjs` para resolver un fallo de hidratación en dev.
-- El build local termina correctamente. El resumen de `astro check` indica 0 errores, 0 warnings y 126 hints; Vite emite además avisos de opciones obsoletas (ver [[Comandos-y-Pruebas]]).
+- El build local termina correctamente. El resumen de `astro check` indica 0 errores, 0 warnings y 126 hints; los avisos de opciones obsoletas de Vite quedaron resueltos con la actualización del 6 de octubre de 2026 (ver [[Comandos-y-Pruebas]]).
 
 ## Mapa del vault
 
