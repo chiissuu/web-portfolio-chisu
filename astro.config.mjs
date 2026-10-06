@@ -12,4 +12,9 @@ import react from "@astrojs/react";
 // the site uses React, every other component stays a plain `.astro` file.
 export default defineConfig({
   integrations: [react()],
+  vite: {
+    optimizeDeps: {
+      include: ["react-dom/client"],
+    },
+  },
 });

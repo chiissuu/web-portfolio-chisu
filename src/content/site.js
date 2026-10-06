@@ -51,50 +51,89 @@ const es = {
   },
   about: {
     aboutMe: {
-      eyebrow: "Quién soy",
-      title: "Sobre mí",
+      eyebrow: "SOBRE MÍ",
+      titleLines: [
+        [{ text: "INGENIERÍA," }],
+        [{ text: "DATOS", tone: "cool" }, { text: " E" }],
+        [{ text: "IDENTIDAD.", tone: "gold" }],
+      ],
+      languageLine: "Madrid, España · Español nativo · Inglés C1 · Alemán A2",
       paragraphs: [
-        "Soy un estudiante de Ingeniería del Software de 19 años, de España, y actualmente estudio en U-TAD, en Madrid. Me encuentro en las primeras etapas de mi trayectoria académica y profesional. Soy hablante nativo de español, con un nivel C1 de inglés y un nivel A2 de alemán.",
-        "Durante mis dos primeros años de universidad he trabajado en desarrollo full-stack, utilizando distintas tecnologías de frontend, backend, bases de datos y arquitectura de software.",
-        "Durante los próximos dos años, mi objetivo es profundizar en Data Science, aprovechando mi base de Ingeniería del Software para trabajar con datos, construir sistemas más inteligentes y entender cómo la información puede transformarse en valor real.",
+        "Soy Jesús León Romero Atienza, estudiante de Ingeniería del Software en U-TAD, Madrid. En septiembre de 2026 comenzaré mi tercer curso, después de dos años en los que he construido una base técnica en desarrollo full-stack, bases de datos, arquitectura de software y programación de sistemas. Sin embargo, no me interesa comprender estas áreas como elementos aislados. Lo que realmente me atrae es entender un producto digital de forma completa: cómo se diseña su arquitectura, cómo funciona internamente, qué problema resuelve y qué experiencia ofrece a la persona que lo utiliza.",
       ],
     },
-    beyondSoftwareEngineering: {
-      heading: "Más allá de la Ingeniería del Software",
-      paragraphs: [
-        "Fuera de la ingeniería, he desarrollado un fuerte interés personal por la inversión, los mercados financieros y el análisis de negocio, centrado sobre todo en el crecimiento de mi propia cartera y en un aprendizaje a largo plazo.",
-        "También he estudiado conceptos como modelos de negocio, creación de valor, análisis DAFO, segmentación de clientes, propuestas de valor y estrategia de marketing. Esto me ha ayudado a ser más analítico y consciente del riesgo a la hora de tomar decisiones.",
-        "También tengo experiencia en diseño gráfico, creando piezas visuales como banners, portadas musicales, portadas de vídeo, miniaturas y contenido digital para proyectos personales, iniciativas de grupo y servicios públicos.",
-      ],
-      gfxButtonLabel: "GFX",
-    },
-    personalBackground: {
-      heading: "Trayectoria personal",
-      paragraphs: [
-        "A nivel personal, me considero una persona competitiva, disciplinada y meticulosa. Me importa hacer las cosas bien, pero también intento mantenerme humilde, empático y abierto a aprender de las personas que me rodean.",
-        "Buena parte de esta mentalidad viene de mi experiencia compitiendo en títulos de esports como Overwatch, Counter-Strike, Fortnite (PC), Fortnite (consola), Clash Royale y otros.",
-        "Los videojuegos competitivos me enseñaron la importancia de la disciplina, la constancia, el control emocional, el trabajo en equipo y la capacidad de adaptación bajo presión.",
-        "También me ayudaron a entender cómo trabajar con personalidades distintas, comunicarme con eficacia y aportar a un entorno de equipo en el que todos rinden al máximo.",
-      ],
-      esportsButtonLabel: "Esports",
-      esportsHref:
-        "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
-      closingParagraph:
-        "Más allá de la tecnología, también me interesan la moda, la música, el cine, la crítica cinematográfica, las redes sociales, las tendencias digitales y la cultura visual. Estos intereses influyen en cómo abordo el diseño, el branding, la creatividad, el storytelling y la experiencia de usuario.",
-    },
-    currentFocus: {
-      heading: "Enfoque actual",
-      items: [
-        "Desarrollo de software full-stack.",
-        "Data Science y machine learning.",
-        "Proyectos personales y crecimiento del portfolio.",
-        "Diseño gráfico e identidad visual.",
-        "Aprendizaje continuo, disciplina y mejora constante.",
-      ],
-    },
-    designArchiveHref:
-      "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
-    skillsTitle: "Skills",
+    scenes: [
+      {
+        id: "foundations",
+        railLabel: "CIMIENTOS",
+        emoji: "🧩",
+        title: "DONDE TODO EMPIEZA",
+        highlight: "Entender un producto digital de forma completa.",
+        paragraphs: [
+          "Durante esta etapa he participado, junto a otros compañeros, en proyectos que me han permitido trabajar con problemas muy diferentes. Entre ellos se encuentra una plataforma de pedidos para restaurantes desarrollada en Java, donde aplicamos distintos patrones de diseño para construir una arquitectura modular y mantenible. También he trabajado en MegatronixOS, un simulador de memoria caché desarrollado en C con el que pude profundizar en conceptos como la jerarquía de memoria, el direccionamiento y la manipulación de archivos binarios. De manera paralela, estoy desarrollando mi portfolio personal con Astro, un proyecto donde puedo unir implementación técnica, animaciones, diseño e identidad visual. Esta variedad me ha permitido comprender mejor tanto la parte visible de un producto como los sistemas que hacen posible su funcionamiento.",
+        ],
+        tone: "cyan",
+        networkHub: "Producto digital",
+        networkBranches: [
+          { tech: "Java", project: "Plataforma de pedidos" },
+          { tech: "C", project: "MegatronixOS" },
+          { tech: "Astro", project: "Portfolio personal" },
+        ],
+      },
+      {
+        id: "direction",
+        railLabel: "DIRECCIÓN",
+        emoji: "📈",
+        title: "HACIA DÓNDE VOY",
+        highlight:
+          "Convertir información en decisiones, automatizaciones y soluciones que generen un valor real.",
+        paragraphs: [
+          "En cuanto a mi dirección académica y profesional, durante los próximos años quiero profundizar en Data Science y, progresivamente, en machine learning. No considero los datos como un camino separado de la Ingeniería del Software, sino como una evolución de la misma base. Mi objetivo es aprender a diseñar sistemas capaces de recoger, organizar e interpretar información para convertirla en decisiones, automatizaciones y soluciones que generen un valor real.",
+        ],
+        tone: "violet",
+        pipeline: ["INGENIERÍA DEL SOFTWARE", "DATA SCIENCE", "MACHINE LEARNING"],
+      },
+      {
+        id: "product",
+        railLabel: "PRODUCTO",
+        emoji: "💡",
+        title: "CÓMO ENTIENDO UN PRODUCTO",
+        highlight:
+          "Comprender qué se construye, para quién se construye, qué valor aporta y cómo debe comunicarse.",
+        paragraphs: [
+          "Por otro lado, la tecnología no es el único ámbito que ha influido en mi manera de pensar. Mantengo un interés constante por la inversión, los mercados financieros y el análisis de negocios, especialmente por conceptos como los modelos de negocio, la creación de valor, la segmentación de clientes o la evaluación del riesgo. Además, tengo experiencia en diseño gráfico, creando portadas, banners, miniaturas y otros recursos visuales para proyectos personales y colectivos. Aunque a primera vista puedan parecer áreas diferentes, para mí forman parte de una misma manera de entender un producto: comprender qué se construye, para quién se construye, qué valor aporta y cómo debe comunicarse.",
+        ],
+        tone: "gold",
+        triangleVertices: ["TECNOLOGÍA", "NEGOCIO", "DISEÑO"],
+        triangleCenter: "PRODUCTO CON VALOR REAL",
+        cta: {
+          label: "Ver archivo de diseño",
+          ariaLabel: "Ver archivo de diseño; se abre en una pestaña nueva",
+          href: "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
+        },
+      },
+      {
+        id: "drive",
+        railLabel: "IMPULSO",
+        emoji: "⚡",
+        title: "LO QUE ME MUEVE",
+        highlight:
+          "Combinar ingeniería, datos y creatividad para desarrollar soluciones útiles, bien construidas y con una identidad propia.",
+        paragraphs: [
+          "Una parte importante de mi forma de trabajar también procede de mi experiencia compitiendo en videojuegos y esports. Haber participado en entornos competitivos de títulos como Fortnite, Overwatch, Counter-Strike o Clash Royale me enseñó la importancia de la disciplina, la constancia, el control emocional y la capacidad de adaptarse rápidamente. También me permitió aprender a comunicarme con personas diferentes, aceptar errores, tomar decisiones bajo presión y contribuir a un equipo sin perder de vista el rendimiento colectivo.",
+          "Por último, intereses como la moda, la música, el cine, la crítica cinematográfica y la cultura digital han desarrollado mi sensibilidad hacia la creatividad, la comunicación y la experiencia de usuario. Todo ello define el perfil que estoy construyendo: una persona con una base técnica cada vez más sólida, una mentalidad analítica y una atención especial por los detalles. Mi objetivo es continuar aprendiendo y participar en proyectos donde pueda combinar ingeniería, datos y creatividad para desarrollar soluciones útiles, bien construidas y con una identidad propia.",
+        ],
+        tone: "coral",
+        words: ["DISCIPLINA", "EQUIPO", "ADAPTACIÓN", "CREATIVIDAD", "PRESIÓN", "CULTURA"],
+        cta: {
+          label: "Ver trayectoria competitiva",
+          ariaLabel: "Ver trayectoria competitiva; se abre en una pestaña nueva",
+          href: "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
+        },
+      },
+    ],
+    foundationTitle: "MI BASE ACTUAL",
+    skillsTitle: "MI SISTEMA DE TRABAJO",
     skillGroups: [
       {
         id: "software",
@@ -116,6 +155,7 @@ const es = {
           ["CSS", "css.png"],
           ["Astro", null],
           ["Node.js", "nodejs.png"],
+          ["GSAP", null],
         ],
       },
       {
@@ -149,6 +189,7 @@ const es = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
+          ["n8n", null],
         ],
       },
       {
@@ -164,14 +205,27 @@ const es = {
     ],
     formacion: {
       title: "Formación",
+      labels: {
+        institution: "Institución",
+        program: "Programa",
+        specialization: "Especialización",
+        status: "Estado actual",
+      },
       entry: {
-        text: "Estudiante de tercer curso de Ingeniería del Software en U-tad, con mención en Ingeniería de Datos.",
+        institution: "U-TAD",
+        program: "Ingeniería del Software",
+        specialization: "Mención en Ingeniería de Datos",
+        status: "Tercer curso",
         href: "https://u-tad.com/grados/ingenieria-software",
       },
     },
     idiomas: {
       title: "Idiomas",
-      items: ["Español — Nativo", "Inglés — C1", "Alemán — A2"],
+      items: [
+        { language: "Español", level: "Nativo" },
+        { language: "Inglés", level: "C1" },
+        { language: "Alemán", level: "A2" },
+      ],
     },
   },
   projects: {
@@ -485,50 +539,89 @@ const en = {
   },
   about: {
     aboutMe: {
-      eyebrow: "Who I am",
-      title: "About Me",
+      eyebrow: "ABOUT ME",
+      titleLines: [
+        [{ text: "ENGINEERING," }],
+        [{ text: "DATA", tone: "cool" }, { text: " &" }],
+        [{ text: "IDENTITY.", tone: "gold" }],
+      ],
+      languageLine: "Madrid, Spain · Native Spanish · English C1 · German A2",
       paragraphs: [
-        "I am a 19-year-old Software Engineering student from Spain, currently studying at U-TAD in Madrid, Spain. I am currently in the early stages of my academic and professional journey. I am a native Spanish speaker, with a C1 level in English and an A2 level in German.",
-        "During my first two years of university, I have been working on full-stack development, using different technologies across frontend, backend, databases, and software architecture.",
-        "Over the next two years, my goal is to move deeper into Data Science, using my Software Engineering background to work with data, build smarter systems, and understand how information can be transformed into real value.",
+        "My name is Jesús León Romero Atienza, and I am a Software Engineering student at U-TAD in Madrid. In September 2026, I will begin my third year after spending the first two years building a technical foundation in full-stack development, databases, software architecture, and systems programming. However, I am not interested in understanding these areas as isolated disciplines. What truly motivates me is understanding a digital product as a complete system: how its architecture is designed, how it works internally, which problem it solves, and what kind of experience it provides to the people using it.",
       ],
     },
-    beyondSoftwareEngineering: {
-      heading: "Beyond Software Engineering",
-      paragraphs: [
-        "Outside of engineering, I have developed a strong personal interest in investing, financial markets, and business analysis, mainly focused on personal portfolio growth and long-term learning.",
-        "I have also studied concepts such as business models, value creation, SWOT analysis, customer segmentation, value propositions, and marketing strategy. This has helped me become more analytical and aware of risk when making decisions.",
-        "I also have experience in graphic design, creating visual assets such as banners, music covers, video covers, thumbnails, and digital content for personal projects, group initiatives, and public services.",
-      ],
-      gfxButtonLabel: "GFX",
-    },
-    personalBackground: {
-      heading: "Personal Background",
-      paragraphs: [
-        "On a personal level, I consider myself competitive, disciplined, and detail-oriented. I care about doing things properly, but I also try to stay humble, empathetic, and open to learning from the people around me.",
-        "A big part of this mindset comes from my experience competing in esports titles such as Overwatch, Counter-Strike, Fortnite (PC), Fortnite (Console), Clash Royale, and others.",
-        "Competitive gaming taught me the importance of discipline, consistency, emotional control, teamwork, and adaptability under pressure.",
-        "It also helped me understand how to work with different personalities, communicate effectively, and contribute to a team environment where everyone performs at their best.",
-      ],
-      esportsButtonLabel: "Esports",
-      esportsHref:
-        "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
-      closingParagraph:
-        "Beyond technology, I am also interested in fashion, music, cinema, film criticism, social media, digital trends, and visual culture. These interests influence the way I approach design, branding, creativity, storytelling, and user experience.",
-    },
-    currentFocus: {
-      heading: "Current Focus",
-      items: [
-        "Full-stack software development.",
-        "Data Science and machine learning.",
-        "Personal projects and portfolio growth.",
-        "Graphic design and visual identity.",
-        "Continuous learning, discipline, and self-improvement.",
-      ],
-    },
-    designArchiveHref:
-      "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
-    skillsTitle: "Skills",
+    scenes: [
+      {
+        id: "foundations",
+        railLabel: "FOUNDATIONS",
+        emoji: "🧩",
+        title: "WHERE IT ALL STARTS",
+        highlight: "Understanding a digital product as a whole.",
+        paragraphs: [
+          "During this stage, I have taken part, alongside other classmates, in projects that let me work with very different kinds of problems. Among them is a restaurant ordering platform developed in Java, where we applied different design patterns to build a modular, maintainable architecture. I have also worked on MegatronixOS, a cache memory simulator developed in C that let me go deeper into concepts such as memory hierarchy, addressing, and binary file manipulation. In parallel, I am developing my personal portfolio with Astro, a project where I can bring together technical implementation, animation, design, and visual identity. This variety has helped me better understand both the visible side of a product and the systems that make it work.",
+        ],
+        tone: "cyan",
+        networkHub: "Digital product",
+        networkBranches: [
+          { tech: "Java", project: "Ordering platform" },
+          { tech: "C", project: "MegatronixOS" },
+          { tech: "Astro", project: "Personal portfolio" },
+        ],
+      },
+      {
+        id: "direction",
+        railLabel: "DIRECTION",
+        emoji: "📈",
+        title: "WHERE I'M HEADED",
+        highlight:
+          "Turning information into decisions, automation, and solutions that create real value.",
+        paragraphs: [
+          "Regarding my academic and professional direction, I want to move deeper into Data Science and gradually into machine learning over the next few years. I do not see data as a separate path from Software Engineering, but as a natural extension of the same foundation. My goal is to learn how to design systems that can collect, organize, and interpret information, transforming it into decisions, automations, and solutions that create real value.",
+        ],
+        tone: "violet",
+        pipeline: ["SOFTWARE ENGINEERING", "DATA SCIENCE", "MACHINE LEARNING"],
+      },
+      {
+        id: "product",
+        railLabel: "PRODUCT",
+        emoji: "💡",
+        title: "HOW I SEE A PRODUCT",
+        highlight:
+          "Understanding what is being built, who it is built for, what value it provides, and how it should be communicated.",
+        paragraphs: [
+          "Technology is not the only field that has influenced the way I think. I have developed a consistent interest in investing, financial markets, and business analysis, particularly in areas such as business models, value creation, customer segmentation, and risk assessment. I also have experience in graphic design, creating covers, banners, thumbnails, and other visual assets for personal and collaborative projects. Although these areas may initially appear unrelated, I see them as part of the same way of understanding a product: knowing what is being built, who it is being built for, which value it provides, and how that value should be communicated.",
+        ],
+        tone: "gold",
+        triangleVertices: ["TECHNOLOGY", "BUSINESS", "DESIGN"],
+        triangleCenter: "A PRODUCT WITH REAL VALUE",
+        cta: {
+          label: "View design archive",
+          ariaLabel: "View design archive; opens in a new tab",
+          href: "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
+        },
+      },
+      {
+        id: "drive",
+        railLabel: "DRIVE",
+        emoji: "⚡",
+        title: "WHAT DRIVES ME",
+        highlight:
+          "Combining engineering, data, and creativity to develop useful, well-built solutions with an identity of their own.",
+        paragraphs: [
+          "An important part of my approach to work also comes from competing in video games and esports. Taking part in competitive environments across titles such as Fortnite, Overwatch, Counter-Strike, and Clash Royale taught me the importance of discipline, consistency, emotional control, and adaptability. It also helped me learn how to communicate with different personalities, accept mistakes, make decisions under pressure, and contribute to a team without losing sight of collective performance.",
+          "Finally, my interest in fashion, music, cinema, film criticism, and digital culture has strengthened my sensitivity towards creativity, communication, and user experience. Together, these experiences define the profile I am building: someone with an increasingly solid technical foundation, an analytical mindset, and strong attention to detail. My goal is to continue learning and contribute to projects where I can combine engineering, data, and creativity to build useful, well-structured solutions with an identity of their own.",
+        ],
+        tone: "coral",
+        words: ["DISCIPLINE", "TEAMWORK", "ADAPTABILITY", "CREATIVITY", "PRESSURE", "CULTURE"],
+        cta: {
+          label: "View competitive background",
+          ariaLabel: "View competitive background; opens in a new tab",
+          href: "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
+        },
+      },
+    ],
+    foundationTitle: "MY FOUNDATION",
+    skillsTitle: "HOW I WORK",
     skillGroups: [
       {
         id: "software",
@@ -550,6 +643,7 @@ const en = {
           ["CSS", "css.png"],
           ["Astro", null],
           ["Node.js", "nodejs.png"],
+          ["GSAP", null],
         ],
       },
       {
@@ -583,6 +677,7 @@ const en = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
+          ["n8n", null],
         ],
       },
       {
@@ -598,14 +693,27 @@ const en = {
     ],
     formacion: {
       title: "Education",
+      labels: {
+        institution: "Institution",
+        program: "Program",
+        specialization: "Specialization",
+        status: "Current status",
+      },
       entry: {
-        text: "Third-year Software Engineering student at U-tad, with a specialization in Data Engineering.",
+        institution: "U-TAD",
+        program: "Software Engineering",
+        specialization: "Data Engineering specialization",
+        status: "Third year",
         href: "https://u-tad.com/grados/ingenieria-software",
       },
     },
     idiomas: {
       title: "Languages",
-      items: ["Spanish — Native", "English — C1", "German — A2"],
+      items: [
+        { language: "Spanish", level: "Native" },
+        { language: "English", level: "C1" },
+        { language: "German", level: "A2" },
+      ],
     },
   },
   projects: {

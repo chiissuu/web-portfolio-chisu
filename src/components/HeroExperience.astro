@@ -39,7 +39,7 @@ const navRight = indexedNavItems.slice(3);
 // Dedicated, independently-ordered nav model for the sidebar ONLY —
 // `navItems`/`navLeft`/`navRight` above (hero's own top nav + mobile nav)
 // stay completely untouched. `navId` is the stable key the active-section
-// script (in the <script> below) matches against. `morphIndex` links back
+// script (in the script block below) matches against. `morphIndex` links back
 // to the hero's own nav item by its ORIGINAL index in `navItems` above, so
 // the hero→sidebar crossfade still works for the 5 links that have a hero
 // equivalent — Servicios/Tools now point at their real subpages instead of
@@ -70,7 +70,7 @@ const portraitSrc = `${base}/assets/images/profile-cutout-alt.png`;
 // itself is now a single raster image (public/assets/images/
 // hero-wordmark-gold.png, trimmed to its opaque bounds, transparent
 // background preserved) instead of per-letter spans. GSAP's entrance
-// tween (the <script> below, untouched) still finds it via the same
+// tween (the script block below, untouched) still finds it via the same
 // `.hx-wordmark-letter` selector — it now matches exactly one element
 // instead of five, so the same wipe-in tween applies to the image as a
 // whole with no JS change needed.
@@ -82,7 +82,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     <!--
       `.hx-pin-fade` is a real DOM child, NOT `.hx-pin`'s own CSS
       `background` — deliberately, since ScrollTrigger pins `.hx-pin`
-      directly (see the <script> below) and its background must stay
+      directly (see the script block below) and its background must stay
       untouched/unanimated. This child carries the warm backdrop instead,
       painted first (z-index: 0, before `.hx-glow`) so it sits behind
       every other layer, and is the ONLY thing the scroll timeline fades
@@ -212,7 +212,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   `<article>` below tracks and tweens its OWN `data-theme`
   ("warm"/"dark") independently, driven by real per-article
   `getBoundingClientRect()` overlap against every `.section-theme-dark`
-  section (see the per-article theme sync in the <script> below), so two
+  section (see the per-article theme sync in the script block below), so two
   adjacent articles can legitimately show different themes at the same
   scroll position while a section boundary is crossing between them.
   Reuses `t.hero`/`t.nav`/`t.contact` data only; no text here is
@@ -223,6 +223,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 <aside
   class="hx-compact-sidebar"
   id="hx-compact-sidebar"
+  data-palette="brand"
   aria-label="Compact site navigation"
   aria-hidden="true"
 >
@@ -313,7 +314,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      a wrapper taller than the viewport, unpinning only once the wrapper's
      OWN bottom scrolled by, independent of whether the animation itself
      had anything left to show). Replaced with a ScrollTrigger-controlled
-     `pin` (see `buildScrollTimeline()` in the <script> below):
+     `pin` (see `buildScrollTimeline()` in the script block below):
      `.hx-wrap`/`.hx-pin` are both exactly one viewport tall, ScrollTrigger
      pins `.hx-pin` for exactly one additional viewport height of scroll
      (`end: () => `+=${window.innerHeight}`), and `pinSpacing: false` means
@@ -330,7 +331,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        this exact DOM/CSS wired to the real GSAP + ScrollTrigger pin
        (same `trigger: wrapEl, start: "top top", end: () =>
        `+=${window.innerHeight}`, pin: pinEl, pinSpacing: false` config as
-       the <script> below, untouched here): `.hx-wrap` inherits
+       the script block below, untouched here): `.hx-wrap` inherits
        `background: var(--color-bg)` (#d5cfbe, pale) from the shared
        `.section-theme-warm` class (Layout.astro) -- reused here only for
        its `--theme-*` custom properties, never because this background
@@ -338,7 +339,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        element's only child) is fully opaque and exactly covers it the
        entire time. But for the final ~23% of the scroll timeline
        (75%-98%, see the `.hx-pin-fade`/`.hx-glow` opacity tween further
-       down in the <script>), `.hx-pin` is still `position: fixed`
+       down in the script block), `.hx-pin` is still `position: fixed`
        (still pinned) while its own fade layers go transparent -- and in
        the vertical strip still ABOVE `AboutSection`'s current
        (still-sliding-up) top edge, nothing else sits behind `.hx-pin` in
@@ -368,7 +369,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        consumer of "where does the wordmark end" reading from these custom
        properties instead of a hardcoded number. `--hx-wordmark-font-size`
        was overwritten inline by the JS auto-fit pass once fonts were
-       ready; that pass (`fitWordmarkWidth()` in the <script> below,
+       ready; that pass (`fitWordmarkWidth()` in the script block below,
        untouched) now no-ops harmlessly instead (it measures
        `.hx-wordmark-row`, which no longer exists now that the wordmark is
        a single image, and returns early) — geometry is driven by
@@ -406,12 +407,15 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     --hx-ui-shadow: rgb(35 20 0 / 28%);
 
     /* No longer `position: sticky` — ScrollTrigger's own `pin: pinEl`
-       option (see the <script> below) now does the fixing. `top: auto`
+       option (see the script block below) now does the fixing. `top: auto`
        is inert here (a `position: relative` element ignores `top` unless
        explicitly offset) but kept for clarity/parity with the pin
        geometry it replaces. */
     position: relative;
     top: auto;
+    /* Above About's backdrop (0), below its scrolling content (3).
+       The color crossfade must not hide the incoming text. */
+    z-index: 2;
     height: 100svh;
     min-height: 640px;
     overflow: clip;
@@ -433,7 +437,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        image is still loading, fails to load, or doesn't fully cover a
        given viewport) — matches `--section-dark-start`, the exact color
        AboutSection's own dark gradient begins at, so the gold-to-black
-       crossfade (see the <script> below) never risks revealing a
+       crossfade (see the script block below) never risks revealing a
        beige/light flash underneath the background image. */
     background: var(--section-dark-start);
     /* First pass of the new Hero background art. Same file the user
@@ -473,7 +477,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
   /* Individually FLIP-morphed elements — each one gets its own
      translate/scale toward its sidebar target, computed from measured
-     rects (see the <script> below), never from the parent wrapper. */
+     rects (see the script block below), never from the parent wrapper. */
   [data-morph-source] {
     will-change: transform, opacity;
   }
@@ -520,7 +524,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      for the text spans it used to select; none of it has any effect on an
      `<img>`. The class name itself stays on the new image element purely
      so the existing GSAP entrance-tween selector (`.hx-wordmark-letter`,
-     in the untouched <script> below) still finds it — now matching one
+     in the untouched script block below) still finds it — now matching one
      element instead of five, so the same wipe-in tween applies to the
      whole image with zero JS changes. All actual visual sizing now comes
      from this new, image-specific class instead. */
@@ -958,7 +962,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      sliding in from the left. `visibility`/`pointer-events` are driven by
      the `.is-active` class (added by the scroll timeline once the morph
      crosses its activation point), NOT `display: none` — the FLIP
-     measurements in the <script> below need `getBoundingClientRect()` on
+     measurements in the script block below need `getBoundingClientRect()` on
      its children while still visually hidden. `--hx-sidebar-width` is
      defined once, at `body.redesign-home` scope (see Layout.astro), so the
      sidebar's width and the sections' inner-content compensation can never
@@ -1002,10 +1006,25 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     pointer-events: auto;
   }
 
+  /* About shares the existing active-section tracker. Override only the
+     sidebar's accent tokens; the Hero and other sections keep their gold. */
+  .hx-compact-sidebar[data-palette="mono"] {
+    --color-brand-gold: #c9c9c9;
+    --color-brand-gold-strong: #ededed;
+  }
+
+  .hx-compact-sidebar[data-palette="mono"] .hx-sidebar-article {
+    background: rgb(160 160 160 / 12%);
+  }
+
+  .hx-compact-sidebar[data-palette="mono"] .hx-compact-wordmark-image {
+    filter: grayscale(1) brightness(0.72);
+  }
+
   /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
      `<aside>` anymore. Each `.hx-sidebar-article` carries its OWN
      `data-theme` ("warm"/"dark"), flipped independently by the per-article
-     overlap check in the <script> below (real `getBoundingClientRect()`
+     overlap check in the script block below (real `getBoundingClientRect()`
      overlap against every `.section-theme-dark` section), so two articles
      can legitimately disagree at the same scroll position while a section
      boundary is crossing between them. `--art-text`/`--art-text-muted`/
@@ -1050,7 +1069,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     padding: 0.85rem 1.25rem;
     border-color: var(--art-border, var(--color-line));
     color: var(--art-text, var(--color-ink));
-    transition: border-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
   /* Brand mark — now the same gold wordmark image used in the hero
@@ -1077,6 +1096,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     width: min(8.25rem, 100%);
     height: auto;
     object-fit: contain;
+    transition: filter 0.3s ease;
   }
 
   /* Small, independent (R) mark — visually anchored to the wordmark
@@ -1092,6 +1112,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     font-weight: 700;
     line-height: 1;
     color: var(--color-brand-gold);
+    transition: color 0.3s ease;
   }
 
   .hx-compact-tagline {
@@ -1122,14 +1143,14 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     border-left: 1px solid var(--art-divider, var(--color-line));
   }
 
-  /* Same brand gold as `.hx-compact-mark`/the Contacto CTA — never yellow,
-     never `--art-text`. */
+  /* Accent follows the section palette: gold normally, neutral in About. */
   .hx-compact-metric-value {
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 1.3rem;
     line-height: 1.1;
     color: var(--color-brand-gold);
+    transition: color 0.3s ease;
   }
 
   /* Contrast fix, warm theme only: an extremely thin black outline on the
@@ -1893,7 +1914,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
   /* Scroll lock: applied globally to <html>/<body> (outside this
      component's own scoped style, hence `:global`) while the mobile menu
-     is open. Toggled from the <script> below via a plain class -- no
+     is open. Toggled from the script block below via a plain class -- no
      `position: fixed` on body, no manual scrollY math, no ScrollTrigger
      involvement (it isn't even active below 900px -- see
      `isDesktopViewport()`/`evaluateMode()` further down). */
@@ -1904,7 +1925,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
-     query -- does not touch HTML, <script>, GSAP/ScrollTrigger, .hx-wrap,
+     query -- does not touch HTML, script block, GSAP/ScrollTrigger, .hx-wrap,
      .hx-pin, the mobile nav/toggle, the 641-899px tier, or the >=900px
      tier. .hx-portrait / .hx-portrait img and the side-card horizontal
      distribution (.hx-metrics, .hx-chip-card) are intentionally left
@@ -2635,7 +2656,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         const targetRect = contentRect(target);
         // `.hx-pin` is still `position: relative` (unpinned) whenever this
         // runs -- buildScrollTimeline() always executes before
-        // ScrollTrigger.refresh() ever engages the pin (see the <script>
+        // ScrollTrigger.refresh() ever engages the pin (see the script block
         // comment above buildScrollTimeline()). At scrollY=0 that
         // coincidentally matches the pinned frame, but after an F5 with a
         // restored non-zero scrollY, `sourceRect` (still inside natural
@@ -2810,26 +2831,20 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           SIDEBAR_ACTIVATE_AT
         );
 
-        // Warm-to-black backdrop crossfade — fades `.hx-pin-fade` (the
-        // gold background image) AND `.hx-glow` (the warm radial
-        // highlights layered on top of it) together, so no warm-toned
-        // layer is left lingering once the base beneath them is already
-        // black. Spans the final 23% of the timeline (75%->98%), clearly
-        // perceptible rather than the previous few visual tenths, and
-        // finishes 2 points before the pin actually releases at 100% —
-        // fully settled before the unpin, not exactly coincident with it.
-        // By this point `AboutSection`'s real dark background has already
-        // scrolled up to sit directly beneath the fixed pin (per
-        // `pinSpacing: false` above), and `.hx-pin-fade`'s own solid base
-        // color now matches `--section-dark-start` exactly (see the
-        // <style> comment above `.hx-pin-fade`), so fading these two
-        // layers reveals it smoothly with no beige/light flash at any
-        // point along the way.
+        // First remove the backdrop's gold and dim its texture while the
+        // elements morph. Then reveal About's charcoal background beneath
+        // the pin. Only the backdrop is filtered; text and sidebar stay crisp.
         if (pinFadeEl) {
+          tl.fromTo(
+            pinFadeEl,
+            { filter: "grayscale(0) brightness(1)" },
+            { filter: "grayscale(1) brightness(0.55)", duration: 0.55 },
+            0.2
+          );
           tl.to(pinFadeEl, { opacity: 0, duration: 0.23 }, 0.75);
         }
         if (glowEl) {
-          tl.to(glowEl, { opacity: 0, duration: 0.23 }, 0.75);
+          tl.fromTo(glowEl, { opacity: 1 }, { opacity: 0, duration: 0.55 }, 0.2);
         }
 
         // If this (re)build happens mid-scroll (e.g. a resize while already
@@ -2854,7 +2869,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         gsap.set([...morphSources, ...noTargetGroup], { clearProps: "all" });
         gsap.set(compactSidebarEl, { clearProps: "opacity" });
         const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
-        if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity" });
+        if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity,filter" });
         const glowEl = pinEl.querySelector<HTMLElement>(".hx-glow");
         if (glowEl) gsap.set(glowEl, { clearProps: "opacity" });
         // Explicit `display: none` fallback for reduced-motion/mobile static
@@ -3079,6 +3094,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       // non-matching link first, so outside that one group there is still
       // never more than one active link at a time.
       function setActiveSections(ids: string[]) {
+        compactSidebarEl.dataset.palette = ids.includes("about") ? "mono" : "brand";
         navLinkEls.forEach((link) => {
           const navId = link.getAttribute("data-nav-id");
           const isMatch = !!navId && ids.includes(navId);

@@ -107,11 +107,12 @@ export interface SimpleNavContent {
 }
 
 // ---- About ------------------------------------------------------------------
-// Redesigned as an editorial composition: About Me / Beyond Software
-// Engineering / Personal Background / Current Focus / Skills / Formación /
-// Idiomas (in that order — see `AboutSection.astro`). Every sub-block below
-// mirrors a real `site.js` key; nothing here is a text literal baked into
-// the component.
+// Editorial composition: typographic cover / four connected "scenes" (each
+// echoed by a short label in the vertical rail next to the sidebar) /
+// "MI BASE ACTUAL" (Formación + Idiomas) / "MI SISTEMA DE TRABAJO" (Skills
+// bento) / final CTA into Proyectos — in that order, see `AboutSection.astro`.
+// Every sub-block below mirrors a real `site.js` key; nothing here is a text
+// literal baked into the component.
 
 /** A single skill entry: `[name, iconFileName]`. Icon is `null` when the
  * skill has no matching icon asset (see "Astro" in site.js). */
@@ -123,58 +124,112 @@ export interface SkillGroup {
   items: SkillItem[];
 }
 
-/** The section's own heading-card copy ("Sobre mí" / "About Me") plus the
- * opening bio paragraphs that sit directly under it. */
+/** One run of the stacked cover title — mirrors `ServicesToolsTextSegment`'s
+ * "plain text plus an optional style hint" shape rather than a fresh pattern.
+ * `tone` selects the cool gradient ("DATOS"/"DATA") or the brand gold
+ * ("IDENTIDAD"/"IDENTITY"); a segment with no `tone` renders in the default
+ * ivory/white cover color ("INGENIERÍA"/"ENGINEERING", the plain "E"/"&"). */
+export interface AboutTitleSegment {
+  text: string;
+  tone?: string;
+}
+
+/** The section's cover copy: eyebrow label, the 3-line stacked title (each
+ * line an array of colored segments), a short factual closing line (city +
+ * languages — relocated here from the end of `paragraphs[0]`, see the
+ * corrective pass's content restoration), and the opening bio paragraph
+ * (first of the six preserved paragraphs, see `AboutScene.paragraphs` for
+ * the other five). */
 export interface AboutMeCopy {
   eyebrow: string;
+  titleLines: readonly AboutTitleSegment[][];
+  languageLine: string;
+  paragraphs: readonly string[];
+}
+
+export interface AboutChapterCta {
+  label: string;
+  ariaLabel: string;
+  href: string;
+}
+
+/** One tech/project pair in the Cimientos scene's constellation diagram —
+ * each branch is always exactly one technology paired with the one project
+ * that used it, never a loose list of either. */
+export interface AboutNetworkBranch {
+  tech: string;
+  project: string;
+}
+
+/** One of the four editorial "scenes" (Cimientos/Dirección/Producto/Impulso)
+ * that replaced the old fixed chapter triplet. `railLabel` is the short,
+ * non-numbered word shown in the vertical rail next to the sidebar;
+ * `title`/`highlight`/`paragraphs` are the scene's own on-page content.
+ * `tone` selects the scene's local accent color (cyan/violet/gold/coral —
+ * defined as custom properties in `AboutSection.astro`, never a global
+ * token). Exactly one of `networkBranches`/`pipeline`/`triangleVertices`+
+ * `triangleCenter`/`words` is populated, matching the scene's own visual
+ * (hub-and-branches diagram / vertical progression / triangle / word
+ * cluster) — `cta` is optional, only Producto and Impulso carry one. */
+export interface AboutScene {
+  id: string;
+  railLabel: string;
+  emoji: string;
   title: string;
+  highlight: string;
   paragraphs: readonly string[];
+  tone: string;
+  cta?: AboutChapterCta;
+  networkHub?: string;
+  networkBranches?: readonly AboutNetworkBranch[];
+  pipeline?: readonly string[];
+  triangleVertices?: readonly string[];
+  triangleCenter?: string;
+  words?: readonly string[];
 }
 
-export interface BeyondSoftwareEngineeringCopy {
-  heading: string;
-  paragraphs: readonly string[];
-  gfxButtonLabel: string;
-}
-
-export interface PersonalBackgroundCopy {
-  heading: string;
-  paragraphs: readonly string[];
-  esportsButtonLabel: string;
-  esportsHref: string;
-  closingParagraph: string;
-}
-
-export interface CurrentFocusCopy {
-  heading: string;
-  items: readonly string[];
+/** Field labels for the Formación "ficha académica" — bilingual UI copy for
+ * the fixed fact labels (Institución/Programa/Especialización/Estado
+ * actual), separate from `FormacionEntry`'s actual values. */
+export interface FormacionFieldLabels {
+  institution: string;
+  program: string;
+  specialization: string;
+  status: string;
 }
 
 export interface FormacionEntry {
-  text: string;
+  institution: string;
+  program: string;
+  specialization: string;
+  status: string;
   href: string;
 }
 
 export interface FormacionCopy {
   title: string;
+  labels: FormacionFieldLabels;
   entry: FormacionEntry;
+}
+
+export interface LanguageEntry {
+  language: string;
+  level: string;
 }
 
 export interface IdiomasCopy {
   title: string;
-  items: readonly string[];
+  items: readonly LanguageEntry[];
 }
 
 export interface AboutContent {
   aboutMe: AboutMeCopy;
-  beyondSoftwareEngineering: BeyondSoftwareEngineeringCopy;
-  personalBackground: PersonalBackgroundCopy;
-  currentFocus: CurrentFocusCopy;
-  designArchiveHref: string;
-  skillsTitle: string;
-  skillGroups: SkillGroup[];
+  scenes: readonly AboutScene[];
+  foundationTitle: string;
   formacion: FormacionCopy;
   idiomas: IdiomasCopy;
+  skillsTitle: string;
+  skillGroups: SkillGroup[];
 }
 
 export interface AboutSectionContent {
