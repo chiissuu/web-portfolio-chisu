@@ -1,7 +1,7 @@
 ---
 tags: [diseno, css, tokens, responsive]
 aliases: [Sistema-de-Diseno]
-actualizado: 2026-10-06
+actualizado: 2026-10-07
 fuente: [src/layouts/Layout.astro]
 ---
 
@@ -16,13 +16,17 @@ Fuente principal: [Layout.astro](../../src/layouts/Layout.astro). CSS nativo glo
 - Temas de sección: `--theme-*` — el mecanismo clave que permite que un mismo componente (botones, bordes, texto) funcione igual sobre fondo claro u oscuro sin lógica condicional; solo cambia qué tema CSS envuelve a la sección. Esto es lo que permitió intercambiar About y Proyectos entre warm/dark sin tocar [[Hero-y-Sidebar]].
 - Artículos del sidebar: `--art-*`
 - Acentos locales del Hero: `--hx-ui-*`
-- Acentos locales de About: `--ab-tone`
+- Acentos locales de About: `--ab-accent` y `--ab-tone` (gris `#c9c9c9`)
 
 Colores base: fondo warm `#d5cfbe`, tinta `#1a1919`, dorado `#e0c58b`, dorado oscuro `#8a6420`. Tema dark: degradado `#050505 → #1b1b1f → #050505`.
 
 ## Orden actual de temas por sección
 
-Hero (gráfico dorado sobre fondo estructural oscuro) → About (warm) → Proyectos (dark plano, `--section-dark-start`) → Servicios/Tools (dark con degradado) → Contacto (warm) → FAQ (dark). No hay alternancia estricta entre todas las secciones.
+Hero (gráfico dorado sobre fondo estructural oscuro) → About (carbón, clase dark con textura desaturada del Hero que se desvanece) → Proyectos (dark plano, `--section-dark-start`) → Servicios/Tools (dark con degradado) → Contacto (warm) → FAQ (dark). No hay alternancia estricta entre todas las secciones.
+
+About usa texto blanco y gris y superficies neutras. Su estado de navegación activa aplica `data-palette="mono"` al sidebar: logo gris oscuro y acentos/botones grises; las demás secciones conservan la paleta dorada. Esta paleta es independiente del tema warm/dark que cada artículo detecta por solapamiento.
+
+La introducción de About tiene un título de hasta 4.6rem y biografía de hasta 1.35rem, centrada y limitada a 60ch. Sus cuatro escenas comparten columna de texto y gráfico compacto alineado arriba, alternando lados desde 1280px. Los encabezados usan iconos Lucide monocromos; proyectos, pipeline, triángulo y conceptos conservan la misma paleta neutral. Ver [[Sobre-Mi]] para la estructura y las excepciones responsive.
 
 ## Layout de contenido
 
@@ -38,7 +42,7 @@ Remotas (Google Fonts): Space Grotesk, Archivo Black, Inter Tight, Inter, JetBra
 
 | Condición | Comportamiento |
 |---|---|
-| ≥900px | Hero con posibilidad de morph/sidebar; compensación de contenido; rail y dos columnas en About |
+| ≥900px | Hero con posibilidad de morph/sidebar; compensación de contenido; About respeta la reserva del sidebar; sin indicador lateral de lectura y escenas en dos columnas desde 1280px |
 | 900–1599px | Tamaños específicos de título, tarjetas y retrato |
 | 900–1399px | Ajustes adicionales de offsets y títulos; deben seguir al bloque general de escritorio |
 | ≥1600px | Retrato y títulos mayores |

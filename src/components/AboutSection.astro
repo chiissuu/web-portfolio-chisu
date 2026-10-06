@@ -1,4 +1,5 @@
 ---
+import { Blocks, TrendingUp, Lightbulb, Zap } from "lucide-astro";
 import type { AboutSectionContent } from "../lib/content-types";
 
 interface Props {
@@ -9,35 +10,52 @@ const { t } = Astro.props as Props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const about = t.about;
 
-// Local accent colors for the four scenes — never a global/shared token,
-// only ever read inside this component via `--ab-tone`, set inline per
-// scene from `scene.tone`. About now runs on the warm/beige theme (see the
-// corrective pass), so these are darkened/saturated versions of the
-// original dark-background set — light cyan/violet/gold/coral would all
-// but disappear against `--color-bg`. Gold mirrors the portfolio's own
-// `--color-brand-gold-strong` (Layout.astro) rather than inventing a new
-// hex, per the "reuse, don't invent" instruction.
+// Keep the existing scene keys while sharing About's neutral accent.
 const TONE_COLORS: Record<string, string> = {
-  cyan: "#0E7490",
-  violet: "#6D28D9",
-  gold: "#8A6420",
-  coral: "#C2410C",
+  cyan: "var(--ab-accent)",
+  violet: "var(--ab-accent)",
+  gold: "var(--ab-accent)",
+  coral: "var(--ab-accent)",
 };
 
-// Pure display transformation — breaks a long paragraph into shorter
-// visual blocks at sentence boundaries so About reads as short editorial
-// passages instead of one dense block. Never changes words, order, or
-// content. Splits only on whitespace that immediately follows `.`/`!`/`?`
-// (via `String.split`, which by construction can never drop characters —
-// unlike a `match()`-based approach, it can't silently lose a whole
-// sentence when a period has no trailing space, e.g. "MegatronixOS.").
-function splitIntoBlocks(text: string, sentencesPerBlock = 2): string[] {
+const SCENE_ICONS: Record<string, typeof Blocks> = {
+  foundations: Blocks,
+  direction: TrendingUp,
+  product: Lightbulb,
+  drive: Zap,
+};
+
+// Styling hints only: source copy remains in site.js, in both languages.
+const SCENE_EMPHASIS: Record<string, readonly string[]> = {
+  foundations: ["Java", "MegatronixOS", "Astro"],
+  direction: ["Data Science", "machine learning"],
+  product: ["modelos de negocio", "diseño gráfico", "business models", "graphic design"],
+  drive: ["rendimiento colectivo", "experiencia de usuario", "collective performance", "user experience"],
+};
+
+// Preserve every sentence and its order. Foundations groups its opening
+// two sentences, then gives each project/conclusion a separate paragraph.
+// The last group size repeats; other scenes keep pairs of sentences.
+function splitIntoBlocks(text: string, groupSizes: readonly number[] = [2]): string[] {
   const sentences = text.split(/(?<=[.!?])\s+/);
   const blocks: string[] = [];
-  for (let i = 0; i < sentences.length; i += sentencesPerBlock) {
-    blocks.push(sentences.slice(i, i + sentencesPerBlock).join(" "));
+  for (let i = 0; i < sentences.length;) {
+    const size = groupSizes[Math.min(blocks.length, groupSizes.length - 1)];
+    blocks.push(sentences.slice(i, i + size).join(" "));
+    i += size;
   }
   return blocks;
+}
+
+// Render ordinary text/strong nodes rather than injecting HTML from copy.
+function emphasize(text: string, sceneId: string) {
+  const phrases = SCENE_EMPHASIS[sceneId] ?? [];
+  if (!phrases.length) return [{ text, strong: false }];
+  const pattern = phrases.map((phrase) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  return text.split(new RegExp(`(${pattern})`, "gi")).map((part) => ({
+    text: part,
+    strong: phrases.some((phrase) => phrase.toLowerCase() === part.toLowerCase()),
+  }));
 }
 
 const formacionFacts = [
@@ -48,43 +66,20 @@ const formacionFacts = [
 ];
 ---
 
-<section class="section-theme-warm" id="about">
+<section
+  class="section-theme-dark ab-section"
+  id="about"
+  style={`--ab-texture: url("${base}/assets/images/hero-background-gold-alternative.png")`}
+>
   <div class="section-inner ab-inner">
-    <!-- Body grid: a real, permanently reserved rail column (col 1) next to
-         a SINGLE content column (col 2) holding the cover, the four scenes,
-         "Mi base actual" and Skills together — so all of them share the
-         exact same left edge. Before this corrective pass the cover/
-         foundation/skills sat directly in `.ab-inner` (unindented) while
-         the scenes sat inside this grid's 2nd column (indented by the rail
-         width), producing three different left edges down the section;
-         moving every block into the same grid column fixes that in one
-         place instead of hand-matching paddings. Below 900px the grid
-         collapses to a single block and the rail hides — see the rail's
-         own comment for why it's still safe to keep in the DOM there. -->
     <div class="ab-body">
-      <div class="ab-rail" aria-hidden="true">
-        <div class="ab-rail-track"><div class="ab-rail-fill"></div></div>
-        <ul class="ab-rail-nodes">
-          {about.scenes.map((scene, i) => (
-            <li
-              class:list={["ab-rail-node", i === 0 && "is-active"]}
-              style={`--ab-tone: ${TONE_COLORS[scene.tone]}`}
-            >
-              <span class="ab-rail-dot"></span>
-              <span class="ab-rail-label">{scene.railLabel}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       <div class="ab-content">
         <!-- 1. Typographic cover — no card/button treatment, no
              SectionHeadingCard. `SOBRE MÍ`/`ABOUT ME` is an editorial
              eyebrow label, not a second heading; the single semantic <h2>
-             is the stacked 3-line title. Two columns at desktop (heading
-             block | prose) so the first paragraph fills the width the
-             title doesn't use, instead of both being squeezed into one
-             narrow column with empty space to the right. -->
+             is the stacked 3-line title. A single column (heading
+             block followed by prose) gives the introduction the width it needs.
+             Center this introduction in the space beside the sidebar. -->
         <header class="ab-cover rd-reveal">
           <div class="ab-cover-heading">
             <p class="ab-eyebrow">{about.aboutMe.eyebrow}</p>
@@ -104,61 +99,65 @@ const formacionFacts = [
           </div>
         </header>
 
-        <!-- 2. The four editorial scenes. Rail activation is a single
-             IntersectionObserver scoped to this component (see <script>
-             below) — no GSAP/ScrollTrigger/global listeners/rAF loops. -->
+        <!-- 2. The four editorial scenes retain their existing anchors. -->
         <div class="ab-scenes">
-          {about.scenes.map((scene) => (
+          {about.scenes.map((scene) => {
+            const SceneIcon = SCENE_ICONS[scene.id] ?? Blocks;
+            const paragraphs = scene.paragraphs.flatMap((paragraph) =>
+              splitIntoBlocks(paragraph, scene.id === "foundations" ? [2, 1] : [2])
+            );
+            return (
             <section
-              class="ab-scene rd-reveal"
+              class:list={[
+                "ab-scene",
+                "rd-reveal",
+                { "ab-scene-reverse": scene.id === "direction" || scene.id === "drive" },
+              ]}
               id={`about-scene-${scene.id}`}
               aria-labelledby={`ab-scene-${scene.id}-heading`}
               style={`--ab-tone: ${TONE_COLORS[scene.tone]}`}
             >
-              <div class="ab-scene-head">
-                <span class="ab-scene-emoji" aria-hidden="true">{scene.emoji}</span>
-                <h3 id={`ab-scene-${scene.id}-heading`} class="ab-scene-title">{scene.title}</h3>
-              </div>
-              <p class="ab-scene-highlight">{scene.highlight}</p>
               <div class="ab-scene-grid">
-                <div class="ab-scene-prose editorial-text">
-                  {scene.paragraphs.flatMap((paragraph) => splitIntoBlocks(paragraph)).map((paragraph) => (
-                    <p>{paragraph}</p>
-                  ))}
-                  {scene.cta && (
-                    <a
-                      class="ab-cta-btn"
-                      href={scene.cta.href}
-                      aria-label={scene.cta.ariaLabel}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {scene.cta.label}
-                    </a>
-                  )}
+                <div class="ab-scene-copy">
+                  <div class="ab-scene-head">
+                    <span class="ab-scene-icon" aria-hidden="true"><SceneIcon size={22} stroke-width={1.6} /></span>
+                    <h3 id={`ab-scene-${scene.id}-heading`} class="ab-scene-title">{scene.title}</h3>
+                  </div>
+                  <p class="ab-scene-highlight">{scene.highlight}</p>
+                  <div class="ab-scene-prose editorial-text">
+                    {paragraphs.map((paragraph) => (
+                      <p>{emphasize(paragraph, scene.id).map((part) => (
+                        part.strong ? <strong>{part.text}</strong> : part.text
+                      ))}</p>
+                    ))}
+                    {scene.cta && (
+                      <a
+                        class="ab-cta-btn"
+                        href={scene.cta.href}
+                        aria-label={scene.cta.ariaLabel}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {scene.cta.label}
+                      </a>
+                    )}
+                  </div>
                 </div>
 
-                <!-- Hub-and-branches "org chart", built entirely from plain
-                     flow layout + borders (no absolute coordinates, no
-                     SVG) — a vertical connector under the hub meets a
-                     horizontal spine (the branch row's own top border), and
-                     each branch has a short tick (its own top border)
-                     dropping from that spine. Every line is anchored to a
-                     real element's own box, so it can never end up
-                     "orphaned" or drift out of place when the row reflows
-                     at a different width. -->
+                <!-- Compact visuals share a top alignment; reading order
+                     stays copy first, visual second on smaller screens. -->
                 <div class="ab-scene-visual">
                   {scene.networkBranches && (
                     <div class="ab-network">
                       <p class="ab-network-hub">{scene.networkHub}</p>
-                      <div class="ab-network-branches">
+                      <ul class="ab-network-branches">
                         {scene.networkBranches.map((branch) => (
-                          <div class="ab-network-branch">
+                          <li class="ab-network-branch">
                             <p class="ab-network-tech">{branch.tech}</p>
                             <p class="ab-network-project">{branch.project}</p>
-                          </div>
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
                   )}
 
@@ -177,8 +176,8 @@ const formacionFacts = [
 
                   {scene.triangleVertices && (
                     <div class="ab-triangle">
-                      <svg class="ab-triangle-shape" viewBox="0 0 100 88" preserveAspectRatio="none" aria-hidden="true">
-                        <polygon points="50,4 8,82 92,82"></polygon>
+                      <svg class="ab-triangle-shape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                        <polygon points="50,20 15,78 85,78"></polygon>
                       </svg>
                       <span class="ab-triangle-vertex ab-triangle-top">{scene.triangleVertices[0]}</span>
                       <span class="ab-triangle-vertex ab-triangle-left">{scene.triangleVertices[1]}</span>
@@ -195,7 +194,8 @@ const formacionFacts = [
                 </div>
               </div>
             </section>
-          ))}
+            );
+          })}
         </div>
 
         <!-- 3. Formación + Idiomas — closes the personal-profile half of
@@ -261,46 +261,56 @@ const formacionFacts = [
   </div>
 </section>
 
-<script>
-  // Scoped exclusively to this component's own markup (`.ab-scene`/
-  // `.ab-rail-node` only ever exist inside AboutSection.astro, rendered
-  // once on the home page) — a single IntersectionObserver, no GSAP/
-  // ScrollTrigger, no global scroll listeners, no requestAnimationFrame
-  // loop. If IntersectionObserver isn't supported, the rail simply stays
-  // in its default state (still visible, just not highlighted) — every
-  // scene's real content (headings/paragraphs/visuals) is always in the
-  // DOM regardless, so nothing depends on this script to be readable.
-  const aboutScenes = document.querySelectorAll<HTMLElement>(".ab-scene");
-  const railNodes = document.querySelectorAll<HTMLElement>(".ab-rail-node");
-  const railFill = document.querySelector<HTMLElement>(".ab-rail-fill");
-
-  if ("IntersectionObserver" in window && aboutScenes.length && railNodes.length) {
-    const setActive = (index: number) => {
-      railNodes.forEach((node, i) => node.classList.toggle("is-active", i === index));
-      if (railFill) {
-        railFill.style.setProperty("--ab-rail-progress", String((index + 1) / aboutScenes.length));
-      }
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (!visible.length) return;
-        const closest = visible.reduce((a, b) =>
-          Math.abs(a.boundingClientRect.top) < Math.abs(b.boundingClientRect.top) ? a : b
-        );
-        const index = Array.from(aboutScenes).indexOf(closest.target as HTMLElement);
-        if (index !== -1) setActive(index);
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
-    );
-
-    aboutScenes.forEach((scene) => observer.observe(scene));
-  }
-</script>
 
 <style>
+  .ab-section {
+    position: relative;
+    /* Let the content and backdrop straddle the pinned Hero's z-index.
+       Isolating this section would trap both beneath its opaque backdrop. */
+    --ab-blend-height: clamp(10rem, 20svh, 14rem);
+    --ab-accent: #c9c9c9;
+    --theme-text: #f2f2f2;
+    --theme-text-muted: #bdbdbd;
+    --theme-border: rgb(255 255 255 / 18%);
+    --theme-surface: rgb(255 255 255 / 4%);
+    --theme-surface-strong: rgb(255 255 255 / 8%);
+    /* Match the exposed Hero wrapper at the section edge, then gradually
+       introduce charcoal. The texture below must also start transparent. */
+    background: linear-gradient(
+      180deg,
+      var(--section-dark-start) 0,
+      #191919 var(--ab-blend-height),
+      #121212 1400px,
+      #0d0d0d 100%
+    );
+  }
+
+  /* Reuse the Hero asset; only its decorative layer is desaturated.
+     Feather both edges to avoid a hard seam during the Hero crossfade. */
+  .ab-section::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: min(1400px, 100%);
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--ab-texture);
+    background-size: cover;
+    background-position: center top;
+    filter: grayscale(1) brightness(0.65);
+    opacity: 0.55;
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0,
+      #000 var(--ab-blend-height),
+      rgb(0 0 0 / 80%) 45%,
+      transparent 100%
+    );
+  }
+
   .ab-inner {
+    position: relative;
+    z-index: 3;
     display: block;
   }
 
@@ -315,94 +325,32 @@ const formacionFacts = [
   }
 
   /* ---------------------------------------------------------------------
-     Rail — a real column reserved between the sidebar and the content
-     column (never a negative margin reaching into
-     `--sidebar-content-gap`, never overlapping the fixed sidebar, since it
-     never leaves its own grid track). Rebuilt from scratch in this
-     corrective pass: the previous version absolutely-positioned four
-     `writing-mode: vertical-rl` labels at fixed top percentages (4/36/64/
-     92%) sized to fit a much taller `.ab-scenes` column — vertical text is
-     as TALL as it is long, so "DIRECCIÓN" (9 characters) rendered far
-     taller than the ~28% gap between two of those percentage marks, and
-     every label overlapped the next. Horizontal labels in a plain flex
-     column with a fixed, generous `gap` can never do that: their height is
-     just their own font-size, entirely decoupled from how tall the
-     content column happens to be.
-
-     `display: none` below 900px lives ONLY inside the `@media (max-width:
-     899px)` block further down, never as a bare unguarded `.ab-rail`
-     rule here — this component's dev server was observed serving just
-     the `@media (min-width: 900px)` variant of this exact selector and
-     silently dropping an unguarded same-selector base rule, which left
-     the rail visible (as a plain bulleted list) below 900px. Two
-     media-guarded rules for the same selector don't hit that. -->
-  .ab-rail-track {
-    position: relative;
-    width: 2px;
-    background: var(--theme-border);
-  }
-
-  .ab-rail-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(var(--ab-rail-progress, 0) * 100%);
-    background: var(--color-brand-gold-strong);
-    transition: height 0.4s ease;
-  }
-
-  .ab-rail-nodes {
-    list-style: none;
-  }
-
-  .ab-rail-node {
-    display: flex;
-    align-items: center;
-  }
-
-  .ab-rail-dot {
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: var(--theme-surface-strong);
-    border: 2px solid var(--theme-border);
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .ab-rail-label {
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    color: var(--theme-text-muted);
-    white-space: nowrap;
-    transition: color 0.3s ease, font-weight 0.3s ease;
-  }
-
-  .ab-rail-node.is-active .ab-rail-dot {
-    background: var(--ab-tone);
-    border-color: var(--ab-tone);
-    box-shadow: 0 0 8px 0 var(--ab-tone);
-  }
-
-  .ab-rail-node.is-active .ab-rail-label {
-    color: var(--ab-tone);
-    font-weight: 700;
-  }
-
-  /* ---------------------------------------------------------------------
      Cover
      --------------------------------------------------------------------- */
   .ab-cover {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 1.75rem;
+  }
+
+  .ab-cover-heading {
+    width: 100%;
+  }
+
+  .ab-cover-prose {
+    width: min(100%, 60ch);
+    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+    line-height: 1.65;
   }
 
   .ab-eyebrow {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: clamp(0.8rem, 1vw, 0.9rem);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-brand-gold-strong);
+    color: var(--ab-accent);
     margin: 0 0 1.1rem;
   }
 
@@ -416,7 +364,7 @@ const formacionFacts = [
 
   .ab-title-line {
     display: block;
-    font-size: clamp(2.1rem, 5.6vw, 3.9rem);
+    font-size: clamp(2.1rem, 6.4vw, 4.6rem);
   }
 
   .ab-title-seg {
@@ -424,19 +372,16 @@ const formacionFacts = [
   }
 
   .ab-tone-cool {
-    background: linear-gradient(120deg, #0e7490, #4c3aa8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: #164e63;
+    color: var(--ab-accent);
   }
 
   .ab-tone-gold {
-    color: var(--color-brand-gold-strong);
+    color: var(--ab-accent);
   }
 
   .ab-language-line {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
     letter-spacing: 0.04em;
     color: var(--theme-text-muted);
     margin: 0;
@@ -445,10 +390,11 @@ const formacionFacts = [
   .ab-cover-prose p {
     color: var(--theme-text);
     max-width: 62ch;
+    margin-inline: auto;
   }
 
   .ab-cover-prose p + p {
-    margin-top: 1rem;
+    margin-top: 1.4rem;
   }
 
   /* ---------------------------------------------------------------------
@@ -464,6 +410,7 @@ const formacionFacts = [
     flex-direction: column;
     padding-top: clamp(2.5rem, 5vw, 3.5rem);
     border-top: 1px solid var(--theme-border);
+    padding-bottom: clamp(2.5rem, 4vw, 4rem);
   }
 
   .ab-scenes .ab-scene:first-child {
@@ -478,18 +425,17 @@ const formacionFacts = [
     margin-bottom: 1rem;
   }
 
-  .ab-scene-emoji {
+  .ab-scene-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     width: 48px;
     height: 48px;
-    border-radius: 14px;
-    background: rgba(26, 25, 25, 0.06);
-    border: 1px solid var(--ab-tone);
-    box-shadow: 0 0 14px -4px var(--ab-tone);
-    font-size: 1.4rem;
+    border-radius: 50%;
+    background: var(--theme-surface-strong);
+    border: 1px solid var(--theme-border);
+    color: var(--ab-tone);
     line-height: 1;
   }
 
@@ -509,6 +455,7 @@ const formacionFacts = [
     max-width: 60ch;
     font-family: var(--font-editorial);
     font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.5;
     color: var(--theme-text);
   }
 
@@ -516,20 +463,44 @@ const formacionFacts = [
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
+    align-items: start;
+  }
+
+  .ab-scene-copy {
+    min-width: 0;
+  }
+
+  .ab-scene-prose {
+    max-width: 60ch;
+    line-height: 1.7;
+  }
+
+  .ab-scene-prose strong {
+    font-weight: 600;
+    color: var(--theme-text);
   }
 
   .ab-scene-prose p {
     color: var(--theme-text-muted);
+    max-width: 62ch;
   }
 
   .ab-scene-prose p + p {
-    margin-top: 1rem;
+    margin-top: 1.25rem;
   }
 
   .ab-scene-visual {
     display: flex;
     align-items: center;
-    min-height: 200px;
+    justify-content: center;
+    align-self: start;
+    width: 100%;
+    max-width: 24rem;
+    min-width: 0;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border: 1px solid var(--theme-border);
+    border-radius: 16px;
+    background: var(--theme-surface);
   }
 
   .ab-cta-btn {
@@ -552,73 +523,58 @@ const formacionFacts = [
   .ab-cta-btn:hover,
   .ab-cta-btn:focus-visible {
     transform: translateY(-2px);
-    border-color: var(--ab-tone, var(--color-brand-gold-strong));
+    border-color: var(--ab-tone, var(--ab-accent));
   }
 
-  /* --- Scene 1: hub-and-branches diagram ------------------------------- */
+  /* --- Scene 1: three project cards joined by a discreet spine -------- */
   .ab-network {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: stretch;
   }
 
   .ab-network-hub {
-    position: relative;
-    margin: 0 0 1.75rem;
-    padding: 0.6rem 1.4rem;
-    border: 1px solid var(--ab-tone);
-    border-radius: 999px;
-    background: var(--theme-surface-strong);
+    margin: 0 0 1.25rem;
     color: var(--theme-text);
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-weight: 700;
   }
 
-  .ab-network-hub::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -1.75rem;
-    width: 2px;
-    height: 1.75rem;
-    background: var(--ab-tone);
-    transform: translateX(-50%);
-  }
-
   .ab-network-branches {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 1.25rem;
-    padding-top: 1.75rem;
-    border-top: 2px solid var(--ab-tone);
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0 0 0 1rem;
+    border-left: 1px solid var(--theme-border);
   }
 
   .ab-network-branch {
     position: relative;
-    flex: 1;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
     align-items: center;
-    gap: 0.4rem;
-    padding: 1rem 0.5rem 0.85rem;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 10px;
+    background: var(--theme-surface);
   }
 
   .ab-network-branch::before {
     content: "";
     position: absolute;
-    top: -1.75rem;
-    left: 50%;
-    width: 2px;
-    height: 1.75rem;
-    background: var(--ab-tone);
-    transform: translateX(-50%);
+    top: 50%;
+    left: -1rem;
+    width: 1rem;
+    height: 1px;
+    background: var(--theme-border);
   }
 
   .ab-network-tech {
@@ -633,58 +589,23 @@ const formacionFacts = [
 
   .ab-network-project {
     margin: 0;
-    max-width: 11rem;
-    font-size: 0.82rem;
-    line-height: 1.35;
+    font-size: 0.95rem;
+    line-height: 1.4;
     color: var(--theme-text-muted);
   }
 
-  @media (max-width: 640px) {
-    .ab-network-hub {
-      margin-bottom: 1.25rem;
-    }
-
-    .ab-network-hub::after {
-      height: 1.25rem;
-      bottom: -1.25rem;
-    }
-
-    .ab-network-branches {
-      flex-direction: column;
-      align-items: stretch;
-      border-top: none;
-      border-left: 2px solid var(--ab-tone);
-      padding-top: 0;
-      padding-left: 1.25rem;
-      gap: 1.1rem;
-    }
-
-    .ab-network-branch {
-      align-items: flex-start;
-      text-align: left;
-      padding: 0;
-    }
-
-    .ab-network-branch::before {
-      display: none;
-    }
-
-    .ab-network-project {
-      max-width: none;
-    }
-  }
-
-  /* --- Scene 2: vertical pipeline — always a single column, at every
-         viewport, per the corrective brief ("sin cambio de orden en
-         responsive"). -------------------------------------------------- */
+  /* --- Scene 2: equal-width stages, with arrows on the shared axis ----- */
   .ab-pipeline {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.6rem;
   }
 
   .ab-pipeline-stage {
+    width: 100%;
+    text-align: center;
     padding: 0.75rem 1.1rem;
     border: 1px solid var(--ab-tone);
     border-radius: 10px;
@@ -696,7 +617,6 @@ const formacionFacts = [
   }
 
   .ab-pipeline-arrow {
-    padding-left: 1.35rem;
     color: var(--ab-tone);
     font-size: 1.2rem;
     line-height: 1;
@@ -706,7 +626,7 @@ const formacionFacts = [
   .ab-triangle {
     position: relative;
     width: 100%;
-    min-height: 280px;
+    height: 16rem;
   }
 
   .ab-triangle-shape {
@@ -734,29 +654,28 @@ const formacionFacts = [
   }
 
   .ab-triangle-top {
-    top: 4%;
+    top: 0;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
   }
 
   .ab-triangle-left {
-    top: 93%;
-    left: 8%;
-    transform: translate(-8%, -50%);
+    bottom: 0;
+    left: 0;
   }
 
   .ab-triangle-right {
-    top: 93%;
-    left: 92%;
-    transform: translate(-92%, -50%);
+    bottom: 0;
+    right: 0;
   }
 
   .ab-triangle-center {
     position: absolute;
-    top: 60%;
+    top: 62%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 9rem;
+    width: 8.5rem;
+    max-width: 60%;
     padding: 0.5rem 0.75rem;
     border-radius: 10px;
     background: var(--theme-surface-strong);
@@ -770,7 +689,7 @@ const formacionFacts = [
 
   @media (max-width: 640px) {
     .ab-triangle {
-      min-height: auto;
+      height: auto;
     }
 
     .ab-triangle-shape {
@@ -792,55 +711,29 @@ const formacionFacts = [
     }
   }
 
-  /* --- Scene 4: word cluster — a stable grid, not floating chaos: a plain
-         flex-wrap row with deliberate size/opacity/color steps per word,
-         no rotation (removed in this corrective pass — a stray ±2deg tilt
-         read as "floating" rather than "hierarchical"). ------------------ */
+  /* --- Scene 4: six concepts with equal visual weight ----------------- */
   .ab-word-cluster {
+    width: 100%;
     list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.6rem 1rem;
-    padding: 1rem 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    padding: 0;
+    margin: 0;
   }
 
   .ab-word {
-    font-family: var(--font-display);
-    font-weight: 700;
+    min-width: 0;
+    padding: 0.85rem 0.4rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    background: var(--theme-surface);
+    font-family: var(--font-mono);
+    font-size: clamp(0.72rem, 1vw, 0.85rem);
+    font-weight: 600;
     color: var(--theme-text);
-    letter-spacing: -0.01em;
-  }
-
-  .ab-word:nth-child(6n + 1) {
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    color: var(--ab-tone);
-  }
-
-  .ab-word:nth-child(6n + 2) {
-    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
-    opacity: 0.75;
-  }
-
-  .ab-word:nth-child(6n + 3) {
-    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
-    opacity: 0.92;
-  }
-
-  .ab-word:nth-child(6n + 4) {
-    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
-    opacity: 0.65;
-  }
-
-  .ab-word:nth-child(6n + 5) {
-    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
-    color: var(--ab-tone);
-    opacity: 0.85;
-  }
-
-  .ab-word:nth-child(6n + 6) {
-    font-size: clamp(1rem, 1.8vw, 1.2rem);
-    opacity: 0.7;
+    text-align: center;
+    line-height: 1.4;
   }
 
   /* ---------------------------------------------------------------------
@@ -848,6 +741,7 @@ const formacionFacts = [
      --------------------------------------------------------------------- */
   .ab-section-title {
     margin: 0 0 1.75rem;
+    text-align: center;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: clamp(1.4rem, 2.8vw, 2rem);
@@ -882,7 +776,7 @@ const formacionFacts = [
 
   .ab-formacion-card:hover,
   .ab-formacion-card:focus-visible {
-    border-color: var(--color-brand-gold-strong);
+    border-color: var(--ab-accent);
     transform: translateY(-2px);
   }
 
@@ -914,7 +808,7 @@ const formacionFacts = [
     top: 1.5rem;
     right: 1.75rem;
     font-size: 1.3rem;
-    color: var(--color-brand-gold-strong);
+    color: var(--ab-accent);
   }
 
   .ab-idiomas-card {
@@ -952,7 +846,7 @@ const formacionFacts = [
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.04em;
-    color: var(--color-brand-gold-strong);
+    color: var(--ab-accent);
   }
 
   /* ---------------------------------------------------------------------
@@ -977,9 +871,9 @@ const formacionFacts = [
 
   .ab-bento-card:hover,
   .ab-bento-card:focus-within {
-    border-color: var(--color-brand-gold-strong);
+    border-color: var(--ab-accent);
     background: var(--theme-surface-strong);
-    box-shadow: 0 0 20px -10px var(--color-brand-gold-strong);
+    box-shadow: 0 0 20px -10px var(--ab-accent);
   }
 
   .ab-bento-software,
@@ -1043,67 +937,16 @@ const formacionFacts = [
     object-fit: contain;
   }
 
-  /* ---------------------------------------------------------------------
-     Desktop (>=900px, same threshold the sidebar itself already uses) —
-     rail becomes visible in its own reserved column, cover splits into
-     heading+prose, scenes move to a two-column grid, foundation adopts
-     its two-column layout.
-     --------------------------------------------------------------------- */
+  /* Preserve the existing tablet layout alongside the main sidebar. */
   @media (min-width: 900px) {
-    .ab-body {
-      display: grid;
-      grid-template-columns: minmax(auto, 6.5rem) minmax(0, 1fr);
-      gap: clamp(1.25rem, 2.5vw, 2.5rem);
-      align-items: start;
-    }
-
-    .ab-rail {
-      display: block;
-      position: sticky;
-      top: clamp(2rem, 12vh, 6rem);
-      padding-top: 0.35rem;
-    }
-
-    .ab-rail-nodes {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 2.5rem;
-    }
-
-    .ab-rail-track {
-      position: absolute;
-      top: 5px;
-      bottom: 5px;
-      left: 4px;
-    }
-
-    .ab-rail-node {
-      position: relative;
-      z-index: 1;
-      gap: 0.7rem;
-    }
-
-    .ab-rail-dot {
-      width: 10px;
-      height: 10px;
-    }
-
-    .ab-rail-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-    }
-
     .ab-cover {
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-      gap: clamp(2rem, 4vw, 3.5rem);
-      align-items: end;
+      display: flex;
+      gap: 2rem;
     }
 
     .ab-scene-grid {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
     }
 
     .ab-foundation-grid {
@@ -1111,11 +954,42 @@ const formacionFacts = [
     }
   }
 
-  @media (max-width: 899px) {
-    .ab-rail {
-      display: none;
+  @media (min-width: 1200px) {
+    :global(body.redesign-home) .ab-inner {
+      margin-inline-start: calc(var(--hx-sidebar-width) + 1.5rem);
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .ab-scene-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr);
+      gap: clamp(1.5rem, 3vw, 3rem);
     }
 
+    .ab-scene-visual {
+      justify-self: end;
+    }
+
+    .ab-scene-reverse .ab-scene-grid {
+      grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+    }
+
+    /* CSS swaps columns only; mobile and assistive reading order is stable. */
+    .ab-scene-reverse .ab-scene-copy {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .ab-scene-reverse .ab-scene-visual {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: start;
+    }
+  }
+
+
+  @media (max-width: 899px) {
     .ab-formacion-facts {
       grid-template-columns: 1fr;
     }

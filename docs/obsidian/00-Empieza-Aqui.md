@@ -43,7 +43,7 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 
 ## Changelog corto (respecto a la auditoría de agosto 2026)
 
-- About pasó de un esquema de capítulos numerados a `scenes` + rail + portada propia sobre beige; Proyectos es ahora el tema oscuro (se intercambiaron).
+- About pasó de capítulos numerados a `scenes` + rail + portada propia. Tras la revisión visual del 6 de octubre usa fondo carbón con textura desaturada del Hero y tema dark, título y biografía en una columna sin indicador lateral de lectura. Proyectos conserva su tema oscuro.
 - Lucide sí se usa y renderiza en el sidebar (la sospecha de dependencia sin uso quedó descartada).
 - El texto de depuración del conversor ya no existe en el proyecto activo.
 - Se añadió `vite.optimizeDeps.include: ["react-dom/client"]` en `astro.config.mjs` para resolver un fallo de hidratación en dev.

@@ -223,6 +223,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 <aside
   class="hx-compact-sidebar"
   id="hx-compact-sidebar"
+  data-palette="brand"
   aria-label="Compact site navigation"
   aria-hidden="true"
 >
@@ -412,6 +413,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        geometry it replaces. */
     position: relative;
     top: auto;
+    /* Above About's backdrop (0), below its scrolling content (3).
+       The color crossfade must not hide the incoming text. */
+    z-index: 2;
     height: 100svh;
     min-height: 640px;
     overflow: clip;
@@ -1002,6 +1006,21 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     pointer-events: auto;
   }
 
+  /* About shares the existing active-section tracker. Override only the
+     sidebar's accent tokens; the Hero and other sections keep their gold. */
+  .hx-compact-sidebar[data-palette="mono"] {
+    --color-brand-gold: #c9c9c9;
+    --color-brand-gold-strong: #ededed;
+  }
+
+  .hx-compact-sidebar[data-palette="mono"] .hx-sidebar-article {
+    background: rgb(160 160 160 / 12%);
+  }
+
+  .hx-compact-sidebar[data-palette="mono"] .hx-compact-wordmark-image {
+    filter: grayscale(1) brightness(0.72);
+  }
+
   /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
      `<aside>` anymore. Each `.hx-sidebar-article` carries its OWN
      `data-theme` ("warm"/"dark"), flipped independently by the per-article
@@ -1050,7 +1069,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     padding: 0.85rem 1.25rem;
     border-color: var(--art-border, var(--color-line));
     color: var(--art-text, var(--color-ink));
-    transition: border-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
   /* Brand mark — now the same gold wordmark image used in the hero
@@ -1077,6 +1096,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     width: min(8.25rem, 100%);
     height: auto;
     object-fit: contain;
+    transition: filter 0.3s ease;
   }
 
   /* Small, independent (R) mark — visually anchored to the wordmark
@@ -1092,6 +1112,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     font-weight: 700;
     line-height: 1;
     color: var(--color-brand-gold);
+    transition: color 0.3s ease;
   }
 
   .hx-compact-tagline {
@@ -1122,14 +1143,14 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     border-left: 1px solid var(--art-divider, var(--color-line));
   }
 
-  /* Same brand gold as `.hx-compact-mark`/the Contacto CTA — never yellow,
-     never `--art-text`. */
+  /* Accent follows the section palette: gold normally, neutral in About. */
   .hx-compact-metric-value {
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 1.3rem;
     line-height: 1.1;
     color: var(--color-brand-gold);
+    transition: color 0.3s ease;
   }
 
   /* Contrast fix, warm theme only: an extremely thin black outline on the
@@ -2810,26 +2831,20 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           SIDEBAR_ACTIVATE_AT
         );
 
-        // Warm-to-black backdrop crossfade — fades `.hx-pin-fade` (the
-        // gold background image) AND `.hx-glow` (the warm radial
-        // highlights layered on top of it) together, so no warm-toned
-        // layer is left lingering once the base beneath them is already
-        // black. Spans the final 23% of the timeline (75%->98%), clearly
-        // perceptible rather than the previous few visual tenths, and
-        // finishes 2 points before the pin actually releases at 100% —
-        // fully settled before the unpin, not exactly coincident with it.
-        // By this point `AboutSection`'s real dark background has already
-        // scrolled up to sit directly beneath the fixed pin (per
-        // `pinSpacing: false` above), and `.hx-pin-fade`'s own solid base
-        // color now matches `--section-dark-start` exactly (see the
-        // <style> comment above `.hx-pin-fade`), so fading these two
-        // layers reveals it smoothly with no beige/light flash at any
-        // point along the way.
+        // First remove the backdrop's gold and dim its texture while the
+        // elements morph. Then reveal About's charcoal background beneath
+        // the pin. Only the backdrop is filtered; text and sidebar stay crisp.
         if (pinFadeEl) {
+          tl.fromTo(
+            pinFadeEl,
+            { filter: "grayscale(0) brightness(1)" },
+            { filter: "grayscale(1) brightness(0.55)", duration: 0.55 },
+            0.2
+          );
           tl.to(pinFadeEl, { opacity: 0, duration: 0.23 }, 0.75);
         }
         if (glowEl) {
-          tl.to(glowEl, { opacity: 0, duration: 0.23 }, 0.75);
+          tl.fromTo(glowEl, { opacity: 1 }, { opacity: 0, duration: 0.55 }, 0.2);
         }
 
         // If this (re)build happens mid-scroll (e.g. a resize while already
@@ -2854,7 +2869,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         gsap.set([...morphSources, ...noTargetGroup], { clearProps: "all" });
         gsap.set(compactSidebarEl, { clearProps: "opacity" });
         const pinFadeEl = pinEl.querySelector<HTMLElement>(".hx-pin-fade");
-        if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity" });
+        if (pinFadeEl) gsap.set(pinFadeEl, { clearProps: "opacity,filter" });
         const glowEl = pinEl.querySelector<HTMLElement>(".hx-glow");
         if (glowEl) gsap.set(glowEl, { clearProps: "opacity" });
         // Explicit `display: none` fallback for reduced-motion/mobile static
@@ -3079,6 +3094,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       // non-matching link first, so outside that one group there is still
       // never more than one active link at a time.
       function setActiveSections(ids: string[]) {
+        compactSidebarEl.dataset.palette = ids.includes("about") ? "mono" : "brand";
         navLinkEls.forEach((link) => {
           const navId = link.getAttribute("data-nav-id");
           const isMatch = !!navId && ids.includes(navId);

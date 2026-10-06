@@ -1,6 +1,6 @@
 ---
 tags: [componente, hero, gsap, scrolltrigger, sidebar]
-actualizado: 2026-10-06
+actualizado: 2026-10-07
 fuente: [src/components/HeroExperience.astro]
 ---
 
@@ -46,11 +46,14 @@ Los pares de morph se enlazan mediante `data-morph-source` / `data-morph-target`
 | 0,10–0,28 | Desaparecen los separadores de navegación |
 | 0,10–0,40 | Retrato, título, chips, botones y nota se desplazan −18px y desaparecen |
 | 0,10–0,60 | Las fuentes viajan a sus destinos del sidebar |
+| 0,20–0,75 | La textura del fondo pierde el dorado y baja a brillo 0,55; desaparece el glow |
 | 0,58–0,90 | Aparece el sidebar |
 | 0,62–0,86 | Desaparecen las fuentes del morph |
-| 0,75–0,98 | Desaparecen fondo y glow, dejando ver la página inferior |
+| 0,75–0,98 | Desaparece el fondo ya desaturado, dejando ver el carbón de Sobre mí |
 
 La interactividad y `aria-hidden` del sidebar se activan cuando `ScrollTrigger.progress > 0.58`. El recorrido es reversible al volver hacia arriba.
+
+El pin tiene `z-index: 2`: pinta encima del fondo de About, pero debajo de su `.ab-inner` (`z-index: 3`). About no usa `isolation: isolate`, porque encerraría su texto debajo del pin y lo ocultaría hasta el fundido final. El contenido entra con el scroll normal mientras el fondo mantiene su transición independiente; el sidebar fijo conserva su nivel 90. El filtro solo afecta a `.hx-pin-fade`, no al texto, los elementos del morph ni el sidebar. Al pasar de escritorio animado a modo estático se limpian tanto `opacity` como `filter` del fondo.
 
 ## Tema y sección activa del sidebar
 
@@ -59,7 +62,9 @@ Cada artículo del sidebar calcula su solapamiento vertical con **todas** las se
 - Se vuelve oscuro con **≥2%** de solapamiento.
 - El artículo de navegación usa un umbral distinto: **≥35%**.
 
-Por eso dos artículos del sidebar pueden tener temas distintos en una misma frontera de scroll — no es un bug, es el diseño. Textos, bordes y separadores interpolan durante 0,3s; con movimiento reducido el cambio es inmediato. Las métricas mantienen siempre su acento dorado, independiente del tema.
+Por eso dos artículos del sidebar pueden tener temas distintos en una misma frontera de scroll — no es un bug, es el diseño. Textos, bordes y separadores interpolan durante 0,3s; con movimiento reducido el cambio es inmediato. Las métricas usan el acento de la paleta del sidebar, independiente del tema warm/dark de cada artículo.
+
+`setActiveSections()` también establece `data-palette` en el sidebar: `mono` cuando About es la sección activa y `brand` en las demás. La paleta mono cambia localmente `--color-brand-gold` a `#c9c9c9` y su variante strong a `#ededed`, de modo que métricas, enlace activo y CTA se vuelven grises. Las tarjetas usan una superficie gris translúcida y el PNG del wordmark recibe `grayscale(1) brightness(0.72)` para verse oscuro. Al salir de About se recuperan el logo y los acentos dorados. Este estado usa los mismos triggers y la sincronización inicial de navegación; no añade observadores ni modifica el morph.
 
 Este mecanismo es genérico (detecta la clase `.section-theme-dark`, no un ID de sección concreto) — es por eso que intercambiar los temas de About y Proyectos (ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]]) no requirió ningún cambio en este archivo.
 
