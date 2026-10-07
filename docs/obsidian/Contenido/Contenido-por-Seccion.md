@@ -1,6 +1,6 @@
 ---
 tags: [contenido, i18n]
-actualizado: 2026-10-06
+actualizado: 2026-10-08
 fuente: [src/content/site.js]
 ---
 
@@ -19,14 +19,20 @@ Dos botones llevan a Proyectos y a Sobre mí. Las métricas son contenido editor
 
 ## Sobre mí
 
-Portada «INGENIERÍA, DATOS E IDENTIDAD.», ubicación e idiomas, y biografía sobre Ingeniería del Software en U-TAD. Continúa con cuatro escenas (mecánica de render en [[Sobre-Mi]]):
+Un único título «SOBRE MÍ» y ocho párrafos de presentación:
 
-| Escena | Contenido | Visual / enlace |
-|---|---|---|
-| Cimientos | Java y plataforma de pedidos; C y MegatronixOS; portfolio con Astro | Diagrama de producto digital con tres ramas |
-| Dirección | Evolución desde software hacia Data Science y machine learning | Secuencia vertical de tres etapas |
-| Producto | Tecnología, negocio, inversión y diseño gráfico | Triángulo + enlace externo al archivo de diseño (Drive) |
-| Impulso | Esports, disciplina, equipo, presión, moda, música, cine y creatividad | Nube de palabras + enlace externo a trayectoria competitiva (Drive) |
+- Formación y ubicación: Jesús León Romero Atienza, Ingeniería del Software con mención en Ingeniería de Datos (Big Data), U-TAD (Centro Universitario de Tecnología y Arte Digital), ciudad natal Madrid, España.
+- Base técnica: tres años de formación, full-stack, bases de datos, arquitectura de software y programación de sistemas.
+- Idiomas: «Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán».
+- Valor diferencial frente a la competencia: conectar tecnología, diseño gráfico, análisis de negocios y finanzas.
+- Esports: se conserva la frase original sobre equipo, disciplina y decisiones bajo presión.
+- Moda, música y redes sociales: facilidad para reconocer tendencias, cuidar la estética, comunicar ideas con personalidad y conectar una identidad con su audiencia.
+- Varias capas por proyecto: base técnica, criterio visual, visión de negocio y sensibilidad cultural para dar profundidad, personalidad y una experiencia cuidada al resultado.
+- Dirección: profundizar en Data Science y machine learning para desarrollar soluciones útiles y con identidad propia.
+
+Estos párrafos sustituyen a las cuatro escenas narrativas (Cimientos, Dirección, Producto e Impulso) y sus gráficos. Ya no se publica el título compuesto ni la línea independiente de ciudad e idiomas. Se retiran también los dos CTA de Drive que acompañaban a esas escenas. Detalle de render en [[Sobre-Mi]].
+
+La biografía se presenta en Inter. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado; Big Data lleva negrita sin círculo. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻, full-stack subrayado, arquitectura rodeada y bases de datos/sistemas en negrita. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia rodeada, varias capas subrayadas y negritas en criterio visual/negocio/cultura y dirección técnica. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción; esports conserva su redacción exacta.
 
 «MI BASE ACTUAL» muestra formación (U-TAD, Ingeniería del Software, Mención en Ingeniería de Datos, Tercer curso) e idiomas (Español nativo, Inglés C1, Alemán A2). La tarjeta de formación enlaza al grado. «MI SISTEMA DE TRABAJO» cierra la sección — **sin** CTA final hacia Proyectos (se retiró deliberadamente en una corrección anterior).
 

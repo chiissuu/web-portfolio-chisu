@@ -1,6 +1,6 @@
 ---
 tags: [operacion, comandos, testing]
-actualizado: 2026-10-06
+actualizado: 2026-10-08
 fuente: [package.json, scripts/copy-ffmpeg-core.mjs]
 ---
 
@@ -110,6 +110,62 @@ Esta ejecución **no** incluyó: conversión real en navegador, comprobación vi
 - Comparación del HTML compilado con `content.es.about`: la introducción y la prosa de las cuatro escenas conservan todas las palabras y su orden. Solo cambian agrupación de párrafos y énfasis. No se modifica `site.js`.
 - `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. `git diff --check`: sin errores de espacios.
 - Capturas en la carpeta de visualizaciones de este chat: `sobre-mi-tipografia-ampliada.jpg`, `sobre-mi-proyectos-compactos.jpg`, `sobre-mi-conceptos-ordenados.jpg` y `sobre-mi-portada-movil-ampliada.jpg`.
+
+## Márgenes equilibrados de About (7 de octubre de 2026)
+
+- Corrección local desde 1200px: el contenido se centra entre el borde visible del nav y el borde derecho de la página. `.ab-inner` ocupa esa área con padding simétrico y `.ab-body` conserva el ancho máximo de lectura.
+- `--hx-sidebar-padding-inline` comparte el padding horizontal del sidebar con el cálculo de su borde visible. No cambia las dimensiones del menú ni el comportamiento de las otras secciones.
+- Navegador real: márgenes de biografía de 177.10/177.35px en 1280×720 y 414.02/414.27px en 1920×1080. Diferencia inferior a 1px por redondeo del navegador. En 1024×768 y 390×844 se conserva el layout previo; sin desbordamiento horizontal en las cuatro vistas.
+- `npm run build`: cuatro páginas, código 0. `git diff --check`: sin errores de espacios. No se repitió `astro check` para este ajuste exclusivo de CSS.
+- Captura: `sobre-mi-margenes-equilibrados.jpg` en la carpeta de visualizaciones de este chat. Se restaura el tamaño del navegador y se cierra la pestaña temporal de comprobación.
+
+## Marca y redes centradas en el sidebar (7 de octubre de 2026)
+
+- PNG CHISU y descripción centrados en la tarjeta superior; LinkedIn, GitHub, Redes Sociales y botón Contacto centrados en la inferior. Ajuste de CSS, sin cambios de textos, enlaces ni orden del DOM.
+- Navegador real, 1280×720: centros del logo y de los cuatro elementos sociales a menos de 0.01px del centro de sus tarjetas; descripción con `text-align: center`. Sidebar sin desbordamiento vertical. Revisada la bajada desde el Hero y la vuelta, sin errores de consola registrados.
+- `npm run build`: cuatro páginas, código 0. `git diff --check`: sin errores de espacios.
+- Captura: `sidebar-marca-y-redes-centradas.jpg` en la carpeta de visualizaciones de este chat. Pestaña temporal cerrada tras la comprobación.
+
+## Resumen de Sobre mí y coincidencia del PNG (8 de octubre de 2026)
+
+- «SOBRE MÍ» pasa a ser el único h2, de hasta 5.5rem. Se retiran el título compuesto y la línea de ciudad/idiomas; Madrid, español nativo e inglés C1 se integran en la introducción.
+- Dos párrafos presentan formación, mención en Ingeniería de Datos (Big Data), U-TAD, tres años de trayectoria, base técnica y valor diferencial en diseño, negocio, finanzas y equipo competitivo. Incluyen la dirección hacia Data Science y machine learning. Se actualiza también la traducción EN.
+- El usuario confirmó sustituir las cuatro escenas por este resumen. Se eliminan sus gráficos, contenido específico, tipos, helpers y estilos; permanecen Mi base actual y Mi sistema de trabajo.
+- Durante el fundido, el logo animado corrige su centro horizontal con la posición real del PNG del sidebar. Comprobado alrededor del 70% de scroll en 1920px y 1280px, incluida la vuelta desde móvil: diferencias de centro inferiores a 0.01px. Sin errores de consola registrados.
+- Navegador real: título de 88px en escritorio y 48px en 390×844; un único h2 y dos párrafos, sin desbordamiento horizontal. Revisado el cambio de tamaño y el enlace lateral About.
+- El servidor dev retenía CSS antiguo incluso al recargar. Se confirmó su proceso Astro de este proyecto y se reinició únicamente ese servidor en localhost:4321; vuelve a servir los estilos correctos. Permanece activo en segundo plano.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. Comparación del HTML: resumen idéntico a `site.js`, sin escenas ni metadatos retirados, y formación/skills presentes. `git diff --check`: sin errores de espacios.
+- Captura: `sobre-mi-resumen-nuevo.jpg` en la carpeta de visualizaciones de este chat. Se restaura el tamaño del navegador y se cierra la pestaña temporal de pruebas.
+
+## Énfasis y tipografía de la biografía (8 de octubre de 2026)
+
+- Inter para la biografía, aprovechando la fuente ya cargada: cuerpo 400, anotaciones 500 y negritas 600. Interlineado 1.75 y separación de párrafos 1.75rem, con gris claro para el cuerpo y blanco para los énfasis.
+- Tres negritas, círculo SVG en `(Big Data)`, subrayado SVG en diseño gráfico y dos emojis decorativos. El círculo incluye paréntesis para impedir su salto aislado en móvil. Los selectores de las frases quedan en `aboutMe.accents` en ES/EN; no se modifica la redacción.
+- Animación CSS de los trazos al activarse el reveal existente; estáticos con movimiento reducido. Sin dependencias nuevas ni cambios en el nav, el morph o las capas de fondo.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. Comprobación puntual del HTML generado: ambos párrafos idénticos a la fuente al retirar la decoración, tres strong y dos SVG; todos los selectores ES/EN coinciden una vez.
+- Navegador real en 1920, 1280, 768 y 390px: sin desbordamiento horizontal. En 1280px, márgenes desde la tarjeta del nav y hasta el borde de contenido de 168.43/168.68px. Las negritas calculan peso 600; revisado el scroll desde el Hero y los trazos completos. Sin errores de consola registrados.
+- Capturas: `sobre-mi-anotaciones-escritorio.jpg` y `sobre-mi-anotaciones-movil.jpg` en la carpeta de visualizaciones del chat. Se cierra la pestaña temporal y se restablece el viewport.
+
+## Enlaces, ubicación e idiomas en la presentación (8 de octubre de 2026)
+
+- La presentación inicial se separa en tres párrafos explícitos, después de cada punto: formación/ubicación, base técnica e idiomas. El párrafo diferencial posterior conserva su redacción y sus énfasis. Los cambios se reflejan en ES/EN.
+- Carrera y mención enlazan al grado indicado por el usuario; el nombre completo de U-TAD enlaza a su URL de Maps. Los enlaces conservan negritas internas, permiten saltos de línea y tienen subrayado y foco visible. Big Data ya no lleva círculo.
+- 📚 junto a U-TAD; Madrid/España en negrita y con franjas de color en las letras. 💻 inicia la base técnica, con full-stack subrayado, bases de datos/sistemas en negrita y arquitectura de software rodeada.
+- Frase ES exacta: «Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán». Banderas decorativas locales es/gb/de junto a los idiomas; incorporan BASE_URL, alt vacío y aria-hidden. Se añaden tres SVG pequeños, sin nuevas dependencias.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. Comprobación del HTML: cuatro párrafos idénticos a la fuente al retirar la decoración, enlaces con las URLs solicitadas, círculo solo en arquitectura, selectores válidos en ES/EN y las tres banderas presentes en dist.
+- Navegador en 390, 768, 1280 y 1920px: sin desbordamiento horizontal; banderas cargadas y de aproximadamente 19px en móvil. En 1280px, márgenes respecto al nav y borde derecho de 168.43/168.68px. El nav conserva su geometría y comportamiento.
+- El servidor dev servía CSS antiguo, confirmado por la ausencia de reglas ab-flag en el navegador y su presencia en el build. Se identificó su proceso Astro de este checkout y se reinició solo ese servidor. Permanece en segundo plano en localhost:4321.
+- Capturas: `sobre-mi-enlaces-y-banderas.jpg` y `sobre-mi-enlaces-y-banderas-movil.jpg` en la carpeta de visualizaciones del chat. Se restablece el viewport y se cierra la pestaña temporal.
+
+## Perfil diferencial y disciplinas creativas (8 de octubre de 2026)
+
+- El inicio dice «Lo que me diferencia de la competencia es la forma de conectar…». Se conserva literalmente la frase de esports sobre equipo, disciplina y decisiones bajo presión.
+- Moda, música y redes sociales se relacionan con tendencias, estética, comunicación y conexión con una audiencia. El cierre expresa la idea de varias capas — técnica, visual, negocio y cultura — para dar profundidad y personalidad a los proyectos, sin añadir logros o métricas inventados. La dirección hacia Data Science y machine learning permanece.
+- Ocho párrafos explícitos en ES/EN: tres introductorios y cinco de perfil. El cuarto lleva ab-profile-start con margen 2.5rem; se usa el selector p + p.ab-profile-start para superar la especificidad de p + p tras el scoping de Astro. Los demás párrafos mantienen 1.25rem.
+- Círculo adicional en versión propia, subrayado en varias capas, negritas en las disciplinas y dirección técnica, emojis 👟/🎧/📱 junto a moda/música/redes. circle pasa a array y emojis reúne pares frase/símbolo; conserva los anteriores 📚 y 🎮 sin renders duplicados. Sin dependencias nuevas.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. HTML comprobado: ocho párrafos idénticos a site.js al retirar la decoración, esports exacto, dos círculos, tres subrayados, dos enlaces existentes y selectores válidos en ES/EN.
+- Capturas del perfil: `sobre-mi-perfil-disciplinas.jpg` y `sobre-mi-perfil-disciplinas-movil.jpg` en la carpeta de visualizaciones del chat. Se revisa el scroll, se cierra la pestaña de pruebas y se restablece el viewport.
+- Navegador real en 1920, 1280 y 390px: sin desbordamiento; en 1280px se mantienen márgenes de 168.43/168.68px respecto al nav y al borde derecho. El perfil se separa 40px (2.5rem) y el reveal muestra el texto en móvil. La coma se mantiene dentro del selector de versión propia para que no salte sola de línea. Sin errores de consola registrados.
 
 ## Cómo mantener este vault al día
 
