@@ -1,52 +1,54 @@
 ---
 tags: [componente, about, layout]
-actualizado: 2026-10-07
-fuente: [src/components/AboutSection.astro]
+actualizado: 2026-10-10
+fuente: [src/components/AboutSection.astro, src/content/site.js]
 ---
 
 # Sobre mí: estructura y excepciones
 
-Fuente: [AboutSection.astro](../../../src/components/AboutSection.astro). Para el texto real de cada escena, ver [[Contenido-por-Seccion]]; esta nota cubre cómo está construido el componente.
+Fuente: [AboutSection.astro](../../../src/components/AboutSection.astro). Texto y traducción en [site.js](../../../src/content/site.js); resumen editorial en [[Contenido-por-Seccion]].
+
+## Estructura actual
+
+La sección tiene dos bloques: portada con un único h2 «SOBRE MÍ» y siete párrafos, y «MI STACK DE TRABAJO». «Mi base actual» se retiró porque duplicaba formación e idiomas ya incluidos en la biografía; se eliminaron también sus datos ES/EN, tipos y CSS sin consumidores. Las cuatro escenas narrativas anteriores y sus gráficos siguen retirados. No recuperar el título «Ingeniería, datos e identidad» ni la línea separada de ubicación e idiomas.
+
+Los siete párrafos se conservan literalmente en ES/EN: nombre/carrera/U-TAD/Madrid, base técnica, idiomas, diferencia al conectar tecnología/diseño/negocio/finanzas, esports, moda/música/redes y cierre. Esta ronda cambia la presentación y el stack, no la biografía. No se añaden fotografías provisionales o imágenes genéricas; queda como propuesta futura una imagen personal o de trabajo entre los dos grupos si aporta contenido real.
+
+## Datos y tipografía
+
+La portada consume `aboutMe.title` y recorre todos los elementos de `aboutMe.paragraphs` en su orden original. Actualmente hay siete párrafos en ES y EN, con los saltos definidos explícitamente en el contenido. `introParagraphCount = 3` agrupa los tres primeros bajo «Quién soy» y los restantes bajo «Qué me diferencia de la competencia», ambos h3 con IDs ab-intro-heading y ab-difference-heading. Los rótulos vienen de `aboutMe.groupLabels`, también traducidos en EN. Los grupos vacíos se omiten; un array vacío deja el h2 sin biografía. El contrato correspondiente es `AboutMeCopy` en [[Archivos-del-Proyecto]].
+
+`aboutMe.closingPhrase` selecciona la última frase exacta para mostrarla en una línea destacada dentro del párrafo, conservando todas las palabras y la puntuación. Si no coincide con el texto, no se dibuja el tratamiento especial. No se duplica la frase ni se crea otra tarjeta.
+
+`aboutMe.accents` define frases exactas por idioma: `strong` (nombre, carrera, Big Data, base técnica, diseño gráfico, equipo, versión propia y varias capas), `emojis` (pares frase/símbolo), `location` (Madrid/España), `flags` (frase y código de país) y `links` (frase y URL). Se eliminan circle/underline del contenido y los tipos, además de sus ramas de render, CSS y animación. `decorateParagraph` divide el texto alrededor de las coincidencias y Astro escapa cada fragmento, sin inyectar HTML. Una cadena vacía se ignora; una frase ausente no genera decoración. Se consume la coincidencia más temprana y, si coinciden al principio, la más larga. Los enlaces procesan sus propias negritas con un subconjunto de reglas; así no se crean enlaces anidados. Los párrafos siguen siendo la única fuente del texto; al editar una frase destacada, actualizar su selector exacto.
+
+La frase de carrera/mención enlaza a `https://u-tad.com/grados/ingenieria-software`; «Centro Universitario de Tecnología y Arte Digital» enlaza al mapa proporcionado por el usuario, `https://maps.app.goo.gl/Ppb4QnavdNihgWui9`. Ambos abren en otra pestaña con `noopener noreferrer`, subrayado visible y foco de teclado. Big Data ya no lleva círculo.
+
+Título centrado: `clamp(3rem, 7vw, 5.5rem)`, display, peso 700. Biografía centrada como columna, pero con párrafos alineados a la izquierda: Inter, ancho máximo 62ch, `clamp(1.05rem, 1.25vw, 1.25rem)`, interlineado 1.85 y separación entre párrafos de 2–2.75rem. Lead: `clamp(1.15rem, 1.5vw, 1.5rem)`, interlineado 1.8. Los grupos tienen 4–6rem de margen, 2–3rem de padding y un separador discreto. Los h3 ahora usan display de 1.25–1.6rem, sentence case. Cierre: display de 1.4–2rem, máximo 32ch, separador y pausa propios. Cuerpo gris #d0d0d0; énfasis blanco #f2f2f2. Se mantienen familias existentes, emojis, banderas, links y negritas.
+
+Se conservan negritas, enlaces y emojis; no hay círculos ni subrayados dibujados. Los subrayados CSS propios de los enlaces permanecen como señal de interacción. 👋 abre el primer párrafo y 💻 el segundo; 📚 acompaña U-TAD, 🎮 esports, 👟 moda, 🎧 música y 📱 redes sociales. Emojis y banderas llevan `aria-hidden`; las imágenes además tienen alt vacío. Los iconos con su palabra no se parten entre líneas; las negritas y enlaces largos sí permiten saltos en móvil. Versión propia y varias capas son strong normales, sin cajas que puedan aislar la puntuación.
+
+Madrid/España usa negrita y letras con franjas rojo claro/amarillo/rojo claro mediante `background-clip: text`, con texto blanco como fallback fuera de `@supports`. Banderas pequeñas de España, Reino Unido y Alemania en `public/assets/icons/flags/{es,gb,de}.svg`, de 1.15em × 0.77em; las URLs incorporan BASE_URL. Son SVG locales simplificados para que su representación no dependa de los emojis de Windows. Los códigos de `flags.country` deben corresponder a esos archivos.
+
+Se reutiliza `.rd-reveal` del layout por título, grupo de lectura y categoría de stack, para evitar que el threshold se calcule sobre una biografía completa demasiado alta. No se añade observador, listener de scroll, librería ni fuente remota.
 
 ## Layout y alineación
 
-Portada, escenas, formación/idiomas y skills comparten una única columna de contenido. Se retiró el indicador decorativo Cimientos–Impulso y su IntersectionObserver para evitar una segunda columna lateral junto al menú principal. Desde 1200px, el contenedor empieza tras el ancho del sidebar más 1,5rem y añade 2rem de padding interior. Móvil y tablet conservan el espaciado previo.
+Desde 1200px, `.ab-inner` ocupa el espacio entre el borde visible de las tarjetas del sidebar y el borde derecho de la página, con 2rem de padding simétrico. Ese borde se calcula como `--hx-sidebar-width - --hx-sidebar-padding-inline`; el ancho del sidebar incluye padding transparente. `.ab-body` se centra, limitado a `--container - 4rem`. Esto equilibra las distancias nav–texto y texto–borde derecho. Móvil y tablet conservan sus reglas de espaciado. No existe un rail adicional de lectura.
 
-La introducción completa (etiqueta, título, ubicación/idiomas y biografía) se centra dentro del área de contenido. El título usa `clamp(2.1rem, 6.4vw, 4.6rem)`; la biografía, `clamp(1.05rem, 1.4vw, 1.35rem)`, ancho máximo 60ch e interlineado 1.65. También crecen ligeramente la etiqueta y la línea de ubicación/idiomas. Los títulos de Mi base actual y Mi sistema de trabajo siguen centrados; el interior de las tarjetas conserva su alineación de lectura.
+## Fondo y continuidad con el Hero
 
-A ≥1280px, las cuatro escenas comparten `.ab-scene-grid`: `.ab-scene-copy` agrupa encabezado, destacado, prosa y CTA; el visual es su hermano y se alinea arriba, con ancho máximo 24rem. Las columnas tienen proporción `1fr / 0.62fr`; `.ab-scene-reverse` las invierte en `direction` (Hacia dónde voy) y `drive` (Lo que me mueve), colocando visual a la izquierda y texto a la derecha. Ya no se usa `display: contents` ni se centra el gráfico verticalmente respecto a toda la prosa. `foundations` y `product` conservan texto a la izquierda y visual a la derecha. Por debajo de 1280px, las cuatro escenas vuelven a una columna, con título y texto antes del visual. El orden del DOM permanece igual.
+Tema dark con fondo carbón: comienza en `--section-dark-start` (#050505), pasa a #191919 durante `--ab-blend-height: clamp(10rem, 20svh, 14rem)`, después a #121212 en 1400px y a #0d0d0d al final. Reutiliza la textura del Hero en un pseudo-elemento de hasta 1400px, con grayscale(1), brightness(0.65), opacidad 0.55 y máscara que introduce y desvanece la textura. La URL incorpora BASE_URL; no se crea otro asset. Paleta: texto #f2f2f2, texto secundario #bdbdbd, acento #c9c9c9 y superficies blancas con opacidad.
 
-## Apariencia y continuidad con el Hero
+La sección no crea un contexto aislado de capas: textura con z-index 0, Hero fijado con 2 y `.ab-inner` con 3. El texto sube por encima del fondo del Hero mientras este se desvanece. No añadir isolation o transform al contenedor exterior sin comprobar este orden con [[Hero-y-Sidebar]]. La navegación principal mantiene su geometría y activa la paleta mono cuando About es la sección activa.
 
-Tema `.section-theme-dark` con fondo carbón: comienza en `--section-dark-start` (`#050505`), igual que el fondo estructural del Hero, pasa a `#191919` durante `--ab-blend-height: clamp(10rem, 20svh, 14rem)`, después a `#121212` en la zona de lectura y a `#0d0d0d` al final. Reutiliza la imagen del Hero en un pseudo-elemento decorativo de hasta 1400px de alto, con grayscale(1), brightness(0.65), opacidad 0.55 y máscara que introduce la textura desde transparente durante ese mismo tramo y la desvanece al final. Ambos fondos coinciden en el borde para evitar una línea horizontal durante el fundido. La URL incorpora BASE_URL; no se genera otro asset. El filtro solo afecta al fondo, no a los textos o las tarjetas. Paleta neutra: texto `#f2f2f2`, texto secundario `#bdbdbd` y acento local `--ab-accent: #c9c9c9`; bordes y superficies usan blanco con opacidad. La portada mantiene título y biografía en una columna. Los diagramas tienen superficies discretas y pasan al lado del texto a ≥1280px; por debajo quedan debajo. El menú lateral general conserva su geometría, enlaces y timeline; detecta automáticamente el tema oscuro de About y usa una paleta monocroma cuando esta sección está activa.
+## Stack y responsive
 
-La sección no crea un contexto aislado de capas. Su textura decorativa usa `z-index: 0`, el Hero fijado usa 2 y `.ab-inner` usa 3: el texto entra con el scroll por encima del fondo del Hero, sin esperar a que termine su fundido. No añadir `isolation`, `transform` u otro contexto al contenedor exterior sin revisar este orden con [[Hero-y-Sidebar]].
+Siete categorías y 42 herramientas, presentadas como filas sin tarjetas bento ni pills. Cada categoría es una section con h4 y una lista de logos/nombres, separados por líneas suaves. Desde 900px el título va a la izquierda y la lista a la derecha. Por debajo se apilan; a ≤640px la lista utiliza tres columnas. Los logos tienen soporte claro para conservar contraste, nombres visibles y alt vacío porque son decorativos; no son controles ni enlaces. Usan loading lazy y decoding async.
 
-## Presentación de la prosa
+TypeScript va en Software por ser un lenguaje; React va en Web por ser una biblioteca de interfaces. HTML/CSS se retiraron del listado visible a petición del usuario. Bases de datos incorpora Qdrant, Redis y Neo4j. Diseño incorpora After Effects e Illustrator. Documentación y colaboración reúne Obsidian, Google Drive, Word, Excel, PowerPoint y Teams. Estos datos describen herramientas personales, no dependencias del runtime de la web.
 
-`splitIntoBlocks(text, groupSizes = [2])` divide por espacios tras `.`, `!` o `?`. El último tamaño de grupo se repite: `[2]` agrupa por parejas; `foundations` usa `[2, 1]` para mantener la apertura junta y dar un párrafo a cada proyecto y a la conclusión. Preserva palabras y orden, pero normaliza los espacios en los puntos de unión — **una abreviatura con punto puede generar una separación no deseada** (p. ej. "Dr. Pérez", porque hay un espacio tras el punto). "Node.js" no se divide por su punto interno, ya que no va seguido de un espacio. Los tamaños son constantes positivas definidas en el componente; no pasar un array vacío ni ceros.
-
-La prosa de las escenas se limita a 60ch, usa interlineado 1.7 y separa sus párrafos con 1.25rem. `SCENE_EMPHASIS` selecciona unas pocas expresiones de los textos en español e inglés. `emphasize()` genera segmentos de texto y nodos `<strong>`; no introduce HTML con `set:html` ni añade palabras. Si cambia una expresión en `site.js`, puede dejar de destacarse hasta ajustar esta configuración de presentación.
-
-> [!tip] Caveat de uso real
-> La portada **solo** consume `aboutMe.paragraphs[0]`. Otros elementos añadidos al array no aparecerían nunca, y un array vacío rompería esa llamada. Las escenas, en cambio, sí recorren **todos** sus párrafos — comportamiento distinto entre la portada y las escenas, fácil de olvidar al editar contenido.
-
-## `TONE_COLORS` y visuales por escena
-
-`TONE_COLORS` conserva las claves `cyan`, `violet`, `gold` y `coral`; todas apuntan a `--ab-accent`, el acento gris local. **No tiene fallback** para una clave desconocida — una escena con un `tone` no reconocido no degrada con gracia.
-
-`SCENE_ICONS` usa los iconos monocromos Blocks, TrendingUp, Lightbulb y Zap de `lucide-astro`, ya instalado. Se eligen por ID de escena, son decorativos y una escena desconocida usa Blocks. El campo histórico `emoji` sigue en los datos, pero About ya no lo renderiza.
-
-Los visuales se renderizan por **presencia de campos** (`networkBranches`, `pipeline`, `triangleVertices`, `words`) — el tipo no obliga a elegir exactamente uno. Si una escena rellena varios campos de visual a la vez, se mostrarán varios simultáneamente (no hay exclusión mutua): la distribución actual se ha comprobado con un solo visual por escena.
-
-- `networkBranches`: tres tarjetas de proyectos, con tecnología y proyecto en la misma fila. Una línea vertical y pequeños conectores CSS las relacionan; ya no hay un organigrama horizontal.
-- `pipeline`: tres etapas verticales de ancho idéntico y flechas centradas en su eje.
-- `triangleVertices`: triángulo SVG de 16rem de alto; sus etiquetas se sitúan arriba y debajo de la figura, fuera de las líneas. Accede a tres posiciones fijas; los datos deben conservar exactamente tres vértices.
-- `words`: seis conceptos con el mismo peso tipográfico, en una rejilla de dos columnas; ya no hay tamaños ni opacidades distintos por palabra.
-
-## Responsive
-
-Las tarjetas de proyectos y el pipeline permanecen verticales en todas las anchuras. A ≤640px el triángulo se convierte en una lista sin SVG. La rejilla de conceptos mantiene dos columnas. Los iconos de skills son decorativos (14px), acompañados siempre de nombre visible como texto. Un icono `null` en los datos omite la imagen limpiamente; un nombre de archivo inexistente en cambio produciría una imagen rota, porque **no hay manejador de error** en el `<img>`.
+Los 16 logos nuevos son PNG locales de 96×96; también se cubren Astro, GSAP y n8n que antes no tenían icono. Procedencia y licencias: [[Logos-Stack]]. No se añadió ninguna dependencia npm. Se comprobó la presentación en 320, 390, 768 y 1440px, sin overflow horizontal ni recursos ausentes. Se conservan la geometría del sidebar y la transición Hero/About.
 
 ## Relacionado
 

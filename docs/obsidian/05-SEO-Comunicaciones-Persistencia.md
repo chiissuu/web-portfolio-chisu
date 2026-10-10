@@ -1,7 +1,7 @@
 ---
 tags: [seo, comunicaciones, persistencia, seguridad]
 aliases: [SEO-Comunicaciones-Persistencia]
-actualizado: 2026-10-06
+actualizado: 2026-10-10
 fuente: [src/layouts/Layout.astro, src/content/site.js]
 ---
 
@@ -25,7 +25,7 @@ No se encontró almacenamiento propio en cookies, localStorage, sessionStorage, 
 
 ## Seguridad (alcance de código estático)
 
-En el código propio revisado no hay `eval`, `set:html` ni `innerHTML`, ni solicitud de backend desde los formularios (ver [[Formularios]] — el envío es simulado). No se han verificado vulnerabilidades de dependencias mediante auditoría remota. `.gitignore` cubre `.env` y `.env.production`, pero no todos los posibles `.env.*`. No se requieren variables de entorno de aplicación actualmente — el único uso es `import.meta.env.BASE_URL`.
+En el código propio revisado no hay `eval`, `set:html` ni `innerHTML`, ni solicitud de backend desde los formularios. npm audit del 10 de octubre informó cero vulnerabilidades conocidas; no se ejecutó audit fix. El fallback GET sin scripts se corrigió localmente en ambos forms (ver [[Auditoria-Web]]). `.gitignore` cubre `.env` y `.env.production`, pero no todos los posibles `.env.*`. No se requieren variables de entorno de aplicación actualmente — el único uso es `import.meta.env.BASE_URL`.
 
 Si en el futuro se conecta un backend real, habrá que definir validación de servidor, tratamiento de errores, control de abuso y gestión de datos/privacidad según el servicio elegido. La ausencia actual de CSRF o de base de datos no es una vulnerabilidad explotable de un sitio estático sin backend — es simplemente el estado de un proyecto que todavía no tiene esa pieza.
 

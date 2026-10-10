@@ -1,0 +1,71 @@
+{
+  "version": "0.0.1",
+  "name": "portfolio-redesign-clean",
+  "dependencies": {
+    "@astrojs/check": {
+      "version": "0.9.10",
+      "resolved": "https://registry.npmjs.org/@astrojs/check/-/check-0.9.10.tgz",
+      "overridden": false
+    },
+    "@astrojs/react": {
+      "version": "7.0.0",
+      "resolved": "https://registry.npmjs.org/@astrojs/react/-/react-7.0.0.tgz",
+      "overridden": false
+    },
+    "@ffmpeg/core": {
+      "version": "0.12.10",
+      "resolved": "https://registry.npmjs.org/@ffmpeg/core/-/core-0.12.10.tgz",
+      "overridden": false
+    },
+    "@ffmpeg/ffmpeg": {
+      "version": "0.12.15",
+      "resolved": "https://registry.npmjs.org/@ffmpeg/ffmpeg/-/ffmpeg-0.12.15.tgz",
+      "overridden": false
+    },
+    "@ffmpeg/util": {
+      "version": "0.12.2",
+      "resolved": "https://registry.npmjs.org/@ffmpeg/util/-/util-0.12.2.tgz",
+      "overridden": false
+    },
+    "@types/react-dom": {
+      "version": "18.3.7",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.7.tgz",
+      "overridden": false
+    },
+    "@types/react": {
+      "version": "18.3.31",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-18.3.31.tgz",
+      "overridden": false
+    },
+    "astro": {
+      "version": "7.3.5",
+      "resolved": "https://registry.npmjs.org/astro/-/astro-7.3.5.tgz",
+      "overridden": false
+    },
+    "gsap": {
+      "version": "3.15.0",
+      "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.15.0.tgz",
+      "overridden": false
+    },
+    "lucide-astro": {
+      "version": "0.469.0",
+      "resolved": "https://registry.npmjs.org/lucide-astro/-/lucide-astro-0.469.0.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz",
+      "overridden": false
+    },
+    "react": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+      "overridden": false
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "overridden": false
+    }
+  }
+}

@@ -21,7 +21,10 @@ const fields = f.fields;
 >
   <h3 class="rd-form-title">{f.title}</h3>
 
-  <div class="rd-form-grid">
+  <p class="rd-form-notice">{f.submitSuccess}</p>
+  <!-- Prevent native GET submission while JS is unavailable: this form
+       is a local simulation, so personal data must never enter the URL. -->
+  <fieldset class="rd-form-grid" disabled>
     <div class="rd-field" data-field="name">
       <label for="services-name">{fields.name}</label>
       <input id="services-name" name="name" type="text" autocomplete="name" required />
@@ -64,15 +67,46 @@ const fields = f.fields;
       <label for="services-message">{fields.message}</label>
       <textarea id="services-message" name="message"></textarea>
     </div>
-  </div>
+  </fieldset>
 
   <div class="rd-form-actions">
-    <button class="rd-btn rd-btn-primary" type="submit">{f.submitIdle}</button>
+    <button class="rd-btn rd-btn-primary" type="submit" disabled>{f.submitIdle}</button>
     <p class="rd-form-status" data-role="status" role="status" aria-live="polite"></p>
   </div>
 </form>
 
 <style>
+  .rd-form :global(.rd-field label) {
+    color: var(--color-text-muted);
+  }
+
+  .rd-form .rd-btn-primary {
+    color: var(--color-paper);
+  }
+
+  .rd-form[data-status="error"] .rd-form-status,
+  .rd-form :global(.rd-field-error) {
+    color: #8f1e53;
+  }
+
+  .rd-form :global(.rd-field-error) {
+    font-size: 0.82rem;
+  }
+
+  .rd-form button:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  fieldset.rd-form-grid {
+    min-width: 0;
+    border: 0;
+  }
+
+  .rd-form-notice {
+    font-size: 0.92rem;
+  }
+
   .rd-form-title {
     font-family: var(--font-display);
     font-size: 1.2rem;
@@ -86,9 +120,22 @@ const fields = f.fields;
   import { submitFormPlaceholder } from "../lib/forms/submit";
 
   const form = document.getElementById("services-form") as HTMLFormElement | null;
+  const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+  form?.querySelectorAll<HTMLElement>("[data-field]").forEach((field) => {
+    const control = field.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea");
+    if (!control) return;
+    const error = document.createElement("p");
+    error.id = `${control.id}-error`;
+    error.className = "rd-field-error";
+    error.hidden = true;
+    control.setAttribute("aria-describedby", error.id);
+    field.append(error);
+  });
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (form.dataset.status === "loading") return;
 
     const statusEl = form.querySelector<HTMLElement>('[data-role="status"]');
     const formData = new FormData(form);
@@ -106,6 +153,9 @@ const fields = f.fields;
 
     form.querySelectorAll("[data-field]").forEach((field) => {
       field.removeAttribute("data-invalid");
+      field.querySelector("input, select, textarea")?.removeAttribute("aria-invalid");
+      const error = field.querySelector<HTMLElement>(".rd-field-error");
+      if (error) error.hidden = true;
     });
 
     const errors = validateServicesForm(data);
@@ -117,12 +167,23 @@ const fields = f.fields;
       errors.forEach((error) => {
         const field = form.querySelector(`[data-field="${error.field}"]`);
         field?.setAttribute("data-invalid", "true");
+        const control = field?.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea");
+        control?.setAttribute("aria-invalid", "true");
+        const message = field?.querySelector<HTMLElement>(".rd-field-error");
+        if (message) {
+          message.textContent = control?.validationMessage || form.dataset.msgError || "";
+          message.hidden = false;
+        }
       });
+
+      form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
 
       return;
     }
 
     form.dataset.status = "loading";
+    form.setAttribute("aria-busy", "true");
+    if (submitButton) submitButton.disabled = true;
     if (statusEl) statusEl.textContent = form.dataset.msgLoading ?? "";
 
     const result = await submitFormPlaceholder(data);
@@ -133,5 +194,13 @@ const fields = f.fields;
         ? form.dataset.msgSuccess ?? ""
         : form.dataset.msgError ?? "";
     }
+    form.removeAttribute("aria-busy");
+    if (submitButton) submitButton.disabled = false;
   });
+
+  if (form) {
+    const fieldset = form.querySelector("fieldset");
+    if (fieldset) fieldset.disabled = false;
+    if (submitButton) submitButton.disabled = false;
+  }
 </script>

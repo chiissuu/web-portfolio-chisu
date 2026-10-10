@@ -1,0 +1,11 @@
+[
+  "src/components/ContactForm.astro",
+  "src/components/ContactSection.astro",
+  "src/components/ProjectsSection.astro",
+  "src/components/ServicesForm.astro",
+  "src/components/ServicesPageContent.astro",
+  "src/components/ServicesToolsSection.astro",
+  "src/components/ToolsPageContent.astro",
+  "src/components/VideoConverterPageContent.astro",
+  "src/components/VideoConverter/video-converter.module.css"
+]

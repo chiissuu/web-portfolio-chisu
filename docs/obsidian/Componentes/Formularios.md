@@ -1,6 +1,6 @@
 ---
 tags: [componente, formularios, validacion]
-actualizado: 2026-10-06
+actualizado: 2026-10-10
 fuente: [src/components/ContactForm.astro, src/components/ServicesForm.astro, src/lib/forms/validate.ts, src/lib/forms/submit.ts]
 ---
 
@@ -22,10 +22,10 @@ Contacto permite motivos: Colaboración, Proyecto, Pregunta general u Otro; y re
 
 ## Flujo de envío (idéntico en ambos formularios)
 
-1. El script intercepta `submit` y llama `preventDefault()`.
+1. HTML deshabilita fieldset y submit hasta que el script instala `preventDefault()`. Un aviso previo reutiliza el texto de envío provisional.
 2. Lee `FormData`, convirtiendo todos los campos a strings; usa cadena vacía cuando falta alguno.
 3. Quita marcas de error previas. Comprueba obligatorios con `trim()` y el email con `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`.
-4. Si hay errores: pone `data-status="error"`, muestra un mensaje global y marca `data-invalid="true"` en los contenedores afectados.
+4. Si hay errores: muestra el mensaje global y marca data-invalid/aria-invalid; asocia un mensaje por campo mediante aria-describedby y enfoca el primer inválido en orden del DOM. Usa validationMessage del navegador o submitError existente. Al reenviar se limpian errores previos.
 5. Si es válido: pasa a estado `loading` y llama al placeholder de envío. Tras 500ms, ese placeholder devuelve **siempre** `{ ok: true }`, sin usar los datos para nada real.
 6. Cambia a `success` y muestra: «Formulario preparado. El envío real se conectará próximamente.»
 
@@ -36,13 +36,13 @@ Los valores siguen en los inputs después del éxito — no se ejecuta `reset()`
 - `novalidate` desactiva la validación nativa del navegador. Los atributos `required` siguen presentes en el HTML, pero quién decide si se envía es el JS, no el navegador.
 - El email se comprueba con `trim()`, pero el objeto de datos que se lee conserva los espacios originales sin recortar. El regex es una comprobación de forma básica, no una verificación de que el buzón exista.
 - Los `<select>` solo se validan como "no vacíos" — no se comprueba que el valor pertenezca realmente a las opciones ofrecidas. No hay límites de longitud, CAPTCHA, honeypot ni limitación de frecuencia de envío.
-- El estado `loading` reduce la opacidad y aplica `pointer-events: none` al botón; **no** establece `disabled` ni ningún bloqueo lógico contra un envío repetido por teclado.
+- Loading establece disabled en el botón y aria-busy en el formulario; un guard evita repetición también por teclado. Al resolver el stub se habilita de nuevo.
 - No hay `try/catch` alrededor del `await` del placeholder — si algún día se sustituye el stub por una petición real que pueda rechazar (`reject`), hay que añadir manejo de esa excepción o el formulario se queda congelado en `loading` para siempre.
-- Los errores no añaden `aria-invalid`, ni descripción individual por campo, ni foco automático al primer campo erróneo. Solo hay texto global + bordes visuales.
+- Los errores tienen texto individual, ARIA y foco; no se ha probado lector de pantalla. Etiquetas, botones y mensajes usan contrastes locales corregidos.
 
 ### El caso sin JavaScript
 
-Al no tener `action` ni `method` definidos, y con `novalidate` presente, un envío sin JS puede acabar como un **GET a la página actual con los campos como query string en la URL**. Es decir: «los datos nunca salen del navegador» **no es una garantía absoluta** para estos formularios tal como están hoy. Antes de exponerlos como el canal real de contacto, este flujo de fallback debe revisarse. Ver [[Hallazgos-y-Pendientes]] (prioridad Alta).
+Corregido el 10 de octubre: fieldset y submit parten deshabilitados y solo se habilitan después de instalar el handler. Se verificó el HTML generado en un fixture sin scripts, con todos los controles deshabilitados y el aviso previo visible. No se activó envío real ni se modificaron method/action. Los reveals invisibles sin JS siguen pendientes en Layout protegido. Ver [[Auditoria-Web]] A04/A16.
 
 ## Si se conecta un backend real
 

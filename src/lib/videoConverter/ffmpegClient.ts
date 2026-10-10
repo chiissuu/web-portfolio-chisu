@@ -4,9 +4,9 @@
 // FFmpeg-specific (module loading, virtual-FS bookkeeping, progress
 // plumbing) stays in here.
 //
-// Both `@ffmpeg/ffmpeg` and `@ffmpeg/util` are imported dynamically inside
-// `getFFmpeg()`, never at module top level — the WebAssembly core itself
-// (tens of MB) is fetched separately via `toBlobURL` and is never part of
+// `@ffmpeg/ffmpeg` and `@ffmpeg/util` are imported dynamically when loading
+// the engine and converting, never at module top level — the WebAssembly core
+// (tens of MB) is fetched separately from the same origin and is never part of
 // any JS bundle regardless, but keeping the *library* import dynamic too
 // means neither one is pulled into this island's bundle until the user
 // actually starts a conversion, per the "no cargues FFmpeg hasta la primera
@@ -37,7 +37,9 @@ interface FFmpegLike {
 }
 
 let ffmpegInstance: FFmpegLike | null = null;
+let loadingInstance: FFmpegLike | null = null;
 let loadPromise: Promise<FFmpegLike> | null = null;
+let engineGeneration = 0;
 let isRunning = false;
 let currentProgressHandler: ((ratio: number) => void) | null = null;
 
@@ -61,13 +63,13 @@ export async function getFFmpeg(): Promise<FFmpegLike> {
   if (ffmpegInstance) return ffmpegInstance;
   if (loadPromise) return loadPromise;
 
-  loadPromise = (async () => {
-    const [{ FFmpeg }, { toBlobURL }] = await Promise.all([
-      import("@ffmpeg/ffmpeg"),
-      import("@ffmpeg/util"),
-    ]);
+  const generation = engineGeneration;
+  const pendingLoad = (async () => {
+    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+    if (generation !== engineGeneration) throw new Error("Engine loading was cancelled.");
 
     const instance = new FFmpeg() as unknown as FFmpegLike;
+    loadingInstance = instance;
     instance.on("progress", ({ progress }) => {
       if (currentProgressHandler && Number.isFinite(progress)) {
         currentProgressHandler(Math.min(1, Math.max(0, progress)));
@@ -75,20 +77,29 @@ export async function getFFmpeg(): Promise<FFmpegLike> {
     });
 
     const coreBase = withBase(FFMPEG_CORE_DIR);
-    const [coreURL, wasmURL] = await Promise.all([
-      toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
-      toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm"),
-    ]);
+    // Self-hosted ESM assets need no Blob copies or CDN/CORS workaround.
+    const coreURL = new URL(`${coreBase}/ffmpeg-core.js`, window.location.href).href;
+    const wasmURL = new URL(`${coreBase}/ffmpeg-core.wasm`, window.location.href).href;
 
-    await instance.load({ coreURL, wasmURL });
-    ffmpegInstance = instance;
-    return instance;
+    try {
+      await instance.load({ coreURL, wasmURL });
+      if (generation !== engineGeneration) throw new Error("Engine loading was cancelled.");
+      ffmpegInstance = instance;
+      return instance;
+    } catch (error) {
+      instance.terminate();
+      throw error;
+    } finally {
+      if (loadingInstance === instance) loadingInstance = null;
+    }
   })();
+  loadPromise = pendingLoad;
 
   try {
-    return await loadPromise;
+    return await pendingLoad;
   } finally {
-    loadPromise = null;
+    // An old cancelled request must not clear a newer request's promise.
+    if (loadPromise === pendingLoad) loadPromise = null;
   }
 }
 
@@ -129,14 +140,17 @@ export async function runConversion(
 
   try {
     const { fetchFile } = await import("@ffmpeg/util");
-    await ffmpeg.writeFile(inputName, await fetchFile(params.file));
+    const inputBytes = await fetchFile(params.file);
+    if (ffmpeg !== ffmpegInstance) throw new Error("Conversion was cancelled.");
+    await ffmpeg.writeFile(inputName, inputBytes);
 
     const args =
       params.target === "mp3"
         ? ["-i", inputName, "-vn", "-c:a", "libmp3lame", "-b:a", `${params.mp3Bitrate}k`, outputName]
         : ["-i", inputName, "-c:v", "libx264", "-c:a", "aac", "-movflags", "+faststart", outputName];
 
-    await ffmpeg.exec(args);
+    const exitCode = await ffmpeg.exec(args);
+    if (exitCode !== 0) throw new Error(`FFmpeg exited with code ${exitCode}.`);
 
     const data = await ffmpeg.readFile(outputName);
     // Re-wrapped through `new Uint8Array(...)` (a copy) rather than used
@@ -144,6 +158,7 @@ export async function runConversion(
     // `ArrayBufferLike` (which includes `SharedArrayBuffer`), and `Blob`
     // only accepts a view backed by a real `ArrayBuffer`.
     const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
+    if (bytes.byteLength === 0) throw new Error("FFmpeg produced an empty file.");
     const mimeType = params.target === "mp3" ? "audio/mpeg" : "video/mp4";
 
     return {
@@ -152,10 +167,10 @@ export async function runConversion(
       fileName: buildOutputFileName(params.file.name, params.target),
     };
   } finally {
-    isRunning = false;
-    currentProgressHandler = null;
     await safeDeleteFile(ffmpeg, inputName);
     await safeDeleteFile(ffmpeg, outputName);
+    isRunning = false;
+    currentProgressHandler = null;
   }
 }
 
@@ -165,15 +180,17 @@ export async function runConversion(
  * it), which `VideoConverter.tsx` surfaces as the "loading engine" state
  * reappearing. */
 export function cancelActiveConversion(): void {
-  if (ffmpegInstance) {
+  engineGeneration += 1;
+  for (const instance of [loadingInstance, ffmpegInstance]) {
+    if (!instance) continue;
     try {
-      ffmpegInstance.terminate();
+      instance.terminate();
     } catch {
       // Already terminated — nothing to do.
     }
   }
   ffmpegInstance = null;
+  loadingInstance = null;
   loadPromise = null;
-  isRunning = false;
   currentProgressHandler = null;
 }

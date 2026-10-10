@@ -51,89 +51,43 @@ const es = {
   },
   about: {
     aboutMe: {
-      eyebrow: "SOBRE MÍ",
-      titleLines: [
-        [{ text: "INGENIERÍA," }],
-        [{ text: "DATOS", tone: "cool" }, { text: " E" }],
-        [{ text: "IDENTIDAD.", tone: "gold" }],
-      ],
-      languageLine: "Madrid, España · Español nativo · Inglés C1 · Alemán A2",
+      title: "SOBRE MÍ",
+      groupLabels: {
+        intro: "Quién soy",
+        difference: "Qué me diferencia de la competencia",
+      },
+      closingPhrase: "proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+      accents: {
+        strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "desarrollo full-stack", "bases de datos", "arquitectura de software", "programación de sistemas", "diseño gráfico", "trabajar en equipo", "versión propia", "varias capas"],
+        emojis: [
+          { text: "U-TAD", symbol: "📚" },
+          { text: "esports", symbol: "🎮" },
+          { text: "moda", symbol: "👟" },
+          { text: "música", symbol: "🎧" },
+          { text: "redes sociales", symbol: "📱" },
+        ],
+        location: "Madrid, España",
+        flags: [
+          { text: "español", country: "es" },
+          { text: "C1 de inglés", country: "gb" },
+          { text: "A2 de alemán", country: "de" },
+        ],
+        links: [
+          { text: "Ingeniería del Software con mención en Ingeniería de Datos (Big Data)", href: "https://u-tad.com/grados/ingenieria-software" },
+          { text: "Centro Universitario de Tecnología y Arte Digital", href: "https://maps.app.goo.gl/Ppb4QnavdNihgWui9" },
+        ],
+      },
       paragraphs: [
-        "Soy Jesús León Romero Atienza, estudiante de Ingeniería del Software en U-TAD, Madrid. En septiembre de 2026 comenzaré mi tercer curso, después de dos años en los que he construido una base técnica en desarrollo full-stack, bases de datos, arquitectura de software y programación de sistemas. Sin embargo, no me interesa comprender estas áreas como elementos aislados. Lo que realmente me atrae es entender un producto digital de forma completa: cómo se diseña su arquitectura, cómo funciona internamente, qué problema resuelve y qué experiencia ofrece a la persona que lo utiliza.",
+        "Soy Jesús León Romero Atienza, estudiante de Ingeniería del Software con mención en Ingeniería de Datos (Big Data) en U-TAD, el Centro Universitario de Tecnología y Arte Digital, situado en mi ciudad natal, Madrid, España.",
+        "Durante estos tres años de formación he construido una base en desarrollo full-stack, bases de datos, arquitectura de software y programación de sistemas.",
+        "Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán.",
+        "Lo que me diferencia de la competencia es la forma de conectar la tecnología con el diseño gráfico, el análisis de negocios y las finanzas.",
+        "Mi experiencia en esports me ha enseñado a trabajar en equipo, mantener la disciplina y tomar decisiones bajo presión.",
+        "La moda, la música y las redes sociales influyen en mi criterio visual y en la forma de comunicar mis proyectos.",
+        "Esta combinación de disciplinas me ayuda a dar a cada proyecto una versión propia, con varias capas que se refuerzan entre sí. Así puedo crear soluciones que funcionan, transmiten una identidad y conectan con las personas. Mi diferencia frente a la competencia está en esa suma de perspectivas: proyectos con más profundidad, más personalidad y una experiencia cuidada.",
       ],
     },
-    scenes: [
-      {
-        id: "foundations",
-        railLabel: "CIMIENTOS",
-        emoji: "🧩",
-        title: "DONDE TODO EMPIEZA",
-        highlight: "Entender un producto digital de forma completa.",
-        paragraphs: [
-          "Durante esta etapa he participado, junto a otros compañeros, en proyectos que me han permitido trabajar con problemas muy diferentes. Entre ellos se encuentra una plataforma de pedidos para restaurantes desarrollada en Java, donde aplicamos distintos patrones de diseño para construir una arquitectura modular y mantenible. También he trabajado en MegatronixOS, un simulador de memoria caché desarrollado en C con el que pude profundizar en conceptos como la jerarquía de memoria, el direccionamiento y la manipulación de archivos binarios. De manera paralela, estoy desarrollando mi portfolio personal con Astro, un proyecto donde puedo unir implementación técnica, animaciones, diseño e identidad visual. Esta variedad me ha permitido comprender mejor tanto la parte visible de un producto como los sistemas que hacen posible su funcionamiento.",
-        ],
-        tone: "cyan",
-        networkHub: "Producto digital",
-        networkBranches: [
-          { tech: "Java", project: "Plataforma de pedidos" },
-          { tech: "C", project: "MegatronixOS" },
-          { tech: "Astro", project: "Portfolio personal" },
-        ],
-      },
-      {
-        id: "direction",
-        railLabel: "DIRECCIÓN",
-        emoji: "📈",
-        title: "HACIA DÓNDE VOY",
-        highlight:
-          "Convertir información en decisiones, automatizaciones y soluciones que generen un valor real.",
-        paragraphs: [
-          "En cuanto a mi dirección académica y profesional, durante los próximos años quiero profundizar en Data Science y, progresivamente, en machine learning. No considero los datos como un camino separado de la Ingeniería del Software, sino como una evolución de la misma base. Mi objetivo es aprender a diseñar sistemas capaces de recoger, organizar e interpretar información para convertirla en decisiones, automatizaciones y soluciones que generen un valor real.",
-        ],
-        tone: "violet",
-        pipeline: ["INGENIERÍA DEL SOFTWARE", "DATA SCIENCE", "MACHINE LEARNING"],
-      },
-      {
-        id: "product",
-        railLabel: "PRODUCTO",
-        emoji: "💡",
-        title: "CÓMO ENTIENDO UN PRODUCTO",
-        highlight:
-          "Comprender qué se construye, para quién se construye, qué valor aporta y cómo debe comunicarse.",
-        paragraphs: [
-          "Por otro lado, la tecnología no es el único ámbito que ha influido en mi manera de pensar. Mantengo un interés constante por la inversión, los mercados financieros y el análisis de negocios, especialmente por conceptos como los modelos de negocio, la creación de valor, la segmentación de clientes o la evaluación del riesgo. Además, tengo experiencia en diseño gráfico, creando portadas, banners, miniaturas y otros recursos visuales para proyectos personales y colectivos. Aunque a primera vista puedan parecer áreas diferentes, para mí forman parte de una misma manera de entender un producto: comprender qué se construye, para quién se construye, qué valor aporta y cómo debe comunicarse.",
-        ],
-        tone: "gold",
-        triangleVertices: ["TECNOLOGÍA", "NEGOCIO", "DISEÑO"],
-        triangleCenter: "PRODUCTO CON VALOR REAL",
-        cta: {
-          label: "Ver archivo de diseño",
-          ariaLabel: "Ver archivo de diseño; se abre en una pestaña nueva",
-          href: "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
-        },
-      },
-      {
-        id: "drive",
-        railLabel: "IMPULSO",
-        emoji: "⚡",
-        title: "LO QUE ME MUEVE",
-        highlight:
-          "Combinar ingeniería, datos y creatividad para desarrollar soluciones útiles, bien construidas y con una identidad propia.",
-        paragraphs: [
-          "Una parte importante de mi forma de trabajar también procede de mi experiencia compitiendo en videojuegos y esports. Haber participado en entornos competitivos de títulos como Fortnite, Overwatch, Counter-Strike o Clash Royale me enseñó la importancia de la disciplina, la constancia, el control emocional y la capacidad de adaptarse rápidamente. También me permitió aprender a comunicarme con personas diferentes, aceptar errores, tomar decisiones bajo presión y contribuir a un equipo sin perder de vista el rendimiento colectivo.",
-          "Por último, intereses como la moda, la música, el cine, la crítica cinematográfica y la cultura digital han desarrollado mi sensibilidad hacia la creatividad, la comunicación y la experiencia de usuario. Todo ello define el perfil que estoy construyendo: una persona con una base técnica cada vez más sólida, una mentalidad analítica y una atención especial por los detalles. Mi objetivo es continuar aprendiendo y participar en proyectos donde pueda combinar ingeniería, datos y creatividad para desarrollar soluciones útiles, bien construidas y con una identidad propia.",
-        ],
-        tone: "coral",
-        words: ["DISCIPLINA", "EQUIPO", "ADAPTACIÓN", "CREATIVIDAD", "PRESIÓN", "CULTURA"],
-        cta: {
-          label: "Ver trayectoria competitiva",
-          ariaLabel: "Ver trayectoria competitiva; se abre en una pestaña nueva",
-          href: "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
-        },
-      },
-    ],
-    foundationTitle: "MI BASE ACTUAL",
-    skillsTitle: "MI SISTEMA DE TRABAJO",
+    skillsTitle: "MI STACK DE TRABAJO",
     skillGroups: [
       {
         id: "software",
@@ -145,17 +99,17 @@ const es = {
           ["C++", "cpp.png"],
           ["JavaScript", "javascript.png"],
           ["PHP", "php.png"],
+          ["TypeScript", "typescript.png"],
         ],
       },
       {
         id: "web",
         title: "Web",
         items: [
-          ["HTML", "html.png"],
-          ["CSS", "css.png"],
-          ["Astro", null],
+          ["Astro", "astro.png"],
+          ["React", "react.png"],
           ["Node.js", "nodejs.png"],
-          ["GSAP", null],
+          ["GSAP", "gsap.png"],
         ],
       },
       {
@@ -166,6 +120,9 @@ const es = {
           ["PostgreSQL", "postgresql.png"],
           ["MariaDB", "mariadb.png"],
           ["MongoDB", "mongodb.png"],
+          ["Qdrant", "qdrant.png"],
+          ["Redis", "redis.png"],
+          ["Neo4j", "neo4j.png"],
         ],
       },
       {
@@ -189,7 +146,7 @@ const es = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
-          ["n8n", null],
+          ["n8n", "n8n.png"],
         ],
       },
       {
@@ -200,33 +157,23 @@ const es = {
           ["GIMP", "gimp.png"],
           ["Photopea", "photopea.png"],
           ["Canva", "canva.png"],
+          ["After Effects", "after-effects.png"],
+          ["Illustrator", "illustrator.png"],
+        ],
+      },
+      {
+        id: "collaboration",
+        title: "Documentación y colaboración",
+        items: [
+          ["Obsidian", "obsidian.png"],
+          ["Google Drive", "google-drive.png"],
+          ["Word", "word.png"],
+          ["Excel", "excel.png"],
+          ["PowerPoint", "powerpoint.png"],
+          ["Teams", "teams.png"],
         ],
       },
     ],
-    formacion: {
-      title: "Formación",
-      labels: {
-        institution: "Institución",
-        program: "Programa",
-        specialization: "Especialización",
-        status: "Estado actual",
-      },
-      entry: {
-        institution: "U-TAD",
-        program: "Ingeniería del Software",
-        specialization: "Mención en Ingeniería de Datos",
-        status: "Tercer curso",
-        href: "https://u-tad.com/grados/ingenieria-software",
-      },
-    },
-    idiomas: {
-      title: "Idiomas",
-      items: [
-        { language: "Español", level: "Nativo" },
-        { language: "Inglés", level: "C1" },
-        { language: "Alemán", level: "A2" },
-      ],
-    },
   },
   projects: {
     eyebrow: "Proyectos — en construcción",
@@ -539,89 +486,43 @@ const en = {
   },
   about: {
     aboutMe: {
-      eyebrow: "ABOUT ME",
-      titleLines: [
-        [{ text: "ENGINEERING," }],
-        [{ text: "DATA", tone: "cool" }, { text: " &" }],
-        [{ text: "IDENTITY.", tone: "gold" }],
-      ],
-      languageLine: "Madrid, Spain · Native Spanish · English C1 · German A2",
+      title: "ABOUT ME",
+      groupLabels: {
+        intro: "Who I am",
+        difference: "What sets me apart from the competition",
+      },
+      closingPhrase: "projects with more depth, more personality, and a thoughtfully designed experience.",
+      accents: {
+        strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "full-stack development", "databases", "software architecture", "systems programming", "graphic design", "work as part of a team", "a distinct identity", "several layers"],
+        emojis: [
+          { text: "U-TAD", symbol: "📚" },
+          { text: "esports", symbol: "🎮" },
+          { text: "Fashion", symbol: "👟" },
+          { text: "music", symbol: "🎧" },
+          { text: "social media", symbol: "📱" },
+        ],
+        location: "Madrid, Spain",
+        flags: [
+          { text: "Spanish", country: "es" },
+          { text: "C1 level of English", country: "gb" },
+          { text: "A2 level of German", country: "de" },
+        ],
+        links: [
+          { text: "Software Engineering student specializing in Data Engineering (Big Data)", href: "https://u-tad.com/grados/ingenieria-software" },
+          { text: "University Center for Technology and Digital Art", href: "https://maps.app.goo.gl/Ppb4QnavdNihgWui9" },
+        ],
+      },
       paragraphs: [
-        "My name is Jesús León Romero Atienza, and I am a Software Engineering student at U-TAD in Madrid. In September 2026, I will begin my third year after spending the first two years building a technical foundation in full-stack development, databases, software architecture, and systems programming. However, I am not interested in understanding these areas as isolated disciplines. What truly motivates me is understanding a digital product as a complete system: how its architecture is designed, how it works internally, which problem it solves, and what kind of experience it provides to the people using it.",
+        "I am Jesús León Romero Atienza, a Software Engineering student specializing in Data Engineering (Big Data) at U-TAD, the University Center for Technology and Digital Art, in my hometown of Madrid, Spain.",
+        "During these three years of study, I have built a foundation in full-stack development, databases, software architecture, and systems programming.",
+        "I am fully fluent in Spanish, with a C1 level of English and an A2 level of German.",
+        "What sets me apart from the competition is how I connect technology with graphic design, business analysis, and finance.",
+        "My experience in esports has taught me to work as part of a team, stay disciplined, and make decisions under pressure.",
+        "Fashion, music, and social media influence my visual judgment and the way I communicate my projects.",
+        "This combination of disciplines helps me give each project a distinct identity, with several layers that reinforce one another. That lets me create solutions that work, express an identity, and connect with people. My difference from the competition lies in that mix of perspectives: projects with more depth, more personality, and a thoughtfully designed experience.",
       ],
     },
-    scenes: [
-      {
-        id: "foundations",
-        railLabel: "FOUNDATIONS",
-        emoji: "🧩",
-        title: "WHERE IT ALL STARTS",
-        highlight: "Understanding a digital product as a whole.",
-        paragraphs: [
-          "During this stage, I have taken part, alongside other classmates, in projects that let me work with very different kinds of problems. Among them is a restaurant ordering platform developed in Java, where we applied different design patterns to build a modular, maintainable architecture. I have also worked on MegatronixOS, a cache memory simulator developed in C that let me go deeper into concepts such as memory hierarchy, addressing, and binary file manipulation. In parallel, I am developing my personal portfolio with Astro, a project where I can bring together technical implementation, animation, design, and visual identity. This variety has helped me better understand both the visible side of a product and the systems that make it work.",
-        ],
-        tone: "cyan",
-        networkHub: "Digital product",
-        networkBranches: [
-          { tech: "Java", project: "Ordering platform" },
-          { tech: "C", project: "MegatronixOS" },
-          { tech: "Astro", project: "Personal portfolio" },
-        ],
-      },
-      {
-        id: "direction",
-        railLabel: "DIRECTION",
-        emoji: "📈",
-        title: "WHERE I'M HEADED",
-        highlight:
-          "Turning information into decisions, automation, and solutions that create real value.",
-        paragraphs: [
-          "Regarding my academic and professional direction, I want to move deeper into Data Science and gradually into machine learning over the next few years. I do not see data as a separate path from Software Engineering, but as a natural extension of the same foundation. My goal is to learn how to design systems that can collect, organize, and interpret information, transforming it into decisions, automations, and solutions that create real value.",
-        ],
-        tone: "violet",
-        pipeline: ["SOFTWARE ENGINEERING", "DATA SCIENCE", "MACHINE LEARNING"],
-      },
-      {
-        id: "product",
-        railLabel: "PRODUCT",
-        emoji: "💡",
-        title: "HOW I SEE A PRODUCT",
-        highlight:
-          "Understanding what is being built, who it is built for, what value it provides, and how it should be communicated.",
-        paragraphs: [
-          "Technology is not the only field that has influenced the way I think. I have developed a consistent interest in investing, financial markets, and business analysis, particularly in areas such as business models, value creation, customer segmentation, and risk assessment. I also have experience in graphic design, creating covers, banners, thumbnails, and other visual assets for personal and collaborative projects. Although these areas may initially appear unrelated, I see them as part of the same way of understanding a product: knowing what is being built, who it is being built for, which value it provides, and how that value should be communicated.",
-        ],
-        tone: "gold",
-        triangleVertices: ["TECHNOLOGY", "BUSINESS", "DESIGN"],
-        triangleCenter: "A PRODUCT WITH REAL VALUE",
-        cta: {
-          label: "View design archive",
-          ariaLabel: "View design archive; opens in a new tab",
-          href: "https://drive.google.com/drive/folders/1e5ltPjqbFB5bYeWJhEbrtPfGYHE3329-?usp=sharing",
-        },
-      },
-      {
-        id: "drive",
-        railLabel: "DRIVE",
-        emoji: "⚡",
-        title: "WHAT DRIVES ME",
-        highlight:
-          "Combining engineering, data, and creativity to develop useful, well-built solutions with an identity of their own.",
-        paragraphs: [
-          "An important part of my approach to work also comes from competing in video games and esports. Taking part in competitive environments across titles such as Fortnite, Overwatch, Counter-Strike, and Clash Royale taught me the importance of discipline, consistency, emotional control, and adaptability. It also helped me learn how to communicate with different personalities, accept mistakes, make decisions under pressure, and contribute to a team without losing sight of collective performance.",
-          "Finally, my interest in fashion, music, cinema, film criticism, and digital culture has strengthened my sensitivity towards creativity, communication, and user experience. Together, these experiences define the profile I am building: someone with an increasingly solid technical foundation, an analytical mindset, and strong attention to detail. My goal is to continue learning and contribute to projects where I can combine engineering, data, and creativity to build useful, well-structured solutions with an identity of their own.",
-        ],
-        tone: "coral",
-        words: ["DISCIPLINE", "TEAMWORK", "ADAPTABILITY", "CREATIVITY", "PRESSURE", "CULTURE"],
-        cta: {
-          label: "View competitive background",
-          ariaLabel: "View competitive background; opens in a new tab",
-          href: "https://drive.google.com/drive/folders/1kWFINuTwxwC1niwWFxsRmgF5mbtppKYF?usp=sharing",
-        },
-      },
-    ],
-    foundationTitle: "MY FOUNDATION",
-    skillsTitle: "HOW I WORK",
+    skillsTitle: "MY WORK STACK",
     skillGroups: [
       {
         id: "software",
@@ -633,17 +534,17 @@ const en = {
           ["C++", "cpp.png"],
           ["JavaScript", "javascript.png"],
           ["PHP", "php.png"],
+          ["TypeScript", "typescript.png"],
         ],
       },
       {
         id: "web",
         title: "Web",
         items: [
-          ["HTML", "html.png"],
-          ["CSS", "css.png"],
-          ["Astro", null],
+          ["Astro", "astro.png"],
+          ["React", "react.png"],
           ["Node.js", "nodejs.png"],
-          ["GSAP", null],
+          ["GSAP", "gsap.png"],
         ],
       },
       {
@@ -654,6 +555,9 @@ const en = {
           ["PostgreSQL", "postgresql.png"],
           ["MariaDB", "mariadb.png"],
           ["MongoDB", "mongodb.png"],
+          ["Qdrant", "qdrant.png"],
+          ["Redis", "redis.png"],
+          ["Neo4j", "neo4j.png"],
         ],
       },
       {
@@ -677,7 +581,7 @@ const en = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
-          ["n8n", null],
+          ["n8n", "n8n.png"],
         ],
       },
       {
@@ -688,33 +592,23 @@ const en = {
           ["GIMP", "gimp.png"],
           ["Photopea", "photopea.png"],
           ["Canva", "canva.png"],
+          ["After Effects", "after-effects.png"],
+          ["Illustrator", "illustrator.png"],
+        ],
+      },
+      {
+        id: "collaboration",
+        title: "Documentation & collaboration",
+        items: [
+          ["Obsidian", "obsidian.png"],
+          ["Google Drive", "google-drive.png"],
+          ["Word", "word.png"],
+          ["Excel", "excel.png"],
+          ["PowerPoint", "powerpoint.png"],
+          ["Teams", "teams.png"],
         ],
       },
     ],
-    formacion: {
-      title: "Education",
-      labels: {
-        institution: "Institution",
-        program: "Program",
-        specialization: "Specialization",
-        status: "Current status",
-      },
-      entry: {
-        institution: "U-TAD",
-        program: "Software Engineering",
-        specialization: "Data Engineering specialization",
-        status: "Third year",
-        href: "https://u-tad.com/grados/ingenieria-software",
-      },
-    },
-    idiomas: {
-      title: "Languages",
-      items: [
-        { language: "Spanish", level: "Native" },
-        { language: "English", level: "C1" },
-        { language: "German", level: "A2" },
-      ],
-    },
   },
   projects: {
     eyebrow: "Projects — under construction",

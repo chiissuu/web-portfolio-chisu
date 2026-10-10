@@ -1,6 +1,6 @@
 ---
 tags: [componente, proyectos, servicios, tools, contacto, faq, compartidos]
-actualizado: 2026-10-06
+actualizado: 2026-10-10
 fuente: [src/components]
 ---
 
@@ -41,6 +41,8 @@ LinkedIn es enfocable y explica «Enlace todavía no disponible» mediante toolt
 Cuatro preguntas (experiencia profesional, disponibilidad freelance, acceso al trabajo de diseño, mejor vía de contacto) usando `<details>/<summary>` nativos con signos +/−, permitiendo varias preguntas abiertas a la vez. La segunda respuesta es un placeholder; la cuarta menciona el formulario aunque este todavía no envíe nada real. La interacción de abrir/cerrar no necesita JS, pero la visibilidad **inicial** del bloque sí depende de `.rd-reveal` (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]).
 
 ## Primitivas compartidas
+
+Auditoría del 10 de octubre: ejemplo Tools con h3 tras h2, correo ajustado a 320px y contrastes locales de notas/prosa. Formularios aclaran su simulación antes de pedir datos. No se modificaron las primitivas, sidebar ni textos fuente. FAQ mantiene dos respuestas desactualizadas sobre Drive/formulario como propuesta de contenido. Evidencia y límites en [[Auditoria-Web]].
 
 - [SectionHeadingCard.astro](../../../src/components/SectionHeadingCard.astro): título sobre un acabado de cristal. Permite h1/h2/h3, tamaños `lg`/`md` y clase opcional; valores por defecto h2/lg. La usan Proyectos, Servicios/Tools, Contacto y FAQ — About tiene su propio título y no la usa.
 - [RollLink.astro](../../../src/components/RollLink.astro): enlace con duplicación visual de texto para efecto de rollover. Ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] para su comportamiento accesible.

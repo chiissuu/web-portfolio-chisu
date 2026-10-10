@@ -993,7 +993,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     flex-direction: column;
     justify-content: flex-start;
     gap: clamp(0.45rem, 0.9vh, 0.75rem);
-    padding: clamp(1rem, 2vh, 1.5rem) clamp(1.25rem, 2.5vw, 2rem);
+    padding: clamp(1rem, 2vh, 1.5rem) var(--hx-sidebar-padding-inline, clamp(1.25rem, 2.5vw, 2rem));
     overflow-y: auto;
     overscroll-behavior: contain;
     opacity: 0;
@@ -1075,13 +1075,12 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   /* Brand mark — now the same gold wordmark image used in the hero
      (`hero-wordmark-gold.png`), not a boxed text treatment: the image is
      already gold, so no background/padding/typography is needed anymore.
-     `align-self: flex-start` keeps it shrink-wrapped to the image instead
-     of stretching to the article's full width (the article is a column
-     flexbox with default stretch). `position: relative` gives the small
+     `align-self: center` centers its image-sized box inside the article
+     without stretching it. `position: relative` gives the small
      (R) mark below a positioning context scoped to just this element. */
   .hx-compact-mark {
     display: inline-flex;
-    align-self: flex-start;
+    align-self: center;
     position: relative;
   }
 
@@ -1116,6 +1115,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   .hx-compact-tagline {
+    text-align: center;
     font-size: 0.86rem;
     line-height: 1.4;
     color: var(--art-text-muted, var(--color-ink));
@@ -1231,6 +1231,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   .hx-compact-socials {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 0.4rem;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -1258,7 +1260,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      inherited from `.hx-btn-primary` (`--color-brand-gold`) — already
      correct, not overridden here. */
   .hx-compact-cta {
-    align-self: flex-start;
+    align-self: center;
     margin-top: 0.25rem;
     border-radius: 8px;
     font-size: clamp(1rem, 0.95vw, 1.1rem);
@@ -2796,6 +2798,20 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           const morph = computeMorph(source, target);
           tl.to(source, { x: morph.x, y: morph.y, scale: morph.scale, duration: 0.5 }, 0.1);
         });
+
+        // Once travel ends, keep both PNGs on the same horizontal center
+        // throughout the crossfade. A centered sidebar mark can move after
+        // the initial measurement (for example during a CSS hot update).
+        const brandPair = morphPairs.find(({ source }) => source.dataset.morphSource === "brand");
+        if (brandPair) {
+          tl.eventCallback("onUpdate", () => {
+            if (tl.time() < 0.6) return;
+            const sourceRect = brandPair.source.getBoundingClientRect();
+            const targetRect = brandPair.target.getBoundingClientRect();
+            const dx = targetRect.left + targetRect.width / 2 - (sourceRect.left + sourceRect.width / 2);
+            if (Math.abs(dx) > 0.01) gsap.set(brandPair.source, { x: `+=${dx}` });
+          });
+        }
 
         // Sources only start hiding once their sidebar targets are
         // already visibly appearing (62%, i.e. after `SIDEBAR_ACTIVATE_AT`

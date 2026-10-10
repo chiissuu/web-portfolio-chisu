@@ -1,0 +1,25 @@
+
+> portfolio-redesign-clean@0.0.1 build
+> astro build
+
+15:31:32 [types] Generated 119ms
+15:31:32 [build] output: "static"
+15:31:32 [build] mode: "static"
+15:31:32 [build] directory: C:\Users\jesus\OneDrive\Escritorio\portfolio-web-chiissuu\dist\
+15:31:32 [build] Collecting build info...
+15:31:32 [build] ✓ Completed in 191ms.
+15:31:32 [build] Building static entrypoints...
+15:31:34 [vite] ✓ built in 1.72s
+15:31:34 [vite] ✓ built in 300ms
+15:31:34 [build] Rearranging server assets...
+
+ generating static routes 
+15:31:34   ├─ /servicios/index.html (+25ms) 
+15:31:34   ├─ /tools/video-converter/index.html (+8ms) 
+15:31:34   ├─ /tools/index.html (+5ms) 
+15:31:34   ├─ /index.html (+11ms) 
+15:31:34 ✓ Completed in 82ms.
+
+15:31:35 [build] ✓ Completed in 2.22s.
+15:31:35 [build] 4 page(s) built in 2.44s
+15:31:35 [build] Complete!

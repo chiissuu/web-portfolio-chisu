@@ -1,0 +1,12 @@
+diff --git a/scripts/copy-ffmpeg-core.mjs b/scripts/copy-ffmpeg-core.mjs
+--- a/scripts/copy-ffmpeg-core.mjs
++++ b/scripts/copy-ffmpeg-core.mjs
+@@ -23 +23 @@
+-const coreDistDir = join(projectRoot, "node_modules", "@ffmpeg", "core", "dist", "umd");
++const coreDistDir = join(projectRoot, "node_modules", "@ffmpeg", "core", "dist", "esm");
+@@ -31 +31 @@
+-      "[copy-ffmpeg-core] node_modules/@ffmpeg/core/dist/umd not found — " +
++      "[copy-ffmpeg-core] node_modules/@ffmpeg/core/dist/esm not found — " +
+@@ -60 +60 @@
+-        "check that @ffmpeg/core's published layout still matches dist/umd/ffmpeg-core.{js,wasm}."
++        "check that @ffmpeg/core's published layout still matches dist/esm/ffmpeg-core.{js,wasm}."

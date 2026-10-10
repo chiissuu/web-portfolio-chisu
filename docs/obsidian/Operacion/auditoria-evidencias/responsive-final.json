@@ -1,0 +1,677 @@
+[
+  {
+    "route": "/",
+    "requested": 320,
+    "clientWidth": 305,
+    "h1": [
+      "Software EngineerData ScienceGFX"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "SOBRE MÍ"
+      },
+      {
+        "tag": "H3",
+        "text": "Quién soy"
+      },
+      {
+        "tag": "H3",
+        "text": "Qué me diferencia de la competencia"
+      },
+      {
+        "tag": "H3",
+        "text": "MI BASE ACTUAL"
+      },
+      {
+        "tag": "H3",
+        "text": "MI SISTEMA DE TRABAJO"
+      },
+      {
+        "tag": "H2",
+        "text": "Proyectos destacados"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto Full-stack (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto de Data Science (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Sistema Visual (placeholder)"
+      },
+      {
+        "tag": "H2",
+        "text": "Servicios y Tools"
+      },
+      {
+        "tag": "H3",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Hablemos de tu próxima idea"
+      },
+      {
+        "tag": "H2",
+        "text": "Preguntas frecuentes"
+      }
+    ],
+    "navDisplay": null,
+    "noteColor": "rgb(8, 9, 11)",
+    "overflow": [],
+    "scrollWidth": 305,
+    "width": 320
+  },
+  {
+    "route": "/",
+    "requested": 390,
+    "clientWidth": 375,
+    "h1": [
+      "Software EngineerData ScienceGFX"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "SOBRE MÍ"
+      },
+      {
+        "tag": "H3",
+        "text": "Quién soy"
+      },
+      {
+        "tag": "H3",
+        "text": "Qué me diferencia de la competencia"
+      },
+      {
+        "tag": "H3",
+        "text": "MI BASE ACTUAL"
+      },
+      {
+        "tag": "H3",
+        "text": "MI SISTEMA DE TRABAJO"
+      },
+      {
+        "tag": "H2",
+        "text": "Proyectos destacados"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto Full-stack (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto de Data Science (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Sistema Visual (placeholder)"
+      },
+      {
+        "tag": "H2",
+        "text": "Servicios y Tools"
+      },
+      {
+        "tag": "H3",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Hablemos de tu próxima idea"
+      },
+      {
+        "tag": "H2",
+        "text": "Preguntas frecuentes"
+      }
+    ],
+    "navDisplay": null,
+    "noteColor": "rgb(8, 9, 11)",
+    "overflow": [],
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "route": "/",
+    "requested": 768,
+    "clientWidth": 753,
+    "h1": [
+      "Software EngineerData ScienceGFX"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "SOBRE MÍ"
+      },
+      {
+        "tag": "H3",
+        "text": "Quién soy"
+      },
+      {
+        "tag": "H3",
+        "text": "Qué me diferencia de la competencia"
+      },
+      {
+        "tag": "H3",
+        "text": "MI BASE ACTUAL"
+      },
+      {
+        "tag": "H3",
+        "text": "MI SISTEMA DE TRABAJO"
+      },
+      {
+        "tag": "H2",
+        "text": "Proyectos destacados"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto Full-stack (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto de Data Science (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Sistema Visual (placeholder)"
+      },
+      {
+        "tag": "H2",
+        "text": "Servicios y Tools"
+      },
+      {
+        "tag": "H3",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Hablemos de tu próxima idea"
+      },
+      {
+        "tag": "H2",
+        "text": "Preguntas frecuentes"
+      }
+    ],
+    "navDisplay": null,
+    "noteColor": "rgb(8, 9, 11)",
+    "overflow": [],
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "route": "/",
+    "requested": 1280,
+    "clientWidth": 1265,
+    "h1": [
+      "Software EngineerData ScienceGFX"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "SOBRE MÍ"
+      },
+      {
+        "tag": "H3",
+        "text": "Quién soy"
+      },
+      {
+        "tag": "H3",
+        "text": "Qué me diferencia de la competencia"
+      },
+      {
+        "tag": "H3",
+        "text": "MI BASE ACTUAL"
+      },
+      {
+        "tag": "H3",
+        "text": "MI SISTEMA DE TRABAJO"
+      },
+      {
+        "tag": "H2",
+        "text": "Proyectos destacados"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto Full-stack (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto de Data Science (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Sistema Visual (placeholder)"
+      },
+      {
+        "tag": "H2",
+        "text": "Servicios y Tools"
+      },
+      {
+        "tag": "H3",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Hablemos de tu próxima idea"
+      },
+      {
+        "tag": "H2",
+        "text": "Preguntas frecuentes"
+      }
+    ],
+    "navDisplay": null,
+    "noteColor": "rgb(8, 9, 11)",
+    "overflow": [],
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "route": "/",
+    "requested": 1920,
+    "clientWidth": 1905,
+    "h1": [
+      "Software EngineerData ScienceGFX"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "SOBRE MÍ"
+      },
+      {
+        "tag": "H3",
+        "text": "Quién soy"
+      },
+      {
+        "tag": "H3",
+        "text": "Qué me diferencia de la competencia"
+      },
+      {
+        "tag": "H3",
+        "text": "MI BASE ACTUAL"
+      },
+      {
+        "tag": "H3",
+        "text": "MI SISTEMA DE TRABAJO"
+      },
+      {
+        "tag": "H2",
+        "text": "Proyectos destacados"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto Full-stack (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Proyecto de Data Science (placeholder)"
+      },
+      {
+        "tag": "H3",
+        "text": "Sistema Visual (placeholder)"
+      },
+      {
+        "tag": "H2",
+        "text": "Servicios y Tools"
+      },
+      {
+        "tag": "H3",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Hablemos de tu próxima idea"
+      },
+      {
+        "tag": "H2",
+        "text": "Preguntas frecuentes"
+      }
+    ],
+    "navDisplay": null,
+    "noteColor": "rgb(8, 9, 11)",
+    "overflow": [],
+    "scrollWidth": 1905,
+    "width": 1920
+  },
+  {
+    "route": "/servicios/",
+    "requested": 320,
+    "clientWidth": 305,
+    "h1": [
+      "Servicios"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Automatización de procesos tecnológicos"
+      },
+      {
+        "tag": "H2",
+        "text": "Páginas web comerciales y visuales"
+      },
+      {
+        "tag": "H2",
+        "text": "Auditoría y asesoramiento técnico/visual"
+      },
+      {
+        "tag": "H3",
+        "text": "Cuéntame tu proyecto"
+      }
+    ],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 305,
+    "width": 320
+  },
+  {
+    "route": "/servicios/",
+    "requested": 390,
+    "clientWidth": 375,
+    "h1": [
+      "Servicios"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Automatización de procesos tecnológicos"
+      },
+      {
+        "tag": "H2",
+        "text": "Páginas web comerciales y visuales"
+      },
+      {
+        "tag": "H2",
+        "text": "Auditoría y asesoramiento técnico/visual"
+      },
+      {
+        "tag": "H3",
+        "text": "Cuéntame tu proyecto"
+      }
+    ],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "route": "/servicios/",
+    "requested": 768,
+    "clientWidth": 753,
+    "h1": [
+      "Servicios"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Automatización de procesos tecnológicos"
+      },
+      {
+        "tag": "H2",
+        "text": "Páginas web comerciales y visuales"
+      },
+      {
+        "tag": "H2",
+        "text": "Auditoría y asesoramiento técnico/visual"
+      },
+      {
+        "tag": "H3",
+        "text": "Cuéntame tu proyecto"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "route": "/servicios/",
+    "requested": 1280,
+    "clientWidth": 1265,
+    "h1": [
+      "Servicios"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Automatización de procesos tecnológicos"
+      },
+      {
+        "tag": "H2",
+        "text": "Páginas web comerciales y visuales"
+      },
+      {
+        "tag": "H2",
+        "text": "Auditoría y asesoramiento técnico/visual"
+      },
+      {
+        "tag": "H3",
+        "text": "Cuéntame tu proyecto"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "route": "/servicios/",
+    "requested": 1920,
+    "clientWidth": 1905,
+    "h1": [
+      "Servicios"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Automatización de procesos tecnológicos"
+      },
+      {
+        "tag": "H2",
+        "text": "Páginas web comerciales y visuales"
+      },
+      {
+        "tag": "H2",
+        "text": "Auditoría y asesoramiento técnico/visual"
+      },
+      {
+        "tag": "H3",
+        "text": "Cuéntame tu proyecto"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1905,
+    "width": 1920
+  },
+  {
+    "route": "/tools/",
+    "requested": 320,
+    "clientWidth": 305,
+    "h1": [
+      "Tools"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Comprobador de quién no te sigue en Instagram"
+      }
+    ],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 305,
+    "width": 320
+  },
+  {
+    "route": "/tools/",
+    "requested": 390,
+    "clientWidth": 375,
+    "h1": [
+      "Tools"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Comprobador de quién no te sigue en Instagram"
+      }
+    ],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "route": "/tools/",
+    "requested": 768,
+    "clientWidth": 753,
+    "h1": [
+      "Tools"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Comprobador de quién no te sigue en Instagram"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "route": "/tools/",
+    "requested": 1280,
+    "clientWidth": 1265,
+    "h1": [
+      "Tools"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Comprobador de quién no te sigue en Instagram"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "route": "/tools/",
+    "requested": 1920,
+    "clientWidth": 1905,
+    "h1": [
+      "Tools"
+    ],
+    "headings": [
+      {
+        "tag": "H2",
+        "text": "Conversor de vídeo a MP3 / MP4"
+      },
+      {
+        "tag": "H2",
+        "text": "Comprobador de quién no te sigue en Instagram"
+      }
+    ],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1905,
+    "width": 1920
+  },
+  {
+    "route": "/tools/video-converter/",
+    "requested": 320,
+    "clientWidth": 305,
+    "h1": [
+      "Conversor de vídeo"
+    ],
+    "headings": [],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 305,
+    "width": 320
+  },
+  {
+    "route": "/tools/video-converter/",
+    "requested": 390,
+    "clientWidth": 375,
+    "h1": [
+      "Conversor de vídeo"
+    ],
+    "headings": [],
+    "navDisplay": "none",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "route": "/tools/video-converter/",
+    "requested": 768,
+    "clientWidth": 768,
+    "h1": [
+      "Conversor de vídeo"
+    ],
+    "headings": [],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "route": "/tools/video-converter/",
+    "requested": 1280,
+    "clientWidth": 1265,
+    "h1": [
+      "Conversor de vídeo"
+    ],
+    "headings": [],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1265,
+    "width": 1280
+  },
+  {
+    "route": "/tools/video-converter/",
+    "requested": 1920,
+    "clientWidth": 1920,
+    "h1": [
+      "Conversor de vídeo"
+    ],
+    "headings": [],
+    "navDisplay": "flex",
+    "noteColor": "rgb(58, 62, 72)",
+    "overflow": [],
+    "scrollWidth": 1920,
+    "width": 1920
+  }
+]

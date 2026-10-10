@@ -1,6 +1,6 @@
 ---
 tags: [inventario, archivos]
-actualizado: 2026-10-06
+actualizado: 2026-10-08
 fuente: [estructura del repositorio]
 ---
 
@@ -11,7 +11,8 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | Archivo | Responsabilidad |
 |---|---|
 | [scripts/copy-ffmpeg-core.mjs](../../../scripts/copy-ffmpeg-core.mjs) | Copia del motor instalado a `public/ffmpeg` |
-| [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Portada editorial, escenas, rail, formación, idiomas y skills — ver [[Sobre-Mi]] |
+| [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Título Sobre mí, resumen inicial, formación, idiomas y skills — ver [[Sobre-Mi]] |
+| Banderas [España](../../../public/assets/icons/flags/es.svg), [Reino Unido](../../../public/assets/icons/flags/gb.svg) y [Alemania](../../../public/assets/icons/flags/de.svg) | SVG locales simplificados para ubicación e idiomas de la biografía; no dependen de emojis de banderas |
 | [src/components/ClosingStatement.astro](../../../src/components/ClosingStatement.astro) | Cierre conservado; sin uso en rutas actuales — ver [[Otras-Secciones-y-Compartidos]] |
 | [src/components/ContactForm.astro](../../../src/components/ContactForm.astro) | Formulario de contacto y estados de validación/envío simulado — ver [[Formularios]] |
 | [src/components/ContactSection.astro](../../../src/components/ContactSection.astro) | Tarjetas sociales, formulario y correo manual |

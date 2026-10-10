@@ -1,0 +1,14 @@
+[
+  {
+    "level": "error",
+    "message": "TypeError: _jsxDEV is not a function\n    at VideoConverter (http://localhost:4321/src/components/VideoConverter/VideoConverter.tsx:164:22)\n    at Nh (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:3376:7)\n    at Vk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6449:9)\n    at Uk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6146:11)\n    at Tk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6140:23)\n    at Ik (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6125:5)\n    at Nk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:5857:7)\n    at Gk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:5795:50)\n    at J (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:96:14)\n    at MessagePort.R (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:128:9)",
+    "timestamp": "2026-10-10T13:15:03.077Z",
+    "url": "http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js"
+  },
+  {
+    "level": "error",
+    "message": "TypeError: _jsxDEV is not a function\n    at VideoConverter (http://localhost:4321/src/components/VideoConverter/VideoConverter.tsx:164:22)\n    at Nh (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:3376:7)\n    at Vk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6449:9)\n    at Uk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6146:11)\n    at Tk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6140:23)\n    at Ik (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:6125:5)\n    at Nk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:5857:7)\n    at Gk (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:5795:50)\n    at J (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:96:14)\n    at MessagePort.R (http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js:128:9)",
+    "timestamp": "2026-10-10T13:15:03.078Z",
+    "url": "http://localhost:4321/node_modules/.vite/deps/react-dom-DsWFHaRg.js"
+  }
+]

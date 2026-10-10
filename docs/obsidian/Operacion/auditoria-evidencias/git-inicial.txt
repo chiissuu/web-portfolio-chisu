@@ -1,0 +1,13 @@
+ M docs/obsidian/00-Empieza-Aqui.md
+ M docs/obsidian/02-Rutas-y-Navegacion.md
+ M docs/obsidian/03-Sistema-de-Diseno.md
+ M docs/obsidian/Componentes/Sobre-Mi.md
+ M docs/obsidian/Contenido/Contenido-por-Seccion.md
+ M docs/obsidian/Operacion/Comandos-y-Pruebas.md
+ M docs/obsidian/Operacion/Hallazgos-y-Pendientes.md
+ M src/components/AboutSection.astro
+ M src/content/site.js
+ M src/lib/content-types.ts
+?? docs/obsidian/Operacion/Prompt-Auditoria-Web.md
+?? docs/obsidian/Operacion/Skills-Desarrollo-Web.md
+?? docs/obsidian/Operacion/auditoria-evidencias/

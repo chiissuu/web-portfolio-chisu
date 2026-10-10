@@ -1,0 +1,338 @@
+[
+  {
+    "path": "src/components/AboutSection.astro",
+    "hash": "670CEA94AD79888AD3DA0A5F1E48A6E11D2DF540F37FA6958187735AC080C86C"
+  },
+  {
+    "path": "src/components/ClosingStatement.astro",
+    "hash": "989537433CD79D95C55D282E8FABA003A0653125D0B7593FCAA44ECD3ED0C6A7"
+  },
+  {
+    "path": "src/components/ContactForm.astro",
+    "hash": "3658C418D569B1B83F03EC2653163070F76F4EBDB65A177FED2E15A2A8FB91D1"
+  },
+  {
+    "path": "src/components/ContactSection.astro",
+    "hash": "CC81694C3E764CB2F1E5F3130AEBB321EF7ABCB87FFC42BA11FCB1D07D04D718"
+  },
+  {
+    "path": "src/components/FaqSection.astro",
+    "hash": "B14F36B0B410BB35931457A90BAF2FF33198AF5F947CFC6CF5649E8C14B157C2"
+  },
+  {
+    "path": "src/components/HeroExperience.astro",
+    "hash": "355B2A1C42DC57E835E6282F7DC1A4E22E947BEE653FB16C1AB65035DF4FC7EE"
+  },
+  {
+    "path": "src/components/ProjectsSection.astro",
+    "hash": "B75E46F4D8A7738CAD070FE0F31A10D562384B795D5CF1AF2003107026D130D2"
+  },
+  {
+    "path": "src/components/RollLink.astro",
+    "hash": "61EB8035D7175A9C325CD88D6D3D327641B242FBB28F63039A6F5425EF4AEEEC"
+  },
+  {
+    "path": "src/components/SectionHeadingCard.astro",
+    "hash": "9B8EAFCA772EB11AF07122762A4696651CE5EA2F20CBA57E281AC7424E162330"
+  },
+  {
+    "path": "src/components/ServicesForm.astro",
+    "hash": "7ABAA2379306B3C50F380BBD0A480AD7D9E9C1C262BE39B34B8D6A5399E6EFCF"
+  },
+  {
+    "path": "src/components/ServicesPageContent.astro",
+    "hash": "AFCBCEAEF700E915B7EF0704066309B6947E30D93EE45D69A92BECFEB1512662"
+  },
+  {
+    "path": "src/components/ServicesTeaser.astro",
+    "hash": "50ED91B0C5288A9996B9A4E4ABBFDF2737EFBB1518BEEA2C25C8F386F35AFC43"
+  },
+  {
+    "path": "src/components/ServicesToolsSection.astro",
+    "hash": "FCAAF8394D4DD27B16D0A2D919178E69646885CC47457AEF66FB2BA121D649FD"
+  },
+  {
+    "path": "src/components/SimpleNav.astro",
+    "hash": "E9CBB2F1BD2D01F746378B35A69E483EA41136626EEC9776CD6DC0F6C30B8EDF"
+  },
+  {
+    "path": "src/components/ToolsPageContent.astro",
+    "hash": "AECAD558A0E06A169B07006C513CAA84E557E99724AC01920BB8ED42088C1A55"
+  },
+  {
+    "path": "src/components/ToolsTeaser.astro",
+    "hash": "1AB8393D44347F5FFA6E601DF8BE7B2683DD5401F7070541C6C0831CDAC44502"
+  },
+  {
+    "path": "src/components/VideoConverterPageContent.astro",
+    "hash": "41942A4D60BC8106711F55C116BF5373ED0000C82F2A5C0DFF7EA9B1803256FE"
+  },
+  {
+    "path": "src/components/VideoConverter/ConversionProgress.tsx",
+    "hash": "025D448F49DCDCA487F6F3537B81253323A1C33097A138D5DAC999B6446756A6"
+  },
+  {
+    "path": "src/components/VideoConverter/ConversionResult.tsx",
+    "hash": "94765B527F20302B9DA330A85C126CF1DB610032FAF522F1635CF576FB336D05"
+  },
+  {
+    "path": "src/components/VideoConverter/DropZone.tsx",
+    "hash": "EB7E9599375ECFBE9A2E41B0D45FBCE042A46AA662194A62CBD211E11FD5002B"
+  },
+  {
+    "path": "src/components/VideoConverter/FileSummary.tsx",
+    "hash": "64759123935968989954FA13F1631BAF2D0F7F144CA98F5AE3F9799EE937CF24"
+  },
+  {
+    "path": "src/components/VideoConverter/OutputSettings.tsx",
+    "hash": "4E60CBD78B99877F57967F4CFEF265D9217C2B81A1C49DA7815A437C62995DA9"
+  },
+  {
+    "path": "src/components/VideoConverter/video-converter.module.css",
+    "hash": "EE381493DEC4773483F0FA34BBECAFF1D6B5D94B08D32507E97B9DA4E0AB1869"
+  },
+  {
+    "path": "src/components/VideoConverter/VideoConverter.tsx",
+    "hash": "DCD9BC335C4A9AE4215A49A70C8B89222C7C83F222F4566AB236A417D28B8E38"
+  },
+  {
+    "path": "src/content/site.js",
+    "hash": "7260DBFABEAFC1AA4B7C5053AA08F9313EB766924D95C6518D79212B356336CB"
+  },
+  {
+    "path": "src/layouts/Layout.astro",
+    "hash": "B63B94C4917CFFA6BCC1B2C404CFE0CD75FA04075348FF7AE09BE87C5F604C72"
+  },
+  {
+    "path": "src/lib/content-types.ts",
+    "hash": "40FBA76803F7C9BAA563EC721C9CCBE59F078441455F153D312CB45AC5F30F5A"
+  },
+  {
+    "path": "src/lib/paths.js",
+    "hash": "53E1BE9E7854B87B5C41FD08BEDE4D5C1FCE33BB89D2E16057E7D1707FAFF38F"
+  },
+  {
+    "path": "src/lib/forms/submit.ts",
+    "hash": "F784652D1F68399EBBA4C5C10D0C2B93401ED50105C00942B3DE87D1E7F5A46E"
+  },
+  {
+    "path": "src/lib/forms/types.ts",
+    "hash": "9901DB3AAC3804D53154A373B96930D6FCDB06A6E07D405A862CE1E55BC93B57"
+  },
+  {
+    "path": "src/lib/forms/validate.ts",
+    "hash": "038B89FD505FCCC664D50AB841E4566674F81EAD49001017D2F12EF761471B64"
+  },
+  {
+    "path": "src/lib/videoConverter/constants.ts",
+    "hash": "34768D25A4CC31D309C75D9761268E3EBB8FDCB5DFBF5A165D2E7AC3FC844E27"
+  },
+  {
+    "path": "src/lib/videoConverter/ffmpegClient.ts",
+    "hash": "DE85B6C8535E8BAA2042DB89FE4E7A1D72E65573ABE8C707B2F29B036EFD2BB7"
+  },
+  {
+    "path": "src/lib/videoConverter/types.ts",
+    "hash": "92718EC25DA7A317F09BECD7B60E6BE8ED08947E721958890AA2B041638F78B2"
+  },
+  {
+    "path": "src/lib/videoConverter/utils.ts",
+    "hash": "3C926005CF051BE82C7EE4CFA2CB611CA33D74DC678FFD2FDF4422C5086BAD93"
+  },
+  {
+    "path": "src/pages/index.astro",
+    "hash": "9E9065DB2FEE7C4773224C2AF8A7C8FD6FB34C6E73C513A01F9F8CB7C464E6F8"
+  },
+  {
+    "path": "src/pages/servicios/index.astro",
+    "hash": "0AE8C98C948514C7C80CAAA36CC74CF06B092CC7D8679FE84C936031759D1780"
+  },
+  {
+    "path": "src/pages/tools/index.astro",
+    "hash": "0214B02BF04C1FE14C8378EA1284901A687DDCA394F6668DBA6CAB990B04CB0F"
+  },
+  {
+    "path": "src/pages/tools/video-converter/index.astro",
+    "hash": "D367C35753C9A5EF2ECCC779D5D746B9F6B4F46D39872AF4430DD3E69E5632E3"
+  },
+  {
+    "path": "public/assets/fonts/PPNeueMontreal-Book.woff2",
+    "hash": "9B0934928B9F18EF9F1A72830FC02BF874C02052E7674ACDA886BCDC6336E309"
+  },
+  {
+    "path": "public/assets/icons/logo-chiissuu.png",
+    "hash": "06A1ECFD3B2BF4042867DA3043F82E5396A894DB843484632525B5A570C2648B"
+  },
+  {
+    "path": "public/assets/icons/flags/de.svg",
+    "hash": "061B73E6D54203E0ADAF3BF97C9FB6D9C1A390F98208762A626E1FB5AC3B09D7"
+  },
+  {
+    "path": "public/assets/icons/flags/es.svg",
+    "hash": "1E04796F4304661ED1F7D9644711B95B068C5368FC48BC9C4B2CE694309DAEC6"
+  },
+  {
+    "path": "public/assets/icons/flags/gb.svg",
+    "hash": "C7E115454676B8F302E6517879939BD4832030EFFD9A4F2E0B2ADC1046AA33CE"
+  },
+  {
+    "path": "public/assets/images/hero-background-gold-alternative.png",
+    "hash": "12AA29620BD0A01C3D3C48A8F1AB2E01E56FF39ACB10D5C28E611CE09D531C1B"
+  },
+  {
+    "path": "public/assets/images/hero-background-gold.png",
+    "hash": "F00E8BED7CD2D5079C59BBE9C1CE3E4D09C7A198F76E242B3E6E9840BA55DD4D"
+  },
+  {
+    "path": "public/assets/images/hero-wordmark-gold.png",
+    "hash": "8AC6A9894CF7C3D274B4A2A2F03F8EF09A1A7D740F6945DBFDD3F5A8253C97B4"
+  },
+  {
+    "path": "public/assets/images/profile-cutout-alt.png",
+    "hash": "A5F833FF2F229AABFCBE1E13AA764E32EED741F86C2FC5DADB0974D31B140555"
+  },
+  {
+    "path": "public/assets/images/profile-cutout-trimmed.png",
+    "hash": "D62D6D049E39B4290EC6439B395DEA03B82B06BDF8166DAC5E6E9B9E3CFC2DE4"
+  },
+  {
+    "path": "public/assets/images/profile-cutout.png",
+    "hash": "8D612604DF989C0CE334732155496AFF470DDCB63977EAF8286A30D80E76FA3E"
+  },
+  {
+    "path": "public/assets/skills/c.png",
+    "hash": "D6BF5B47FA2EB2EBC64D42DBE52B1C26DF17C4D35545B826A43653EFA1CE187A"
+  },
+  {
+    "path": "public/assets/skills/canva.png",
+    "hash": "68FD50530A0D9F9A41445A756AC9B2771950745EC2AE6115BCC34C78F328243C"
+  },
+  {
+    "path": "public/assets/skills/cpp.png",
+    "hash": "0F77D87475163F29FB3C5FEC010913E42B555264AAAFE73775198D08118A3E96"
+  },
+  {
+    "path": "public/assets/skills/css.png",
+    "hash": "D03324125C7AE0D18B99522E2770C55197ECE0E04C8C67D9D7B1AC2359DEF144"
+  },
+  {
+    "path": "public/assets/skills/docker.png",
+    "hash": "819980D364BE52941B24329E154A898D2A4DDE8418D974A25BDC948321014D35"
+  },
+  {
+    "path": "public/assets/skills/gimp.png",
+    "hash": "25105A46DA0DDE40E4209F4DE3D7DB8A6CAE94A75E57B8F2447AA425CAD883F2"
+  },
+  {
+    "path": "public/assets/skills/git.png",
+    "hash": "292439C190FA71EE5E85702501654EBC39EC87787DE4D5BC3716FABD1D7C3C54"
+  },
+  {
+    "path": "public/assets/skills/github.svg",
+    "hash": "12794390CCE7D0682FFC783C785E4282305684431B30B29ED75C224DA24035B4"
+  },
+  {
+    "path": "public/assets/skills/html.png",
+    "hash": "DAE57D9245E50ACF290CCBDCBBF138CA963127BEF465C666665D4197043B8101"
+  },
+  {
+    "path": "public/assets/skills/java.png",
+    "hash": "714321BED6393700DE647333A07AA84DB0ADF3CD75DE8DAB403F31AAC370DAF7"
+  },
+  {
+    "path": "public/assets/skills/javascript.png",
+    "hash": "8C627CC6BBD2BB2C13C2E5E206BB247D581F3B47F79EE9AEA231AA3ABF80BE1E"
+  },
+  {
+    "path": "public/assets/skills/jupyter.png",
+    "hash": "D06BE7934E01CFCB48883383A0B1551560D00FBBD3FAE5A5FB2402ADB91C0C19"
+  },
+  {
+    "path": "public/assets/skills/linux.png",
+    "hash": "3BBA034F87CD342DDF7C9201774AA3B68BACA6056CF7BFE8C017DC241FF1D50A"
+  },
+  {
+    "path": "public/assets/skills/mariadb.png",
+    "hash": "86319335E55B76A33DE2B3B4B0ED939308ADB6DB9DC4769328FFDDAE0B31C2E2"
+  },
+  {
+    "path": "public/assets/skills/matplotlib.png",
+    "hash": "AD77EBC7848B7C3D05ADE677C412B0514FB9DC74A36317E5849AEE7E637183DB"
+  },
+  {
+    "path": "public/assets/skills/mongodb.png",
+    "hash": "D39CF1E4C7B779DDA75FFBBF92D6CF97110BAE38AB402883E0803E1547E98CAF"
+  },
+  {
+    "path": "public/assets/skills/mysql.png",
+    "hash": "848903751A59CAB8D60702F438E1633500EC0EFAC131F828054415F82AA63CBD"
+  },
+  {
+    "path": "public/assets/skills/nodejs.png",
+    "hash": "1182C71BCED355DDA87F5EBF08716817E80558B44A1506FF75FC40AADEAE5C78"
+  },
+  {
+    "path": "public/assets/skills/numpy.png",
+    "hash": "25527D455DDA5BCD3AB21FB27843F11BDC5B1E7C19113227061722440693F87A"
+  },
+  {
+    "path": "public/assets/skills/pandas.png",
+    "hash": "723470A761E94427D18C2F571A088499A3721924F15EBB6E51839E94A2FFF295"
+  },
+  {
+    "path": "public/assets/skills/photopea.png",
+    "hash": "68A14E1C90538A8110CCE4BAC42F4AD03A5EB266EB4642364330C162D40C04C3"
+  },
+  {
+    "path": "public/assets/skills/photoshop.png",
+    "hash": "3BA7DF4D0AAD39A9767395CE92A643944675FA1FCB4D145C5170EF6069B4FB30"
+  },
+  {
+    "path": "public/assets/skills/php.png",
+    "hash": "D67176F1BEC3A037CF3BA587BD28F0F4E7646B7CBBF55904EDCE27DB1CEB59DC"
+  },
+  {
+    "path": "public/assets/skills/postgresql.png",
+    "hash": "2680ED5A96DFC7B74E29D75E6EB72C1C9FBAC957449A076A5F04705DF6739592"
+  },
+  {
+    "path": "public/assets/skills/python.png",
+    "hash": "4D9303B71249CB4DAFA7F6E58C5D783FB60A549A3F39AFCA3107C774679F4CA0"
+  },
+  {
+    "path": "public/assets/skills/scikit-learn.png",
+    "hash": "E0E941CD82E7843B2F5214F5A3BD3CF0FF6BB08399F5F788D6292024B2C4D19E"
+  },
+  {
+    "path": "public/assets/skills/seaborn.png",
+    "hash": "F2316C5C3C5369E5CFD638AC471BFB18D8DEE2D208F413DF19D95A46F058F1EE"
+  },
+  {
+    "path": "public/assets/skills/windows.png",
+    "hash": "B95360194A3435937E9949AF333CA4D072A7871EB8BAA4F861619275E073DD3E"
+  },
+  {
+    "path": "scripts/copy-ffmpeg-core.mjs",
+    "hash": "B1E67DCD3283F3EFC625D916B3D15BBE26BE75C8482AD0B83385195AE387EBF3"
+  },
+  {
+    "path": "package.json",
+    "hash": "390D8B97548CF1A5FEDEE88DF71119F3D7704E3DE919EA1403ED3767BDCAB91A"
+  },
+  {
+    "path": "package-lock.json",
+    "hash": "5CE41A01510431DE861B8D4161B6534BB7FE982E6B7153AC6208643547440D07"
+  },
+  {
+    "path": "astro.config.mjs",
+    "hash": "3394BF49C697F7D1689F409478113FFBF829A52DD3372DCCD6AF2371FF7C8ECA"
+  },
+  {
+    "path": "tsconfig.json",
+    "hash": "AFDB345261AA4F96C19B75AA1F714F812522090EEAA35838627E89AB9004EEB8"
+  },
+  {
+    "path": ".gitignore",
+    "hash": "470ABE19E16C159E7413186801AA10E64FFA2F741427683F53416F5FD772CB11"
+  }
+]

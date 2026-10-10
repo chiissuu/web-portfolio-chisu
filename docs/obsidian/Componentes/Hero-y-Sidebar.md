@@ -20,6 +20,8 @@ Fuente: [HeroExperience.astro](../../../src/components/HeroExperience.astro). Es
 - El sidebar es **hermano exterior** de `.hx-wrap`, fijo y transparente, con cuatro artículos: marca/tagline, métricas, navegación, redes/CTA. Puede desplazarse internamente si no cabe en altura.
 - El botón y el panel del menú móvil también están fuera del Hero. El bloqueo `inert` del resto de la página no debe contenerlos a ellos.
 
+La imagen de marca se centra en su tarjeta mediante `align-self: center`; la descripción inferior usa `text-align: center`. LinkedIn (placeholder), GitHub y Redes Sociales se centran con `align-items: center` y `text-align: center`, y el CTA Contacto con `align-self: center`. Las filas del menú principal mantienen su alineación de icono y etiqueta. Los destinos de morph siguen siendo la imagen y el párrafo reales, medidos por el timeline; no se añaden offsets manuales.
+
 ## Entrada inicial
 
 Estados internos: `pending` → `playing` → `completed` / `interrupted`. Espera `document.fonts.ready` y, cuando está disponible, la decodificación del retrato. Los fallos de estas esperas se toleran (no bloquean la entrada).
@@ -37,6 +39,8 @@ Solo se construye el timeline maestro cuando `innerWidth >= 900` **y** no hay mo
 `pinSpacing: false` es lo que permite que About suba por debajo del Hero fijado — añadir espacio automático rompería esa transición visual. La animación mide fuentes y destinos por sus rectángulos de contenido, restando la posición del pin en la coordenada vertical de origen. La escala se limita entre 0,001 y 1.
 
 Los pares de morph se enlazan mediante `data-morph-source` / `data-morph-target`: marca, tagline, cada métrica, y `nav-0`…`nav-5`. El orden original de navegación se indexa **antes** de dividirla en izquierda/derecha; el sidebar reordena visualmente esos enlaces manteniendo `morphIndex`. Una fuente sin destino se omite — FAQ y el CTA final no tienen fuente de morph y aparecen directamente con el sidebar.
+
+La posición de viaje se calcula al construir el timeline. Para la marca PNG, desde el tiempo local 0.60 (viaje terminado), un callback del timeline compara los centros horizontales reales de origen y destino y corrige `x` si difieren más de 0.01px. Así las dos imágenes comparten el mismo centro durante el fundido aunque el destino cambie tras la medición inicial, por ejemplo con CSS recargado en desarrollo. La corrección no altera la escala, la posición vertical ni los tiempos de opacidad. El resto de pares conserva su cálculo original.
 
 ### Tabla de tiempos del timeline (posiciones locales 0–1, no segundos reales)
 

@@ -1,0 +1,30 @@
+{
+  "routes": {
+    "/": {
+      "h1": 1,
+      "lang": "es",
+      "description": "Portfolio de Jesús León: Ingeniería del Software, Data Science y diseño visual.",
+      "duplicate_ids": []
+    },
+    "/servicios/": {
+      "h1": 1,
+      "lang": "es",
+      "description": "Desarrollo web full-stack, automatización de procesos y asesoramiento técnico/visual para empresas.",
+      "duplicate_ids": []
+    },
+    "/tools/": {
+      "h1": 1,
+      "lang": "es",
+      "description": "Plantilla visual de herramientas propias. Se irán añadiendo a medida que estén listas.",
+      "duplicate_ids": []
+    },
+    "/tools/video-converter/": {
+      "h1": 1,
+      "lang": "es",
+      "description": "Extrae audio en MP3 o convierte tu vídeo a un MP4 compatible, totalmente en tu navegador. Nada se sube a ningún servidor.",
+      "duplicate_ids": []
+    }
+  },
+  "local_references": 91,
+  "missing": []
+}
