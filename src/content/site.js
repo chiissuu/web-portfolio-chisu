@@ -52,10 +52,13 @@ const es = {
   about: {
     aboutMe: {
       title: "SOBRE MÍ",
+      groupLabels: {
+        intro: "Quién soy",
+        difference: "Qué me diferencia de la competencia",
+      },
+      closingPhrase: "proyectos con más profundidad, más personalidad y una experiencia cuidada.",
       accents: {
-        strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "bases de datos", "programación de sistemas", "trabajar en equipo", "criterio visual", "visión de negocio", "sensibilidad cultural", "Data Science", "machine learning"],
-        circle: ["arquitectura de software", "versión propia,"],
-        underline: ["desarrollo full-stack", "diseño gráfico", "varias capas"],
+        strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "desarrollo full-stack", "bases de datos", "arquitectura de software", "programación de sistemas", "diseño gráfico", "trabajar en equipo", "versión propia", "varias capas"],
         emojis: [
           { text: "U-TAD", symbol: "📚" },
           { text: "esports", symbol: "🎮" },
@@ -80,13 +83,11 @@ const es = {
         "Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán.",
         "Lo que me diferencia de la competencia es la forma de conectar la tecnología con el diseño gráfico, el análisis de negocios y las finanzas.",
         "Mi experiencia en esports me ha enseñado a trabajar en equipo, mantener la disciplina y tomar decisiones bajo presión.",
-        "También tengo facilidad para moverme entre la moda, la música y las redes sociales: reconocer tendencias, cuidar la estética y comunicar ideas con personalidad. Son ámbitos que afinan mi sensibilidad visual y me ayudan a entender cómo una identidad conecta con su audiencia.",
-        "Esta combinación de disciplinas me ayuda a dar a cada proyecto una versión propia, con varias capas que se refuerzan entre sí: base técnica, criterio visual, visión de negocio y sensibilidad cultural. Así puedo crear soluciones que funcionan, transmiten una identidad y conectan con las personas. Mi diferencia frente a la competencia está en esa suma de perspectivas: proyectos con más profundidad, más personalidad y una experiencia cuidada.",
-        "Quiero seguir profundizando en Data Science y machine learning para convertir información en soluciones útiles, bien construidas y con identidad propia.",
+        "La moda, la música y las redes sociales influyen en mi criterio visual y en la forma de comunicar mis proyectos.",
+        "Esta combinación de disciplinas me ayuda a dar a cada proyecto una versión propia, con varias capas que se refuerzan entre sí. Así puedo crear soluciones que funcionan, transmiten una identidad y conectan con las personas. Mi diferencia frente a la competencia está en esa suma de perspectivas: proyectos con más profundidad, más personalidad y una experiencia cuidada.",
       ],
     },
-    foundationTitle: "MI BASE ACTUAL",
-    skillsTitle: "MI SISTEMA DE TRABAJO",
+    skillsTitle: "MI STACK DE TRABAJO",
     skillGroups: [
       {
         id: "software",
@@ -98,17 +99,17 @@ const es = {
           ["C++", "cpp.png"],
           ["JavaScript", "javascript.png"],
           ["PHP", "php.png"],
+          ["TypeScript", "typescript.png"],
         ],
       },
       {
         id: "web",
         title: "Web",
         items: [
-          ["HTML", "html.png"],
-          ["CSS", "css.png"],
-          ["Astro", null],
+          ["Astro", "astro.png"],
+          ["React", "react.png"],
           ["Node.js", "nodejs.png"],
-          ["GSAP", null],
+          ["GSAP", "gsap.png"],
         ],
       },
       {
@@ -119,6 +120,9 @@ const es = {
           ["PostgreSQL", "postgresql.png"],
           ["MariaDB", "mariadb.png"],
           ["MongoDB", "mongodb.png"],
+          ["Qdrant", "qdrant.png"],
+          ["Redis", "redis.png"],
+          ["Neo4j", "neo4j.png"],
         ],
       },
       {
@@ -142,7 +146,7 @@ const es = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
-          ["n8n", null],
+          ["n8n", "n8n.png"],
         ],
       },
       {
@@ -153,33 +157,23 @@ const es = {
           ["GIMP", "gimp.png"],
           ["Photopea", "photopea.png"],
           ["Canva", "canva.png"],
+          ["After Effects", "after-effects.png"],
+          ["Illustrator", "illustrator.png"],
+        ],
+      },
+      {
+        id: "collaboration",
+        title: "Documentación y colaboración",
+        items: [
+          ["Obsidian", "obsidian.png"],
+          ["Google Drive", "google-drive.png"],
+          ["Word", "word.png"],
+          ["Excel", "excel.png"],
+          ["PowerPoint", "powerpoint.png"],
+          ["Teams", "teams.png"],
         ],
       },
     ],
-    formacion: {
-      title: "Formación",
-      labels: {
-        institution: "Institución",
-        program: "Programa",
-        specialization: "Especialización",
-        status: "Estado actual",
-      },
-      entry: {
-        institution: "U-TAD",
-        program: "Ingeniería del Software",
-        specialization: "Mención en Ingeniería de Datos",
-        status: "Tercer curso",
-        href: "https://u-tad.com/grados/ingenieria-software",
-      },
-    },
-    idiomas: {
-      title: "Idiomas",
-      items: [
-        { language: "Español", level: "Nativo" },
-        { language: "Inglés", level: "C1" },
-        { language: "Alemán", level: "A2" },
-      ],
-    },
   },
   projects: {
     eyebrow: "Proyectos — en construcción",
@@ -493,14 +487,17 @@ const en = {
   about: {
     aboutMe: {
       title: "ABOUT ME",
+      groupLabels: {
+        intro: "Who I am",
+        difference: "What sets me apart from the competition",
+      },
+      closingPhrase: "projects with more depth, more personality, and a thoughtfully designed experience.",
       accents: {
-        strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "databases", "systems programming", "work as part of a team", "visual judgment", "business insight", "cultural awareness", "Data Science", "machine learning"],
-        circle: ["software architecture", "a distinct identity,"],
-        underline: ["full-stack development", "graphic design", "several layers"],
+        strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "full-stack development", "databases", "software architecture", "systems programming", "graphic design", "work as part of a team", "a distinct identity", "several layers"],
         emojis: [
           { text: "U-TAD", symbol: "📚" },
           { text: "esports", symbol: "🎮" },
-          { text: "fashion", symbol: "👟" },
+          { text: "Fashion", symbol: "👟" },
           { text: "music", symbol: "🎧" },
           { text: "social media", symbol: "📱" },
         ],
@@ -521,13 +518,11 @@ const en = {
         "I am fully fluent in Spanish, with a C1 level of English and an A2 level of German.",
         "What sets me apart from the competition is how I connect technology with graphic design, business analysis, and finance.",
         "My experience in esports has taught me to work as part of a team, stay disciplined, and make decisions under pressure.",
-        "I also feel at home across fashion, music, and social media: spotting trends, shaping a visual style, and communicating ideas with personality. These areas sharpen my visual sensitivity and help me understand how an identity connects with its audience.",
-        "This combination of disciplines helps me give each project a distinct identity, with several layers that reinforce one another: a technical foundation, visual judgment, business insight, and cultural awareness. That lets me create solutions that work, express an identity, and connect with people. My difference from the competition lies in that mix of perspectives: projects with more depth, more personality, and a thoughtfully designed experience.",
-        "I want to keep exploring Data Science and machine learning to turn information into useful, well-built solutions with an identity of their own.",
+        "Fashion, music, and social media influence my visual judgment and the way I communicate my projects.",
+        "This combination of disciplines helps me give each project a distinct identity, with several layers that reinforce one another. That lets me create solutions that work, express an identity, and connect with people. My difference from the competition lies in that mix of perspectives: projects with more depth, more personality, and a thoughtfully designed experience.",
       ],
     },
-    foundationTitle: "MY FOUNDATION",
-    skillsTitle: "HOW I WORK",
+    skillsTitle: "MY WORK STACK",
     skillGroups: [
       {
         id: "software",
@@ -539,17 +534,17 @@ const en = {
           ["C++", "cpp.png"],
           ["JavaScript", "javascript.png"],
           ["PHP", "php.png"],
+          ["TypeScript", "typescript.png"],
         ],
       },
       {
         id: "web",
         title: "Web",
         items: [
-          ["HTML", "html.png"],
-          ["CSS", "css.png"],
-          ["Astro", null],
+          ["Astro", "astro.png"],
+          ["React", "react.png"],
           ["Node.js", "nodejs.png"],
-          ["GSAP", null],
+          ["GSAP", "gsap.png"],
         ],
       },
       {
@@ -560,6 +555,9 @@ const en = {
           ["PostgreSQL", "postgresql.png"],
           ["MariaDB", "mariadb.png"],
           ["MongoDB", "mongodb.png"],
+          ["Qdrant", "qdrant.png"],
+          ["Redis", "redis.png"],
+          ["Neo4j", "neo4j.png"],
         ],
       },
       {
@@ -583,7 +581,7 @@ const en = {
           ["Docker", "docker.png"],
           ["Linux", "linux.png"],
           ["Windows", "windows.png"],
-          ["n8n", null],
+          ["n8n", "n8n.png"],
         ],
       },
       {
@@ -594,33 +592,23 @@ const en = {
           ["GIMP", "gimp.png"],
           ["Photopea", "photopea.png"],
           ["Canva", "canva.png"],
+          ["After Effects", "after-effects.png"],
+          ["Illustrator", "illustrator.png"],
+        ],
+      },
+      {
+        id: "collaboration",
+        title: "Documentation & collaboration",
+        items: [
+          ["Obsidian", "obsidian.png"],
+          ["Google Drive", "google-drive.png"],
+          ["Word", "word.png"],
+          ["Excel", "excel.png"],
+          ["PowerPoint", "powerpoint.png"],
+          ["Teams", "teams.png"],
         ],
       },
     ],
-    formacion: {
-      title: "Education",
-      labels: {
-        institution: "Institution",
-        program: "Program",
-        specialization: "Specialization",
-        status: "Current status",
-      },
-      entry: {
-        institution: "U-TAD",
-        program: "Software Engineering",
-        specialization: "Data Engineering specialization",
-        status: "Third year",
-        href: "https://u-tad.com/grados/ingenieria-software",
-      },
-    },
-    idiomas: {
-      title: "Languages",
-      items: [
-        { language: "Spanish", level: "Native" },
-        { language: "English", level: "C1" },
-        { language: "German", level: "A2" },
-      ],
-    },
   },
   projects: {
     eyebrow: "Projects — under construction",

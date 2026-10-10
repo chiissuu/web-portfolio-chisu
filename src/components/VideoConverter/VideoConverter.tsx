@@ -44,11 +44,16 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
   const [resultFileName, setResultFileName] = useState<string | null>(null);
   const [showMemoryWarning, setShowMemoryWarning] = useState(false);
 
-  // Set right before `cancelActiveConversion()` so the `catch` block in
-  // `handleStartConversion` (below) can tell a user-initiated cancel apart
-  // from a real failure — `ffmpeg.terminate()` rejects the pending exec the
-  // same way an actual error would.
-  const wasCancelledRef = useRef(false);
+  // Invalidate late results after cancellation, reset or another selection.
+  const operationRef = useRef(0);
+  const selectionRef = useRef(0);
+  const busyRef = useRef(false);
+
+  useEffect(() => () => {
+    operationRef.current += 1;
+    selectionRef.current += 1;
+    cancelActiveConversion();
+  }, []);
 
   useEffect(() => {
     // Revokes the *previous* URL whenever `resultUrl` changes to a new one,
@@ -61,7 +66,9 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
 
   const handleFileSelected = useCallback(
     async (file: File) => {
+      const selection = ++selectionRef.current;
       setNote(null);
+      setShowMemoryWarning(false);
       setResultUrl(null);
       setResultFileName(null);
       setProgressRatio(null);
@@ -76,6 +83,7 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
 
       const extension = getFileExtension(file.name);
       const { duration } = await readVideoMetadata(file);
+      if (selection !== selectionRef.current) return;
 
       if (duration === null) {
         // Browser couldn't decode metadata at all — the duration cap can't
@@ -98,11 +106,12 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
   );
 
   const handleStartConversion = useCallback(async () => {
-    if (!selectedFile || BUSY_STAGES.includes(stage)) return;
+    if (!selectedFile || busyRef.current || BUSY_STAGES.includes(stage)) return;
+    busyRef.current = true;
+    const operation = ++operationRef.current;
 
     setNote(null);
     setProgressRatio(null);
-    wasCancelledRef.current = false;
     setStage("loading-engine");
 
     // Local, not state: tells the `catch` block below which phase failed,
@@ -112,6 +121,7 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
 
     try {
       const ffmpeg = await getFFmpeg();
+      if (operation !== operationRef.current) return;
       phase = "converting";
       setStage("converting");
 
@@ -123,16 +133,12 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
         onProgress: setProgressRatio,
       });
 
+      if (operation !== operationRef.current) return;
       setResultUrl(URL.createObjectURL(outcome.blob));
       setResultFileName(outcome.fileName);
       setStage("done");
     } catch (error) {
-      if (wasCancelledRef.current) {
-        wasCancelledRef.current = false;
-        setStage("file-ready");
-        setNote({ kind: "warning", text: copy.status.cancelled });
-        return;
-      }
+      if (operation !== operationRef.current) return;
 
       setStage("file-ready");
       if (error instanceof ConversionInProgressError) {
@@ -142,15 +148,23 @@ export default function VideoConverter({ copy }: VideoConverterProps) {
       } else {
         setNote({ kind: "error", text: copy.errors.conversionFailed });
       }
+    } finally {
+      if (operation === operationRef.current) busyRef.current = false;
     }
   }, [selectedFile, stage, outputFormat, mp3Bitrate, copy]);
 
   const handleCancel = useCallback(() => {
-    wasCancelledRef.current = true;
+    operationRef.current += 1;
+    busyRef.current = false;
     cancelActiveConversion();
-  }, []);
+    setProgressRatio(null);
+    setStage("file-ready");
+    setNote({ kind: "warning", text: copy.status.cancelled });
+  }, [copy.status.cancelled]);
 
   const handleReset = useCallback(() => {
+    selectionRef.current += 1;
+    operationRef.current += 1;
     setSelectedFile(null);
     setStage("idle");
     setNote(null);

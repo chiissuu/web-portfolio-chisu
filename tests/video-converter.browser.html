@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Pruebas del conversor local</title>
+<style>body{font:18px system-ui;max-width:900px;margin:40px auto;padding:20px}button{padding:12px}li{margin:16px 0}video{width:256px}</style>
+<h1>Pruebas del conversor local</h1>
+<p>Usa el wrapper real y el vídeo sintético de la auditoría. Sin datos personales ni servicios externos.</p>
+<button id="run">Verificar motor, MP3, MP4, errores y cancelación</button>
+<ol id="results"></ol>
+<script type="module">
+import { getFFmpeg, runConversion, cancelActiveConversion, isFFmpegLoaded } from '/src/lib/videoConverter/ffmpegClient.ts';
+const button = document.querySelector('#run');
+const results = document.querySelector('#results');
+const check = (condition, message) => { if (!condition) throw new Error(message); };
+const expectRejection = async (promise) => {
+  try { await promise; } catch { return; }
+  throw new Error('Se esperaba un rechazo');
+};
+button.addEventListener('click', async () => {
+  button.disabled = true;
+  results.replaceChildren();
+  let succeeded = 0;
+  let file;
+  async function test(name, run) {
+    const row = document.createElement('li');
+    row.textContent = `${name}: en curso`;
+    results.append(row);
+    try { row.textContent = `${name}: OK — ${await run() ?? ''}`; succeeded++; }
+    catch (error) { row.textContent = `${name}: ERROR — ${error.message ?? error}`; }
+  }
+  try {
+    const response = await fetch('/__converter-check.avi');
+    check(response.ok, 'No se puede leer el vídeo sintético');
+    file = new File([await response.arrayBuffer()], 'sintetico.avi', {type:'video/avi'});
+    await test('Carga y reutilización', async () => {
+      const first = await getFFmpeg();
+      check(first === await getFFmpeg(), 'El motor no se reutiliza');
+      return 'misma instancia';
+    });
+    for (const target of ['mp3','mp4']) {
+      await test(`Conversión ${target.toUpperCase()} y decodificación`, async () => {
+        const result = await runConversion(await getFFmpeg(), {file,inputExtension:'avi',target,mp3Bitrate:192,onProgress:()=>{}});
+        check(result.blob.size > 0, 'Archivo vacío');
+        let detail;
+        if (target === 'mp3') {
+          const context = new AudioContext();
+          try {
+            const decoded = await context.decodeAudioData(await result.blob.arrayBuffer());
+            check(decoded.duration > 0 && decoded.numberOfChannels > 0, 'Audio no decodificable');
+            detail = `${decoded.duration.toFixed(2)} s, ${decoded.numberOfChannels} canal(es)`;
+          } finally { await context.close(); }
+        } else {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.muted = true;
+          const url = URL.createObjectURL(result.blob);
+          try {
+            await new Promise((resolve,reject) => {
+              const timeout = setTimeout(()=>reject(new Error('Timeout de metadatos MP4')),8000);
+              video.onloadedmetadata = ()=>{clearTimeout(timeout);resolve();};
+              video.onerror = ()=>{clearTimeout(timeout);reject(new Error('MP4 no decodificable'));};
+              video.src = url;
+            });
+            check(video.duration > 0 && video.videoWidth > 0, 'Sin pista de vídeo');
+            detail = `${video.duration.toFixed(2)} s, ${video.videoWidth}×${video.videoHeight}`;
+          } finally { video.removeAttribute('src'); video.load(); URL.revokeObjectURL(url); }
+        }
+        return `${result.fileName}, ${result.blob.size} bytes, ${detail}`;
+      });
+    }
+    await test('Archivo corrupto y reintento', async () => {
+      const corrupt = new File(['invalid video'], 'corrupto.mp4', {type:'video/mp4'});
+      await expectRejection(runConversion(await getFFmpeg(), {file:corrupt,inputExtension:'mp4',target:'mp3',mp3Bitrate:192,onProgress:()=>{}}));
+      const result = await runConversion(await getFFmpeg(), {file,inputExtension:'avi',target:'mp3',mp3Bitrate:192,onProgress:()=>{}});
+      check(result.blob.size > 0, 'No se puede reintentar');
+      return 'error rechazado, siguiente conversión correcta';
+    });
+    await test('Cancelar carga y recargar', async () => {
+      cancelActiveConversion();
+      const pending = getFFmpeg();
+      const rejected = expectRejection(pending);
+      await new Promise(resolve=>setTimeout(resolve,0));
+      cancelActiveConversion();
+      await rejected;
+      check(!isFFmpegLoaded(), 'Se publicó un motor cancelado');
+      await getFFmpeg();
+      return 'carga rechazada y motor nuevo disponible';
+    });
+    await test('Cancelar conversión y reintentar', async () => {
+      const pending = runConversion(await getFFmpeg(), {file,inputExtension:'avi',target:'mp4',mp3Bitrate:192,onProgress:()=>cancelActiveConversion()});
+      await expectRejection(pending);
+      check(!isFFmpegLoaded(), 'Worker no terminado');
+      const result = await runConversion(await getFFmpeg(), {file,inputExtension:'avi',target:'mp4',mp3Bitrate:192,onProgress:()=>{}});
+      check(result.blob.size > 0, 'Reintento vacío');
+      return 'ejecución interrumpida y reintento correcto';
+    });
+  } catch (error) {
+    const row = document.createElement('li'); row.textContent = `ERROR de preparación: ${error.message}`; results.append(row);
+  } finally {
+    cancelActiveConversion();
+    button.disabled = false;
+    const summary = document.createElement('p');
+    summary.textContent = `Resultado: ${succeeded}/6 pruebas correctas.`;
+    results.after(summary);
+  }
+});
+</script>
+</html>

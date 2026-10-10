@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-10",
+  "environment": "Chromium integrado, motor y wrapper reales, vídeo sintético de 1 s",
+  "cases": [
+    "Carga y reutilización: OK — misma instancia",
+    "Conversión MP3 y decodificación: OK — sintetico.mp3, 10701 bytes, 1.00 s, 1 canal(es)",
+    "Conversión MP4 y decodificación: OK — sintetico.mp4, 6549 bytes, 1.00 s, 32×32",
+    "Archivo corrupto y reintento: OK — error rechazado, siguiente conversión correcta",
+    "Cancelar carga y recargar: OK — carga rechazada y motor nuevo disponible",
+    "Cancelar conversión y reintentar: OK — ejecución interrumpida y reintento correcto"
+  ],
+  "mp3Download": "sintetico.mp3, 10701 bytes, desde preview",
+  "limitations": [
+    "Sin vídeos grandes",
+    "Sin dispositivos reales",
+    "Sin hosting final",
+    "Selecciones concurrentes y desmontaje revisados en código"
+  ]
+}

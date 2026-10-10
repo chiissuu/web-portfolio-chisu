@@ -1,7 +1,7 @@
 ---
 tags: [diseno, css, tokens, responsive]
 aliases: [Sistema-de-Diseno]
-actualizado: 2026-10-08
+actualizado: 2026-10-10
 fuente: [src/layouts/Layout.astro]
 ---
 
@@ -26,7 +26,7 @@ Hero (gráfico dorado sobre fondo estructural oscuro) → About (carbón, clase 
 
 About usa texto blanco y gris y superficies neutras. Su estado de navegación activa aplica `data-palette="mono"` al sidebar: logo gris oscuro y acentos/botones grises; las demás secciones conservan la paleta dorada. Esta paleta es independiente del tema warm/dark que cada artículo detecta por solapamiento.
 
-About presenta un único título «SOBRE MÍ» de hasta 5.5rem y ocho párrafos centrados en Inter de hasta 1.35rem, limitados a 60ch y con interlineado 1.75: tres frases de introducción separadas y cinco párrafos de perfil. Texto gris #d0d0d0, negritas blancas con peso 600, círculos y subrayados SVG plata, emojis y enlaces subrayados. El perfil empieza con 2.5rem de separación y mantiene 1.25rem entre párrafos. Madrid/España introduce los colores de su bandera en las letras; las banderas pequeñas de los idiomas son SVG locales. Los trazos aprovechan la entrada existente y respetan movimiento reducido. Sustituyen las cuatro escenas y sus gráficos; formación/idiomas y skills siguen debajo. Ver [[Sobre-Mi]] para la estructura y el responsive.
+About presenta un título «SOBRE MÍ» centrado de hasta 5.5rem y siete párrafos en Inter alineados a la izquierda dentro de una columna centrada de hasta 62ch. Dos h3 en display agrupan «Quién soy» y «Qué me diferencia de la competencia». Cuerpo hasta 1.25rem con interlineado 1.85; lead hasta 1.5rem; cierre hasta 2rem. Párrafos separados 2–2.75rem y grupos 4–6rem, con separadores discretos. Se conservan texto gris, negritas blancas, emojis, links y banderas. Mi base actual se retiró. El stack cierra con siete filas de categorías y 42 logos/nombres, sin bento ni pills, y listas de tres columnas en móvil. Se reutiliza rd-reveal por bloque. Ver [[Sobre-Mi]] para los contratos y responsive, y [[Logos-Stack]] para los PNG nuevos.
 
 ## Layout de contenido
 

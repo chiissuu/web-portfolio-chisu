@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Diagnóstico aislado FFmpeg</title>
+<h1>Diagnóstico aislado del motor; no modifica el conversor</h1>
+<button id="umd">Probar núcleo UMD actual</button>
+<button id="esm">Probar núcleo ESM propuesto</button>
+<p id="status" role="status"></p>
+<script type="module">
+  import { FFmpeg } from '/vendor/ffmpeg/index.js';
+  import { toBlobURL } from '/vendor/util/index.js';
+  const status = document.getElementById('status');
+  for (const kind of ['umd', 'esm']) {
+    document.getElementById(kind).addEventListener('click', async () => {
+      const engine = new FFmpeg();
+      status.textContent = `Cargando ${kind}…`;
+      try {
+        const [coreURL, wasmURL] = await Promise.all([
+          toBlobURL(`/core-${kind}/ffmpeg-core.js`, 'text/javascript'),
+          toBlobURL(`/core-${kind}/ffmpeg-core.wasm`, 'application/wasm'),
+        ]);
+        try { await engine.load({coreURL, wasmURL}); }
+        finally { URL.revokeObjectURL(coreURL); URL.revokeObjectURL(wasmURL); }
+        status.textContent = `OK: ${kind}; motor cargado`;
+      } catch (error) {
+        status.textContent = `ERROR: ${kind}; ${error?.message || String(error)}`;
+      } finally {
+        engine.terminate();
+      }
+    });
+  }
+</script>
+</html>

@@ -1,0 +1,541 @@
+diff --git a/docs/obsidian/00-Empieza-Aqui.md b/docs/obsidian/00-Empieza-Aqui.md
+index b74193e..83a5f2f 100644
+--- a/docs/obsidian/00-Empieza-Aqui.md
++++ b/docs/obsidian/00-Empieza-Aqui.md
+@@ -1,7 +1,7 @@
+ ---
+ tags: [moc, contexto-agente]
+ aliases: [Empieza-Aqui]
+-actualizado: 2026-10-06
++actualizado: 2026-10-09
+ fuente: [código fuente del proyecto]
+ ---
+ 
+@@ -72,6 +72,8 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
+ **Operación**
+ - [[Comandos-y-Pruebas]] — dev/check/build/preview, recorrido de prueba manual
+ - [[Hallazgos-y-Pendientes]] — tabla priorizada de pendientes, enlazada por componente
++- [[Skills-Desarrollo-Web]] — selección comprobada de skills e instalación manual
++- [[Prompt-Auditoria-Web]] — encargo preparado para una auditoría con Hero/Sobre mí/nav lateral protegidos y cambios según riesgo
+ 
+ **Inventario**
+ - [[Archivos-del-Proyecto]] — los archivos de `src/` + config, cada uno enlazado al código real
+diff --git a/docs/obsidian/02-Rutas-y-Navegacion.md b/docs/obsidian/02-Rutas-y-Navegacion.md
+index 8a8fc51..abdbda2 100644
+--- a/docs/obsidian/02-Rutas-y-Navegacion.md
++++ b/docs/obsidian/02-Rutas-y-Navegacion.md
+@@ -1,7 +1,7 @@
+ ---
+ tags: [rutas, navegacion]
+ aliases: [Rutas-y-Navegacion]
+-actualizado: 2026-10-06
++actualizado: 2026-10-09
+ fuente: [src/pages]
+ ---
+ 
+@@ -22,7 +22,7 @@ No existen rutas `/en`, detalle de proyecto, Instagram checker, contacto indepen
+ 
+ ## Anclas de la portada
+ 
+-`home`, `about`, `projects`, `services-tools`, `services`, `tools`, `contact`, `faq`. `services` y `tools` son columnas internas de `services-tools`, no secciones principales independientes. About añade además `about-scene-foundations`, `about-scene-direction`, `about-scene-product` y `about-scene-drive` (ver [[Sobre-Mi]]).
++`home`, `about`, `projects`, `services-tools`, `services`, `tools`, `contact`, `faq`. `services` y `tools` son columnas internas de `services-tools`, no secciones principales independientes. Las escenas antiguas de About y sus anclas ya no existen. Sus encabezados internos usan ab-intro-heading, ab-difference-heading, ab-foundation-heading y ab-skills-heading; la navegación principal sigue apuntando a #about (ver [[Sobre-Mi]]).
+ 
+ ## Tres navegaciones distintas — deliberadamente no equivalentes
+ 
+diff --git a/docs/obsidian/03-Sistema-de-Diseno.md b/docs/obsidian/03-Sistema-de-Diseno.md
+index e98ddee..00ae4f3 100644
+--- a/docs/obsidian/03-Sistema-de-Diseno.md
++++ b/docs/obsidian/03-Sistema-de-Diseno.md
+@@ -1,7 +1,7 @@
+ ---
+ tags: [diseno, css, tokens, responsive]
+ aliases: [Sistema-de-Diseno]
+-actualizado: 2026-10-08
++actualizado: 2026-10-09
+ fuente: [src/layouts/Layout.astro]
+ ---
+ 
+@@ -26,7 +26,7 @@ Hero (gráfico dorado sobre fondo estructural oscuro) → About (carbón, clase
+ 
+ About usa texto blanco y gris y superficies neutras. Su estado de navegación activa aplica `data-palette="mono"` al sidebar: logo gris oscuro y acentos/botones grises; las demás secciones conservan la paleta dorada. Esta paleta es independiente del tema warm/dark que cada artículo detecta por solapamiento.
+ 
+-About presenta un único título «SOBRE MÍ» de hasta 5.5rem y ocho párrafos centrados en Inter de hasta 1.35rem, limitados a 60ch y con interlineado 1.75: tres frases de introducción separadas y cinco párrafos de perfil. Texto gris #d0d0d0, negritas blancas con peso 600, círculos y subrayados SVG plata, emojis y enlaces subrayados. El perfil empieza con 2.5rem de separación y mantiene 1.25rem entre párrafos. Madrid/España introduce los colores de su bandera en las letras; las banderas pequeñas de los idiomas son SVG locales. Los trazos aprovechan la entrada existente y respetan movimiento reducido. Sustituyen las cuatro escenas y sus gráficos; formación/idiomas y skills siguen debajo. Ver [[Sobre-Mi]] para la estructura y el responsive.
++About presenta un único título «SOBRE MÍ» de hasta 5.5rem y siete párrafos centrados en Inter, limitados a 60ch. Dos h3 discretos agrupan «Quién soy» y «Qué me diferencia de la competencia». Cuerpo de hasta 1.35rem con interlineado 1.75; primer párrafo de hasta 1.55rem e interlineado 1.65; cierre destacado en fuente display de hasta 1.65rem e interlineado 1.4. Los grupos se separan hasta 3.5rem y los párrafos 1.25rem. Texto gris #d0d0d0, negritas blancas con peso 600, emojis y enlaces subrayados; sin círculos ni subrayados dibujados. Madrid/España introduce los colores de su bandera en las letras; las banderas pequeñas son SVG locales. Se conserva el reveal existente. Formación/idiomas y skills siguen debajo. Ver [[Sobre-Mi]] para los contratos y el responsive.
+ 
+ ## Layout de contenido
+ 
+diff --git a/docs/obsidian/Componentes/Sobre-Mi.md b/docs/obsidian/Componentes/Sobre-Mi.md
+index d5a1590..9cad527 100644
+--- a/docs/obsidian/Componentes/Sobre-Mi.md
++++ b/docs/obsidian/Componentes/Sobre-Mi.md
+@@ -1,6 +1,6 @@
+ ---
+ tags: [componente, about, layout]
+-actualizado: 2026-10-08
++actualizado: 2026-10-09
+ fuente: [src/components/AboutSection.astro, src/content/site.js]
+ ---
+ 
+@@ -10,25 +10,27 @@ Fuente: [AboutSection.astro](../../../src/components/AboutSection.astro). Texto
+ 
+ ## Estructura actual
+ 
+-La sección tiene tres bloques: portada con un único h2 «SOBRE MÍ» y ocho párrafos, «MI BASE ACTUAL» (formación e idiomas) y «MI SISTEMA DE TRABAJO» (skills). Las cuatro escenas narrativas y sus gráficos se sustituyeron por el resumen inicial a petición del usuario. Ya no existen sus anclas, campos de contenido, estilos, iconos ni funciones de división/énfasis de texto. No recuperar el título «Ingeniería, datos e identidad» ni la línea separada de ubicación e idiomas.
++La sección tiene tres bloques: portada con un único h2 «SOBRE MÍ» y siete párrafos, «MI BASE ACTUAL» (formación e idiomas) y «MI SISTEMA DE TRABAJO» (skills). Las cuatro escenas narrativas y sus gráficos se sustituyeron por el resumen inicial a petición del usuario. Ya no existen sus anclas, campos de contenido, estilos, iconos ni funciones de división/énfasis de texto. No recuperar el título «Ingeniería, datos e identidad» ni la línea separada de ubicación e idiomas.
+ 
+-La presentación inicial se divide después de cada punto en tres párrafos: nombre/carrera/U-TAD/Madrid, tres años de formación y base técnica, e idiomas. La frase de idiomas es «Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán». Siguen cinco párrafos: diferencia frente a la competencia al conectar tecnología/diseño/negocio/finanzas; frase original de esports; facilidad con moda/música/redes sociales; síntesis de varias capas que aportan profundidad e identidad a los proyectos; y dirección hacia Data Science y machine learning.
++Los cinco primeros párrafos están aprobados por el usuario y se conservan literalmente: nombre/carrera/U-TAD/Madrid, tres años de formación y base técnica, idiomas, diferencia frente a la competencia al conectar tecnología/diseño/negocio/finanzas, y experiencia en esports. Siguen una frase concisa sobre moda/música/redes sociales y su influencia en el criterio visual y la comunicación, y el cierre sobre una versión propia con varias capas, identidad y una experiencia cuidada. Se retiran la enumeración de disciplinas del cierre y el último párrafo sobre profundizar en Data Science/machine learning; el bento Data permanece.
+ 
+ ## Datos y tipografía
+ 
+-La portada consume `aboutMe.title` y recorre todos los elementos de `aboutMe.paragraphs` en su orden original. Actualmente hay ocho párrafos en ES y EN, con los saltos definidos explícitamente en el contenido, sin dividir cada punto mediante una expresión regular. Añadir otro al array sí lo muestra; un array vacío deja el título sin biografía. El contrato correspondiente es `AboutMeCopy` en [[Archivos-del-Proyecto]].
++La portada consume `aboutMe.title` y recorre todos los elementos de `aboutMe.paragraphs` en su orden original. Actualmente hay siete párrafos en ES y EN, con los saltos definidos explícitamente en el contenido. `introParagraphCount = 3` agrupa los tres primeros bajo «Quién soy» y los restantes bajo «Qué me diferencia de la competencia», ambos h3 con IDs ab-intro-heading y ab-difference-heading. Los rótulos vienen de `aboutMe.groupLabels`, también traducidos en EN. Los grupos vacíos se omiten; un array vacío deja el h2 sin biografía. El contrato correspondiente es `AboutMeCopy` en [[Archivos-del-Proyecto]].
+ 
+-`aboutMe.accents` define frases exactas por idioma: `strong` (nombre, carrera, Big Data, base técnica, equipo, criterio visual/negocio/cultura y Data Science/machine learning), `circle` (array: arquitectura de software y versión propia), `underline` (array: desarrollo full-stack, diseño gráfico y varias capas), `emojis` (pares frase/símbolo), `location` (Madrid/España), `flags` (frase y código de país) y `links` (frase y URL). `emojis` reemplaza los campos separados esports/study para reutilizar el mismo render en todas las palabras. `decorateParagraph` divide el texto alrededor de las coincidencias y Astro escapa cada fragmento, sin inyectar HTML. Una cadena vacía se ignora; una frase ausente no genera decoración. Se consume la coincidencia más temprana y, si coinciden al principio, la más larga. Los enlaces procesan sus propias negritas con un subconjunto de reglas; así no se crean enlaces anidados. Los párrafos siguen siendo la única fuente del texto; al editar una frase destacada, actualizar su selector exacto.
++`aboutMe.closingPhrase` selecciona la última frase exacta para mostrarla en una línea destacada dentro del párrafo, conservando todas las palabras y la puntuación. Si no coincide con el texto, no se dibuja el tratamiento especial. No se duplica la frase ni se crea otra tarjeta.
++
++`aboutMe.accents` define frases exactas por idioma: `strong` (nombre, carrera, Big Data, base técnica, diseño gráfico, equipo, versión propia y varias capas), `emojis` (pares frase/símbolo), `location` (Madrid/España), `flags` (frase y código de país) y `links` (frase y URL). Se eliminan circle/underline del contenido y los tipos, además de sus ramas de render, CSS y animación. `decorateParagraph` divide el texto alrededor de las coincidencias y Astro escapa cada fragmento, sin inyectar HTML. Una cadena vacía se ignora; una frase ausente no genera decoración. Se consume la coincidencia más temprana y, si coinciden al principio, la más larga. Los enlaces procesan sus propias negritas con un subconjunto de reglas; así no se crean enlaces anidados. Los párrafos siguen siendo la única fuente del texto; al editar una frase destacada, actualizar su selector exacto.
+ 
+ La frase de carrera/mención enlaza a `https://u-tad.com/grados/ingenieria-software`; «Centro Universitario de Tecnología y Arte Digital» enlaza al mapa proporcionado por el usuario, `https://maps.app.goo.gl/Ppb4QnavdNihgWui9`. Ambos abren en otra pestaña con `noopener noreferrer`, subrayado visible y foco de teclado. Big Data ya no lleva círculo.
+ 
+-Título: `clamp(3rem, 7vw, 5.5rem)`, fuente display, peso 700. Biografía: Inter (`--font-body`, ya cargada en el layout), `clamp(1.05rem, 1.4vw, 1.35rem)`, ancho máximo 60ch, interlineado 1.75, tracking -0.015em y separación entre párrafos de 1.25rem. El cuarto párrafo (índice 3), marcado `.ab-profile-start`, separa el perfil de los tres párrafos introductorios con 2.5rem; ya no se aplica ese margen al último párrafo. Si cambia el número de párrafos introductorios, actualizar ese índice. Cuerpo gris #d0d0d0; énfasis blanco #f2f2f2 con peso real 600 para las negritas. Todo el resumen se centra. Los encabezados de Mi base actual y Mi sistema de trabajo también se centran; el interior de sus tarjetas conserva su alineación de lectura.
++Título: `clamp(3rem, 7vw, 5.5rem)`, fuente display, peso 700. Biografía: Inter (`--font-body`, ya cargada), `clamp(1.05rem, 1.4vw, 1.35rem)`, máximo 60ch, interlineado 1.75, tracking -0.015em y separación entre párrafos de 1.25rem. Primer párrafo (`ab-lead`): `clamp(1.15rem, 1.65vw, 1.55rem)` e interlineado 1.65. Los grupos se separan con `clamp(2.25rem, 4vw, 3.5rem)`; se retira ab-profile-start. Rótulos: fuente mono, `clamp(0.72rem, 0.85vw, 0.85rem)`, peso 500, gris secundario y text-wrap balance. Cierre: fuente display, `clamp(1.2rem, 1.9vw, 1.65rem)`, peso 600, interlineado 1.4, máximo 38ch y margen superior 1.25rem. Cuerpo gris #d0d0d0; énfasis blanco #f2f2f2. Todo se centra; el interior de las tarjetas de formación/idiomas y skills conserva su alineación de lectura. Si cambia el número de párrafos introductorios, revisar introParagraphCount y los prefijos de emojis.
+ 
+-Círculos y subrayados son SVG inline decorativos, plata #c9c9c9, con trazo de 1.6px independiente del escalado. Ajustan su ancho a la frase sin alterar el orden del texto. El selector de «versión propia,» incluye la coma para impedir que quede sola al inicio de otra línea en móvil. 👋 abre el primer párrafo y 💻 el segundo; 📚 acompaña U-TAD, 🎮 esports, 👟 moda, 🎧 música y 📱 redes sociales. Emojis, trazos y banderas llevan `aria-hidden`; las imágenes además tienen alt vacío. Las anotaciones e iconos con su palabra no se parten entre líneas, pero las negritas y enlaces largos sí permiten saltos en móvil.
++Se conservan negritas, enlaces y emojis; no hay círculos ni subrayados dibujados. Los subrayados CSS propios de los enlaces permanecen como señal de interacción. 👋 abre el primer párrafo y 💻 el segundo; 📚 acompaña U-TAD, 🎮 esports, 👟 moda, 🎧 música y 📱 redes sociales. Emojis y banderas llevan `aria-hidden`; las imágenes además tienen alt vacío. Los iconos con su palabra no se parten entre líneas; las negritas y enlaces largos sí permiten saltos en móvil. Versión propia y varias capas son strong normales, sin cajas que puedan aislar la puntuación.
+ 
+ Madrid/España usa negrita y letras con franjas rojo claro/amarillo/rojo claro mediante `background-clip: text`, con texto blanco como fallback fuera de `@supports`. Banderas pequeñas de España, Reino Unido y Alemania en `public/assets/icons/flags/{es,gb,de}.svg`, de 1.15em × 0.77em; las URLs incorporan BASE_URL. Son SVG locales simplificados para que su representación no dependa de los emojis de Windows. Los códigos de `flags.country` deben corresponder a esos archivos.
+ 
+-Los trazos se dibujan una vez al activarse `.ab-cover.rd-in`, aprovechando el reveal existente del layout. La animación CSS dura 0.7s, con retraso 0.3s para el círculo y 0.6s para el subrayado. Con `prefers-reduced-motion: reduce` se muestran completos sin animación. No se añade observador, listener de scroll, librería ni nueva fuente remota.
++Se mantiene la entrada existente `.rd-reveal` del layout. La portada ya no tiene animación de trazos ni SVG decorativos; no se añade observador, listener de scroll, librería ni nueva fuente remota.
+ 
+ ## Layout y alineación
+ 
+diff --git a/docs/obsidian/Contenido/Contenido-por-Seccion.md b/docs/obsidian/Contenido/Contenido-por-Seccion.md
+index f8c91b1..b8778ed 100644
+--- a/docs/obsidian/Contenido/Contenido-por-Seccion.md
++++ b/docs/obsidian/Contenido/Contenido-por-Seccion.md
+@@ -1,6 +1,6 @@
+ ---
+ tags: [contenido, i18n]
+-actualizado: 2026-10-08
++actualizado: 2026-10-09
+ fuente: [src/content/site.js]
+ ---
+ 
+@@ -19,20 +19,21 @@ Dos botones llevan a Proyectos y a Sobre mí. Las métricas son contenido editor
+ 
+ ## Sobre mí
+ 
+-Un único título «SOBRE MÍ» y ocho párrafos de presentación:
++Un único título «SOBRE MÍ» y siete párrafos de presentación:
++
++Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). El primer párrafo es algo mayor; la última frase del cierre se destaca en su propia línea sin cambiar la redacción. Etiquetas y selector de cierre también existen en inglés.
+ 
+ - Formación y ubicación: Jesús León Romero Atienza, Ingeniería del Software con mención en Ingeniería de Datos (Big Data), U-TAD (Centro Universitario de Tecnología y Arte Digital), ciudad natal Madrid, España.
+ - Base técnica: tres años de formación, full-stack, bases de datos, arquitectura de software y programación de sistemas.
+ - Idiomas: «Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán».
+ - Valor diferencial frente a la competencia: conectar tecnología, diseño gráfico, análisis de negocios y finanzas.
+ - Esports: se conserva la frase original sobre equipo, disciplina y decisiones bajo presión.
+-- Moda, música y redes sociales: facilidad para reconocer tendencias, cuidar la estética, comunicar ideas con personalidad y conectar una identidad con su audiencia.
+-- Varias capas por proyecto: base técnica, criterio visual, visión de negocio y sensibilidad cultural para dar profundidad, personalidad y una experiencia cuidada al resultado.
+-- Dirección: profundizar en Data Science y machine learning para desarrollar soluciones útiles y con identidad propia.
++- Moda, música y redes sociales: «La moda, la música y las redes sociales influyen en mi criterio visual y en la forma de comunicar mis proyectos».
++- Varias capas por proyecto: una versión propia, soluciones que funcionan y transmiten identidad, y proyectos con profundidad, personalidad y una experiencia cuidada. Se retira la enumeración de disciplinas y el último párrafo de dirección hacia Data Science/machine learning.
+ 
+ Estos párrafos sustituyen a las cuatro escenas narrativas (Cimientos, Dirección, Producto e Impulso) y sus gráficos. Ya no se publica el título compuesto ni la línea independiente de ciudad e idiomas. Se retiran también los dos CTA de Drive que acompañaban a esas escenas. Detalle de render en [[Sobre-Mi]].
+ 
+-La biografía se presenta en Inter. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado; Big Data lleva negrita sin círculo. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻, full-stack subrayado, arquitectura rodeada y bases de datos/sistemas en negrita. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia rodeada, varias capas subrayadas y negritas en criterio visual/negocio/cultura y dirección técnica. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción; esports conserva su redacción exacta.
++La biografía se presenta en Inter. Los cinco primeros párrafos conservan la redacción aprobada. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻 y negritas en full-stack, bases de datos, arquitectura y sistemas. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia y varias capas en negrita. Se retiran todos los círculos/subrayados SVG y su animación; permanecen los subrayados funcionales de los enlaces. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción.
+ 
+ «MI BASE ACTUAL» muestra formación (U-TAD, Ingeniería del Software, Mención en Ingeniería de Datos, Tercer curso) e idiomas (Español nativo, Inglés C1, Alemán A2). La tarjeta de formación enlaza al grado. «MI SISTEMA DE TRABAJO» cierra la sección — **sin** CTA final hacia Proyectos (se retiró deliberadamente en una corrección anterior).
+ 
+diff --git a/docs/obsidian/Operacion/Comandos-y-Pruebas.md b/docs/obsidian/Operacion/Comandos-y-Pruebas.md
+index ec87ceb..4e0963e 100644
+--- a/docs/obsidian/Operacion/Comandos-y-Pruebas.md
++++ b/docs/obsidian/Operacion/Comandos-y-Pruebas.md
+@@ -1,6 +1,6 @@
+ ---
+ tags: [operacion, comandos, testing]
+-actualizado: 2026-10-08
++actualizado: 2026-10-09
+ fuente: [package.json, scripts/copy-ffmpeg-core.mjs]
+ ---
+ 
+@@ -167,6 +167,25 @@ Esta ejecución **no** incluyó: conversión real en navegador, comprobación vi
+ - Capturas del perfil: `sobre-mi-perfil-disciplinas.jpg` y `sobre-mi-perfil-disciplinas-movil.jpg` en la carpeta de visualizaciones del chat. Se revisa el scroll, se cierra la pestaña de pruebas y se restablece el viewport.
+ - Navegador real en 1920, 1280 y 390px: sin desbordamiento; en 1280px se mantienen márgenes de 168.43/168.68px respecto al nav y al borde derecho. El perfil se separa 40px (2.5rem) y el reveal muestra el texto en móvil. La coma se mantiene dentro del selector de versión propia para que no salte sola de línea. Sin errores de consola registrados.
+ 
++## Biografía concisa y retirada de trazos (9 de octubre de 2026)
++
++- Se conservan literalmente los cinco párrafos aprobados (presentación, base técnica, idiomas, diferenciación y esports). Moda/música/redes se resume en una frase sobre criterio visual y comunicación. El cierre mantiene versión propia, varias capas e identidad, sin la enumeración de disciplinas ni el último párrafo sobre Data Science/machine learning.
++- Siete párrafos en ES/EN. Se retiran circle/underline de los datos y tipos, sus ramas SVG, estilos y keyframes. Los términos seleccionados pasan a negrita; se mantienen emojis, banderas y los subrayados funcionales de los enlaces. Sin cambios de fuentes, dependencias o navegación.
++- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. Comparación SHA-256 antes/después de los cinco primeros párrafos, formación, idiomas y skills: idénticos en ambos idiomas. HTML generado: siete párrafos exactos, dos enlaces y ningún trazo SVG ni los textos retirados. Selectores de énfasis válidos en ES/EN.
++- Navegador real en 1920, 1280 y 390px: sin desbordamiento horizontal; arquitectura de software con peso 600 y cero SVG de anotación en la biografía. Entrada al hacer scroll visible en móvil. Sin errores de consola registrados.
++- Capturas: `sobre-mi-texto-limpio-portada.jpg`, `sobre-mi-texto-limpio.jpg` y `sobre-mi-texto-limpio-movil.jpg` en la carpeta de visualizaciones del chat. Se cierra la pestaña temporal y se restablece el viewport.
++- Ideas de diseño propuestas, pendientes de elección: rótulos pequeños para agrupar el contenido, primer párrafo con más jerarquía y cierre destacado tipográficamente. No están implementadas en este cambio.
++
++## Dos grupos, introducción y cierre destacados (9 de octubre de 2026)
++
++- Se agrupan los siete párrafos, sin cambiar ninguna palabra, en «Quién soy» y «Qué me diferencia de la competencia». Ambos son h3 con aria-labelledby para su sección. groupLabels y closingPhrase se mantienen en ES/EN en site.js; los grupos vacíos se omiten.
++- Primer párrafo de hasta 1.55rem y frase final destacada de hasta 1.65rem en fuente display. La frase se presenta dentro del mismo p, sin duplicación. Se mantienen enlaces, negritas, emojis, fondo, transición y geometría del nav.
++- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. HTML comprobado: siete párrafos exactos, dos grupos y una frase destacada. SHA-256 del texto completo de los siete párrafos idéntico antes/después en ES/EN.
++- Navegador real: 1920px, lead/body/cierre de 24.8/21.6/26.4px; en 1280px, 21.12/17.92/24.32px; en 390px, lead 18.4px y cierre 19.2px. Rótulo completo en una línea a 390px y dos a 320px, sin overflow interno de About. Revisadas también las vistas de 768px.
++- A 320px hay overflow global existente por ct-email-btn de Contacto: x=20 a x=325, mientras About scrollWidth/clientWidth coinciden en 305. Registrado en Hallazgos-y-Pendientes para la auditoría posterior; ContactSection no se modifica en este cambio.
++- Capturas guardadas antes de la interrupción de red del navegador integrado: `sobre-mi-dos-grupos-portada.jpg` y `sobre-mi-grupos-y-cierre-movil.jpg`. La última recarga de escritorio devolvió ERR_NETWORK_IO_SUSPENDED; no se tomó una nueva captura de escritorio del cierre tras esa interrupción.
++- Preparados Skills-Desarrollo-Web y Prompt-Auditoria-Web: catálogo y fuentes verificados, instalación manual de cuatro skills y auditoría futura con exclusiones y autorización según riesgo. No se instalan skills ni se ejecuta la auditoría en esta sesión.
++
+ ## Cómo mantener este vault al día
+ 
+ Actualizar junto al cambio de código: rutas, contratos, límites, estados, fuentes y hallazgos afectados. Volver a medir antes de copiar resultados de build o tamaños de archivo — no asumir que siguen igual. El contenido de [[Contenido-por-Seccion]] es una instantánea de `site.js`: al editar ese archivo, hay que regenerar o actualizar la nota — nunca debe convertirse en una segunda fuente de la aplicación. No dejar un hallazgo marcado como abierto en [[Hallazgos-y-Pendientes]] cuando el código y una prueba pertinente ya confirmen que está resuelto.
+diff --git a/docs/obsidian/Operacion/Hallazgos-y-Pendientes.md b/docs/obsidian/Operacion/Hallazgos-y-Pendientes.md
+index 6e4406e..587212a 100644
+--- a/docs/obsidian/Operacion/Hallazgos-y-Pendientes.md
++++ b/docs/obsidian/Operacion/Hallazgos-y-Pendientes.md
+@@ -1,6 +1,6 @@
+ ---
+ tags: [hallazgos, pendientes, operacion]
+-actualizado: 2026-10-06
++actualizado: 2026-10-09
+ fuente: [análisis transversal del código del proyecto]
+ ---
+ 
+@@ -40,6 +40,7 @@ Esta tabla prioriza futuras tareas. **No implica que se hayan corregido, ni que
+ | Comentarios históricos contradicen el código actual | Fuente editorial sí presente, About warm, CTA final eliminado, uso de Lucide, raster de marca | [[00-Empieza-Aqui]] |
+ | Código y contenido no usados | Teasers, `ClosingStatement`, `fitWordmarkWidth`, `siteName`/SEO auxiliar según consumidor | [[Otras-Secciones-y-Compartidos]], [[Hero-y-Sidebar]] |
+ | Diagnósticos ruidosos del check | Se analiza JS generado de `public/ffmpeg`; 126 hints, sin errores | [[Comandos-y-Pruebas]] |
++| Correo de Contacto desborda en 320px | Navegador real: ct-email-btn comienza en x=20px y termina en x=325px para un viewport de 320px; About mide 305px sin overflow interno. Revisar ancho y salto del correo en ContactSection.astro; hallazgo fuera del cambio actual de About | [[Comandos-y-Pruebas]], [[Prompt-Auditoria-Web]] |
+ | Limpieza para una posible navegación parcial futura | Listeners y observers fuera del contexto de GSAP; no hay `ClientRouter` hoy | [[Hero-y-Sidebar]] |
+ 
+ > [!note]
+diff --git a/src/components/AboutSection.astro b/src/components/AboutSection.astro
+index 90832e8..04c9d83 100644
+--- a/src/components/AboutSection.astro
++++ b/src/components/AboutSection.astro
+@@ -10,22 +10,38 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+ const about = t.about;
+ 
+ type ProsePart =
+-  | { text: string; kind: "text" | "strong" | "circle" | "underline" | "location" }
++  | { text: string; kind: "text" | "strong" | "location" | "closing" }
+   | { text: string; kind: "link"; href: string }
+   | { text: string; kind: "emoji"; symbol: string }
+   | { text: string; kind: "flag"; country: string };
+ const accents = about.aboutMe.accents;
+ const strongAnnotations: ProsePart[] = accents.strong.map((text) => ({ text, kind: "strong" }));
+ const annotations = ([
++  { text: about.aboutMe.closingPhrase, kind: "closing" },
+   ...accents.links.map(({ text, href }) => ({ text, href, kind: "link" as const })),
+   ...strongAnnotations,
+-  ...accents.circle.map((text) => ({ text, kind: "circle" as const })),
+-  ...accents.underline.map((text) => ({ text, kind: "underline" as const })),
+   ...accents.emojis.map(({ text, symbol }) => ({ text, symbol, kind: "emoji" as const })),
+   { text: accents.location, kind: "location" },
+   ...accents.flags.map(({ text, country }) => ({ text, country, kind: "flag" as const })),
+ ] satisfies ProsePart[]).filter(({ text }) => text.length > 0);
+ 
++// Preserve authored paragraphs; only their presentation is grouped.
++const introParagraphCount = 3;
++const proseGroups = [
++  {
++    headingId: "ab-intro-heading",
++    title: about.aboutMe.groupLabels.intro,
++    paragraphs: about.aboutMe.paragraphs.slice(0, introParagraphCount),
++    offset: 0,
++  },
++  {
++    headingId: "ab-difference-heading",
++    title: about.aboutMe.groupLabels.difference,
++    paragraphs: about.aboutMe.paragraphs.slice(introParagraphCount),
++    offset: introParagraphCount,
++  },
++].filter(({ paragraphs }) => paragraphs.length > 0);
++
+ // Keep authored copy as plain text: Astro escapes every part, including accents.
+ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = annotations): ProsePart[] {
+   const parts: ProsePart[] = [];
+@@ -62,51 +78,46 @@ const formacionFacts = [
+   <div class="section-inner ab-inner">
+     <div class="ab-body">
+       <div class="ab-content">
+-        <!-- Three introductory paragraphs followed by the personal profile. -->
++        <!-- Two labelled groups, an introductory lead, and an emphasized close. -->
+         <header class="ab-cover rd-reveal">
+           <h2 class="ab-title">{about.aboutMe.title}</h2>
+           <div class="ab-cover-prose editorial-text">
+-            {about.aboutMe.paragraphs.map((paragraph, index) => (
+-              <p class:list={{ "ab-profile-start": index === 3 }}>
+-                {index === 0 && <span class="ab-emoji" aria-hidden="true">👋</span>}
+-                {index === 1 && <span class="ab-emoji" aria-hidden="true">💻</span>}
+-                {decorateParagraph(paragraph).map((part) => (
+-                  part.kind === "strong" ? <strong>{part.text}</strong> :
+-                  part.kind === "link" ? (
+-                    <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
+-                      {decorateParagraph(part.text, strongAnnotations).map((bit) => (
+-                        bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
++            {proseGroups.map((group) => (
++              <section class="ab-prose-group" aria-labelledby={group.headingId}>
++                <h3 class="ab-group-title" id={group.headingId}>{group.title}</h3>
++                {group.paragraphs.map((paragraph, groupIndex) => {
++                  const index = group.offset + groupIndex;
++                  return (
++                    <p class:list={{ "ab-lead": index === 0 }}>
++                      {index === 0 && <span class="ab-emoji" aria-hidden="true">👋</span>}
++                      {index === 1 && <span class="ab-emoji" aria-hidden="true">💻</span>}
++                      {decorateParagraph(paragraph).map((part) => (
++                        part.kind === "strong" ? <strong>{part.text}</strong> :
++                        part.kind === "closing" ? <span class="ab-closing-line">{part.text}</span> :
++                        part.kind === "link" ? (
++                          <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
++                            {decorateParagraph(part.text, strongAnnotations).map((bit) => (
++                              bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
++                            ))}
++                          </a>
++                        ) : part.kind === "emoji" ? (
++                          <span class="ab-icon-word"><span class="ab-emoji" aria-hidden="true">{part.symbol}</span>{part.text}</span>
++                        ) : part.kind === "location" ? (
++                          <strong class="ab-location">
++                            <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
++                            <span class="ab-spain-text">{part.text}</span>
++                          </strong>
++                        ) : part.kind === "flag" ? (
++                          <span class="ab-icon-word">
++                            <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
++                            {part.text}
++                          </span>
++                        ) : part.text
+                       ))}
+-                    </a>
+-                  ) : part.kind === "emoji" ? (
+-                    <span class="ab-icon-word"><span class="ab-emoji" aria-hidden="true">{part.symbol}</span>{part.text}</span>
+-                  ) : part.kind === "location" ? (
+-                    <strong class="ab-location">
+-                      <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
+-                      <span class="ab-spain-text">{part.text}</span>
+-                    </strong>
+-                  ) : part.kind === "flag" ? (
+-                    <span class="ab-icon-word">
+-                      <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
+-                      {part.text}
+-                    </span>
+-                  ) : part.kind === "circle" ? (
+-                    <span class="ab-annotation ab-annotation-circle">
+-                      {part.text}
+-                      <svg viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+-                        <path pathLength="1" d="M 94 16 C 87 3, 47 1, 20 7 C -3 12, -1 34, 23 39 C 49 44, 89 40, 96 28 C 102 16, 85 5, 61 5" />
+-                      </svg>
+-                    </span>
+-                  ) : part.kind === "underline" ? (
+-                    <span class="ab-annotation ab-annotation-underline">
+-                      {part.text}
+-                      <svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+-                        <path pathLength="1" d="M 2 6 C 24 2, 53 8, 98 3" />
+-                      </svg>
+-                    </span>
+-                  ) : part.text
+-                ))}
+-              </p>
++                    </p>
++                  );
++                })}
++              </section>
+             ))}
+           </div>
+         </header>
+@@ -277,8 +288,38 @@ const formacionFacts = [
+     margin-top: 1.25rem;
+   }
+ 
+-  .ab-cover-prose p + p.ab-profile-start {
+-    margin-top: 2.5rem;
++  .ab-prose-group + .ab-prose-group {
++    margin-top: clamp(2.25rem, 4vw, 3.5rem);
++  }
++
++  .ab-group-title {
++    margin: 0 0 1rem;
++    color: var(--theme-text-muted);
++    font-family: var(--font-mono);
++    font-size: clamp(0.72rem, 0.85vw, 0.85rem);
++    font-weight: 500;
++    letter-spacing: 0.06em;
++    line-height: 1.5;
++    text-transform: uppercase;
++    text-wrap: balance;
++  }
++
++  .ab-cover-prose p.ab-lead {
++    font-size: clamp(1.15rem, 1.65vw, 1.55rem);
++    line-height: 1.65;
++  }
++
++  .ab-closing-line {
++    display: block;
++    max-width: 38ch;
++    margin: 1.25rem auto 0;
++    color: var(--theme-text);
++    font-family: var(--font-display);
++    font-size: clamp(1.2rem, 1.9vw, 1.65rem);
++    font-weight: 600;
++    letter-spacing: -0.015em;
++    line-height: 1.4;
++    text-wrap: balance;
+   }
+ 
+   .ab-cover-prose strong {
+@@ -351,68 +392,11 @@ const formacionFacts = [
+     vertical-align: 0.04em;
+   }
+ 
+-  .ab-icon-word,
+-  .ab-annotation {
++  .ab-icon-word {
+     display: inline-block;
+     white-space: nowrap;
+   }
+ 
+-  .ab-annotation {
+-    position: relative;
+-    color: var(--theme-text);
+-    font-weight: 500;
+-  }
+-
+-  .ab-annotation-circle {
+-    padding-inline: 0.25em;
+-  }
+-
+-  .ab-annotation svg {
+-    position: absolute;
+-    pointer-events: none;
+-    overflow: visible;
+-    fill: none;
+-    stroke: var(--ab-accent);
+-    stroke-width: 1.6;
+-    stroke-linecap: round;
+-    stroke-linejoin: round;
+-  }
+-
+-  .ab-annotation path {
+-    vector-effect: non-scaling-stroke;
+-  }
+-
+-  .ab-annotation-circle svg {
+-    inset: 0;
+-    width: 100%;
+-    height: 100%;
+-  }
+-
+-  .ab-annotation-underline svg {
+-    left: 0;
+-    bottom: 0.08em;
+-    width: 100%;
+-    height: 0.35em;
+-  }
+-
+-  /* Reuse the existing one-time reveal. Static strokes remain visible
+-     when motion is reduced; no new scroll listener or dependency is needed. */
+-  @media (prefers-reduced-motion: no-preference) {
+-    .ab-cover.rd-in .ab-annotation path {
+-      stroke-dasharray: 1;
+-      animation: ab-draw-accent 0.7s ease-out 0.3s both;
+-    }
+-
+-    .ab-cover.rd-in .ab-annotation-underline path {
+-      animation-delay: 0.6s;
+-    }
+-  }
+-
+-  @keyframes ab-draw-accent {
+-    from { stroke-dashoffset: 1; }
+-    to { stroke-dashoffset: 0; }
+-  }
+-
+   /* ---------------------------------------------------------------------
+      Formación + Idiomas
+      --------------------------------------------------------------------- */
+diff --git a/src/content/site.js b/src/content/site.js
+index db2889e..5a833a2 100644
+--- a/src/content/site.js
++++ b/src/content/site.js
+@@ -52,10 +52,13 @@ const es = {
+   about: {
+     aboutMe: {
+       title: "SOBRE MÍ",
++      groupLabels: {
++        intro: "Quién soy",
++        difference: "Qué me diferencia de la competencia",
++      },
++      closingPhrase: "proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+       accents: {
+-        strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "bases de datos", "programación de sistemas", "trabajar en equipo", "criterio visual", "visión de negocio", "sensibilidad cultural", "Data Science", "machine learning"],
+-        circle: ["arquitectura de software", "versión propia,"],
+-        underline: ["desarrollo full-stack", "diseño gráfico", "varias capas"],
++        strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "desarrollo full-stack", "bases de datos", "arquitectura de software", "programación de sistemas", "diseño gráfico", "trabajar en equipo", "versión propia", "varias capas"],
+         emojis: [
+           { text: "U-TAD", symbol: "📚" },
+           { text: "esports", symbol: "🎮" },
+@@ -80,9 +83,8 @@ const es = {
+         "Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán.",
+         "Lo que me diferencia de la competencia es la forma de conectar la tecnología con el diseño gráfico, el análisis de negocios y las finanzas.",
+         "Mi experiencia en esports me ha enseñado a trabajar en equipo, mantener la disciplina y tomar decisiones bajo presión.",
+-        "También tengo facilidad para moverme entre la moda, la música y las redes sociales: reconocer tendencias, cuidar la estética y comunicar ideas con personalidad. Son ámbitos que afinan mi sensibilidad visual y me ayudan a entender cómo una identidad conecta con su audiencia.",
+-        "Esta combinación de disciplinas me ayuda a dar a cada proyecto una versión propia, con varias capas que se refuerzan entre sí: base técnica, criterio visual, visión de negocio y sensibilidad cultural. Así puedo crear soluciones que funcionan, transmiten una identidad y conectan con las personas. Mi diferencia frente a la competencia está en esa suma de perspectivas: proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+-        "Quiero seguir profundizando en Data Science y machine learning para convertir información en soluciones útiles, bien construidas y con identidad propia.",
++        "La moda, la música y las redes sociales influyen en mi criterio visual y en la forma de comunicar mis proyectos.",
++        "Esta combinación de disciplinas me ayuda a dar a cada proyecto una versión propia, con varias capas que se refuerzan entre sí. Así puedo crear soluciones que funcionan, transmiten una identidad y conectan con las personas. Mi diferencia frente a la competencia está en esa suma de perspectivas: proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+       ],
+     },
+     foundationTitle: "MI BASE ACTUAL",
+@@ -493,14 +495,17 @@ const en = {
+   about: {
+     aboutMe: {
+       title: "ABOUT ME",
++      groupLabels: {
++        intro: "Who I am",
++        difference: "What sets me apart from the competition",
++      },
++      closingPhrase: "projects with more depth, more personality, and a thoughtfully designed experience.",
+       accents: {
+-        strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "databases", "systems programming", "work as part of a team", "visual judgment", "business insight", "cultural awareness", "Data Science", "machine learning"],
+-        circle: ["software architecture", "a distinct identity,"],
+-        underline: ["full-stack development", "graphic design", "several layers"],
++        strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "full-stack development", "databases", "software architecture", "systems programming", "graphic design", "work as part of a team", "a distinct identity", "several layers"],
+         emojis: [
+           { text: "U-TAD", symbol: "📚" },
+           { text: "esports", symbol: "🎮" },
+-          { text: "fashion", symbol: "👟" },
++          { text: "Fashion", symbol: "👟" },
+           { text: "music", symbol: "🎧" },
+           { text: "social media", symbol: "📱" },
+         ],
+@@ -521,9 +526,8 @@ const en = {
+         "I am fully fluent in Spanish, with a C1 level of English and an A2 level of German.",
+         "What sets me apart from the competition is how I connect technology with graphic design, business analysis, and finance.",
+         "My experience in esports has taught me to work as part of a team, stay disciplined, and make decisions under pressure.",
+-        "I also feel at home across fashion, music, and social media: spotting trends, shaping a visual style, and communicating ideas with personality. These areas sharpen my visual sensitivity and help me understand how an identity connects with its audience.",
+-        "This combination of disciplines helps me give each project a distinct identity, with several layers that reinforce one another: a technical foundation, visual judgment, business insight, and cultural awareness. That lets me create solutions that work, express an identity, and connect with people. My difference from the competition lies in that mix of perspectives: projects with more depth, more personality, and a thoughtfully designed experience.",
+-        "I want to keep exploring Data Science and machine learning to turn information into useful, well-built solutions with an identity of their own.",
++        "Fashion, music, and social media influence my visual judgment and the way I communicate my projects.",
++        "This combination of disciplines helps me give each project a distinct identity, with several layers that reinforce one another. That lets me create solutions that work, express an identity, and connect with people. My difference from the competition lies in that mix of perspectives: projects with more depth, more personality, and a thoughtfully designed experience.",
+       ],
+     },
+     foundationTitle: "MY FOUNDATION",
+diff --git a/src/lib/content-types.ts b/src/lib/content-types.ts
+index ec76ba1..6a252b8 100644
+--- a/src/lib/content-types.ts
++++ b/src/lib/content-types.ts
+@@ -123,12 +123,12 @@ export interface SkillGroup {
+ /** Section heading and authored introduction paragraphs, in source order. */
+ export interface AboutMeCopy {
+   title: string;
++  groupLabels: { intro: string; difference: string };
++  closingPhrase: string;
+   paragraphs: readonly string[];
+   /** Exact phrases to decorate; paragraphs remain the source of the wording. */
+   accents: {
+     strong: readonly string[];
+-    circle: readonly string[];
+-    underline: readonly string[];
+     emojis: readonly { text: string; symbol: string }[];
+     location: string;
+     flags: readonly { text: string; country: string }[];

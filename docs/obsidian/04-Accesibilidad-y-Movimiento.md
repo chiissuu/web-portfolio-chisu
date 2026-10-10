@@ -1,7 +1,7 @@
 ---
 tags: [accesibilidad, movimiento, reveals]
 aliases: [Accesibilidad-y-Movimiento]
-actualizado: 2026-10-06
+actualizado: 2026-10-10
 fuente: [src/layouts/Layout.astro, src/components/RollLink.astro]
 ---
 
@@ -26,13 +26,15 @@ Layout reduce las duraciones globales a 0,001ms y cambia el smooth scroll a `aut
 Existen: labels de formulario, estados `aria-live`, `<progress>` nativo, `alt` del retrato, iconos decorativos marcados, y menú móvil con control de foco (ver [[Hero-y-Sidebar]]). **No** hay auditoría con lector de pantalla ni medición de contraste.
 
 Puntos concretos pendientes de revisar:
-- Errores de formulario por campo (ver [[Formularios]])
+- Errores por campo corregidos: ARIA, descripción individual y foco; lector de pantalla sin probar (ver [[Formularios]])
 - Contenido invisible sin JS (reveals, arriba)
-- Jerarquía h2→h4 en el ejemplo de Tools
+- Jerarquía del ejemplo de Tools corregida a h2→h3, sin cambiar texto/estilo
 - Enlaces de SimpleNav en móvil
 - Cabeceras sticky que puedan tapar destinos de anclas
 
 La presencia de atributos ARIA no equivale a conformidad completa de accesibilidad.
+
+[[Auditoria-Web]] midió contrastes concretos y verificó cuatro rutas en cinco anchos, FAQ con Enter y foco de formularios. Reduced motion y desactivación global de JS no están expuestos por el navegador de esta sesión: se revisó código y un fixture de formularios sin scripts. Layout y Hero permanecen protegidos.
 
 ## Clic central (middle-click)
 

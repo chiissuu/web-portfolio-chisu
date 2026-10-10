@@ -1,7 +1,7 @@
 ---
 tags: [moc, contexto-agente]
 aliases: [Empieza-Aqui]
-actualizado: 2026-10-06
+actualizado: 2026-10-10
 fuente: [código fuente del proyecto]
 ---
 
@@ -14,6 +14,8 @@ Este vault se construyó reestructurando, en notas de Obsidian interconectadas, 
 **Estado Git en el momento de crear este vault (2026-10-06):** rama `feat/lower-sections-redesign`, HEAD `7b53ed6` ("chore: create audited portfolio checkpoint"). Cambios locales sin commit ya presentes: [AboutSection.astro](../../src/components/AboutSection.astro), [ProjectsSection.astro](../../src/components/ProjectsSection.astro), [site.js](../../src/content/site.js) y [content-types.ts](../../src/lib/content-types.ts). Son parte del estado documentado — no son un error a revertir.
 
 ## Qué es esto, en una frase por área
+
+Estado comprobado el 10 de octubre en [[Auditoria-Web]]: formularios siguen simulados, con aviso previo y protección sin scripts; correo y contrastes locales corregidos. En una corrección posterior autorizada se aplicó el núcleo ESM del conversor: MP3/MP4, decodificación, errores, cancelación y reintentos pasan con el vídeo sintético. Se separaron las cachés dev/build para evitar el fallo de React. Ver [[Conversor-de-Video]] y [[Comandos-y-Pruebas]]. Las cuatro rutas permanecen y las zonas visuales terminadas se conservaron.
 
 | Área | Estado real |
 |---|---|
@@ -72,6 +74,9 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 **Operación**
 - [[Comandos-y-Pruebas]] — dev/check/build/preview, recorrido de prueba manual
 - [[Hallazgos-y-Pendientes]] — tabla priorizada de pendientes, enlazada por componente
+- [[Skills-Desarrollo-Web]] — selección comprobada de skills e instalación manual
+- [[Prompt-Auditoria-Web]] — encargo preparado para una auditoría con Hero/Sobre mí/nav lateral protegidos y cambios según riesgo
+- [[Auditoria-Web]] — ronda ejecutada el 10 de octubre; cambios verificados, evidencias y decisiones pendientes
 
 **Inventario**
 - [[Archivos-del-Proyecto]] — los archivos de `src/` + config, cada uno enlazado al código real

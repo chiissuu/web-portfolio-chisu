@@ -55,6 +55,10 @@ const links = t.contact.links;
 </section>
 
 <style>
+  .ct-email .editorial-text-muted {
+    color: var(--color-text-muted);
+  }
+
   .ct-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -117,7 +121,7 @@ const links = t.contact.links;
   .ct-closing {
     max-width: 60ch;
     margin-bottom: 2.5rem;
-    color: var(--theme-text-muted);
+    color: var(--color-text-muted);
   }
 
   .ct-form {
@@ -136,6 +140,8 @@ const links = t.contact.links;
   .ct-email-btn {
     display: inline-flex;
     align-items: center;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     min-height: 46px;
     padding: 0.8rem 1.4rem;
     border-radius: 999px;

@@ -20,7 +20,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const coreDistDir = join(projectRoot, "node_modules", "@ffmpeg", "core", "dist", "umd");
+// Vite emits a module Worker: its dynamic import needs the ESM default export.
+const coreDistDir = join(projectRoot, "node_modules", "@ffmpeg", "core", "dist", "esm");
 const targetDir = join(projectRoot, "public", "ffmpeg");
 
 const FILES_TO_COPY = ["ffmpeg-core.js", "ffmpeg-core.wasm"];
@@ -28,7 +29,7 @@ const FILES_TO_COPY = ["ffmpeg-core.js", "ffmpeg-core.wasm"];
 function main() {
   if (!existsSync(coreDistDir)) {
     console.warn(
-      "[copy-ffmpeg-core] node_modules/@ffmpeg/core/dist/umd not found — " +
+      "[copy-ffmpeg-core] node_modules/@ffmpeg/core/dist/esm not found — " +
         "skipping copy. Run `npm install` first (it installs @ffmpeg/core, " +
         "which triggers this script automatically via postinstall). The " +
         "video converter tool cannot load its engine until this has run " +
@@ -55,7 +56,7 @@ function main() {
   } else {
     console.warn(
       `[copy-ffmpeg-core] Only copied ${copiedCount}/${FILES_TO_COPY.length} expected file(s) — ` +
-        "check that @ffmpeg/core's published layout still matches dist/umd/ffmpeg-core.{js,wasm}."
+        "check that @ffmpeg/core's published layout still matches dist/esm/ffmpeg-core.{js,wasm}."
     );
   }
 }

@@ -11,7 +11,18 @@ import react from "@astrojs/react";
 // from `src/components/VideoConverterPageContent.astro`) — no other part of
 // the site uses React, every other component stays a plain `.astro` file.
 export default defineConfig({
-  integrations: [react()],
+  integrations: [
+    react(),
+    {
+      name: "separate-vite-cache",
+      hooks: {
+        // Astro build also creates an internal Vite server; use Astro's command.
+        "astro:config:setup": ({ command, updateConfig }) => {
+          updateConfig({ vite: { cacheDir: `node_modules/.vite-astro-${command}` } });
+        },
+      },
+    },
+  ],
   vite: {
     optimizeDeps: {
       include: ["react-dom/client"],

@@ -1,6 +1,6 @@
 ---
 tags: [contenido, i18n]
-actualizado: 2026-10-08
+actualizado: 2026-10-10
 fuente: [src/content/site.js]
 ---
 
@@ -19,33 +19,35 @@ Dos botones llevan a Proyectos y a Sobre mí. Las métricas son contenido editor
 
 ## Sobre mí
 
-Un único título «SOBRE MÍ» y ocho párrafos de presentación:
+Un único título «SOBRE MÍ» y siete párrafos de presentación:
+
+Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). Los párrafos se alinean a la izquierda en una columna centrada de hasta 62ch, con más espacio entre ideas y grupos. El primer párrafo es algo mayor y la última frase del cierre se destaca con su propio espacio y separador. No se cambia la redacción. Etiquetas y selector de cierre también existen en inglés.
 
 - Formación y ubicación: Jesús León Romero Atienza, Ingeniería del Software con mención en Ingeniería de Datos (Big Data), U-TAD (Centro Universitario de Tecnología y Arte Digital), ciudad natal Madrid, España.
 - Base técnica: tres años de formación, full-stack, bases de datos, arquitectura de software y programación de sistemas.
 - Idiomas: «Domino totalmente el español, tengo un nivel C1 de inglés y un A2 de alemán».
 - Valor diferencial frente a la competencia: conectar tecnología, diseño gráfico, análisis de negocios y finanzas.
 - Esports: se conserva la frase original sobre equipo, disciplina y decisiones bajo presión.
-- Moda, música y redes sociales: facilidad para reconocer tendencias, cuidar la estética, comunicar ideas con personalidad y conectar una identidad con su audiencia.
-- Varias capas por proyecto: base técnica, criterio visual, visión de negocio y sensibilidad cultural para dar profundidad, personalidad y una experiencia cuidada al resultado.
-- Dirección: profundizar en Data Science y machine learning para desarrollar soluciones útiles y con identidad propia.
+- Moda, música y redes sociales: «La moda, la música y las redes sociales influyen en mi criterio visual y en la forma de comunicar mis proyectos».
+- Varias capas por proyecto: una versión propia, soluciones que funcionan y transmiten identidad, y proyectos con profundidad, personalidad y una experiencia cuidada. Se retira la enumeración de disciplinas y el último párrafo de dirección hacia Data Science/machine learning.
 
 Estos párrafos sustituyen a las cuatro escenas narrativas (Cimientos, Dirección, Producto e Impulso) y sus gráficos. Ya no se publica el título compuesto ni la línea independiente de ciudad e idiomas. Se retiran también los dos CTA de Drive que acompañaban a esas escenas. Detalle de render en [[Sobre-Mi]].
 
-La biografía se presenta en Inter. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado; Big Data lleva negrita sin círculo. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻, full-stack subrayado, arquitectura rodeada y bases de datos/sistemas en negrita. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia rodeada, varias capas subrayadas y negritas en criterio visual/negocio/cultura y dirección técnica. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción; esports conserva su redacción exacta.
+La biografía se presenta en Inter. Los cinco primeros párrafos conservan la redacción aprobada. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻 y negritas en full-stack, bases de datos, arquitectura y sistemas. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia y varias capas en negrita. Se retiran todos los círculos/subrayados SVG y su animación; permanecen los subrayados funcionales de los enlaces. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción.
 
-«MI BASE ACTUAL» muestra formación (U-TAD, Ingeniería del Software, Mención en Ingeniería de Datos, Tercer curso) e idiomas (Español nativo, Inglés C1, Alemán A2). La tarjeta de formación enlaza al grado. «MI SISTEMA DE TRABAJO» cierra la sección — **sin** CTA final hacia Proyectos (se retiró deliberadamente en una corrección anterior).
+«Mi base actual» se retiró por duplicar formación e idiomas. La sección cierra con «MI STACK DE TRABAJO»: filas de categorías y logos visibles, sin las antiguas tarjetas bento ni un CTA final hacia Proyectos.
 
 | Grupo de skills | Elementos |
 |---|---|
-| Software | Java, Python, C, C++, JavaScript, PHP |
-| Web | HTML, CSS, Astro, Node.js, GSAP |
-| Bases de datos | MySQL, PostgreSQL, MariaDB, MongoDB |
+| Software | Java, Python, C, C++, JavaScript, PHP, TypeScript |
+| Web | Astro, React, Node.js, GSAP |
+| Bases de datos | MySQL, PostgreSQL, MariaDB, MongoDB, Qdrant, Redis, Neo4j |
 | Data | Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn, Jupyter |
 | Herramientas | Git, GitHub, Docker, Linux, Windows, n8n |
-| Diseño | Photoshop, GIMP, Photopea, Canva |
+| Diseño | Photoshop, GIMP, Photopea, Canva, After Effects, Illustrator |
+| Documentación y colaboración | Obsidian, Google Drive, Word, Excel, PowerPoint, Teams |
 
-31 habilidades en total. Astro, GSAP y n8n no tienen icono propio y se muestran solo como texto — no son enlaces ni botones.
+42 herramientas en total, todas con recurso de logo local. Los añadidos usan PNG de 96×96; se documentan sus fuentes en [[Logos-Stack]]. Los nombres acompañan siempre a sus imágenes. No son enlaces ni botones y no implican dependencias instaladas en el proyecto.
 
 ## Proyectos
 

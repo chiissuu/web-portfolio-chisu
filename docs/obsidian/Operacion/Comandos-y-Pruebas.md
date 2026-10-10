@@ -1,6 +1,6 @@
 ---
 tags: [operacion, comandos, testing]
-actualizado: 2026-10-08
+actualizado: 2026-10-10
 fuente: [package.json, scripts/copy-ffmpeg-core.mjs]
 ---
 
@@ -20,7 +20,7 @@ npm run copy:ffmpeg-core
 
 `dev` inicia Astro. `preview` sirve el build ya existente — **no** sustituye al build, si no se ha compilado antes sirve lo que hubiera de una vez anterior. `npm run astro -- <comando>` expone la CLI de Astro directamente. En una instalación nueva, `npm ci` usa el lockfile y ejecuta `postinstall` automáticamente.
 
-[copy-ffmpeg-core.mjs](../../../scripts/copy-ffmpeg-core.mjs) copia desde `node_modules/@ffmpeg/core/dist/umd/` el JS y el WASM a `public/ffmpeg/`. Crea el destino si no existe y **sobrescribe** esos dos archivos si ya estaban. Si falta el directorio fuente, avisa y retorna sin fallar la instalación; si falta solo un archivo, lo salta y avisa igual. Esto significa que hay que comprobar manualmente que ambos recursos existan después de instalar, aunque `npm install` termine en verde — un archivo anterior podría quedarse si falta su reemplazo.
+[copy-ffmpeg-core.mjs](../../../scripts/copy-ffmpeg-core.mjs) copia desde `node_modules/@ffmpeg/core/dist/esm/` el JS y el WASM a `public/ffmpeg/`. Crea el destino si no existe y **sobrescribe** esos dos archivos si ya estaban. Si falta el directorio fuente, avisa y retorna sin fallar la instalación; si falta solo un archivo, lo salta y avisa igual. Esto significa que hay que comprobar manualmente que ambos recursos existan después de instalar, aunque `npm install` termine en verde — un archivo anterior podría quedarse si falta su reemplazo.
 
 Al publicar, `dist/` debe incluir las cuatro rutas, `_astro/`, `assets/` y `ffmpeg/`. Omitir el WASM permite que la página cargue pero rompe la conversión. No hay backend que arrancar aparte del propio servidor estático. `node_modules` debe instalarse en la misma plataforma donde se compila — una instalación hecha en Windows puede no servir en Linux por bindings nativos.
 
@@ -50,6 +50,23 @@ Esta ejecución **no** incluyó: conversión real en navegador, comprobación vi
 - Arranque temporal mediante la API `dev` de Astro en el puerto 4322: reoptimización sin error de escaneo; GET de `/` y `/tools/video-converter/` con HTTP 200. Servidor temporal detenido al finalizar; el servidor del usuario no se detuvo.
 - No se probó la conversión real ni el aspecto visual en navegador. Reiniciar el servidor del usuario tras los cambios de dependencias.
 ## Recorrido de prueba manual para próximos cambios
+
+### Prueba reproducible del conversor — 10 de octubre de 2026
+
+Desde la raíz del repositorio:
+
+```powershell
+npm run copy:ffmpeg-core
+node scripts/test-video-converter.mjs
+```
+
+Abrir `http://localhost:4324/__converter-check.html` y pulsar «Verificar motor, MP3, MP4, errores y cancelación». Detener con Ctrl+C. El script sirve solo dos rutas de prueba adicionales mientras está activo; no se copian al build. Usa el wrapper real, el núcleo ESM local y `sintetico.avi` de las evidencias de auditoría. No requiere instalar paquetes.
+
+Resultado obtenido: **6/6** — carga/reutilización, MP3 decodificado (10.701 bytes, 1s, mono), MP4 decodificado (6.549 bytes, 1s, 32×32), corrupto/reintento, cancelación durante carga/recarga y cancelación durante conversión/reintento. Se descargó además `sintetico.mp3` desde el preview de la interfaz. La prueba no mide rendimiento con 200MiB, compatibilidad entre navegadores o hosting real.
+
+La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` mediante el hook `astro:config:setup`: una optimización de producción ya no sustituye el runtime JSX de un dev abierto. Es importante distinguir el comando de **Astro**, porque el build también crea un servidor interno de Vite. El fallo `_jsxDEV` se reprodujo con el runtime de producción en la caché compartida; una caché independiente monta la isla correctamente. Reiniciar `npm run dev` y recargar la pestaña si sigue usando módulos de una sesión anterior.
+
+### Recorrido general
 
 1. Cargar las cuatro rutas y verificar título, recursos y enlaces. En portada, recorrer las seis secciones y volver arriba.
 2. Probar la entrada del Hero en scroll 0, con URL con ancla, con scroll antes de cargar fuentes, y con scroll durante la entrada. Revisar la frontera Hero/About y los temas independientes del sidebar (ver [[Hero-y-Sidebar]]).
@@ -166,6 +183,34 @@ Esta ejecución **no** incluyó: conversión real en navegador, comprobación vi
 - `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. HTML comprobado: ocho párrafos idénticos a site.js al retirar la decoración, esports exacto, dos círculos, tres subrayados, dos enlaces existentes y selectores válidos en ES/EN.
 - Capturas del perfil: `sobre-mi-perfil-disciplinas.jpg` y `sobre-mi-perfil-disciplinas-movil.jpg` en la carpeta de visualizaciones del chat. Se revisa el scroll, se cierra la pestaña de pruebas y se restablece el viewport.
 - Navegador real en 1920, 1280 y 390px: sin desbordamiento; en 1280px se mantienen márgenes de 168.43/168.68px respecto al nav y al borde derecho. El perfil se separa 40px (2.5rem) y el reveal muestra el texto en móvil. La coma se mantiene dentro del selector de versión propia para que no salte sola de línea. Sin errores de consola registrados.
+
+## Biografía concisa y retirada de trazos (9 de octubre de 2026)
+
+- Se conservan literalmente los cinco párrafos aprobados (presentación, base técnica, idiomas, diferenciación y esports). Moda/música/redes se resume en una frase sobre criterio visual y comunicación. El cierre mantiene versión propia, varias capas e identidad, sin la enumeración de disciplinas ni el último párrafo sobre Data Science/machine learning.
+- Siete párrafos en ES/EN. Se retiran circle/underline de los datos y tipos, sus ramas SVG, estilos y keyframes. Los términos seleccionados pasan a negrita; se mantienen emojis, banderas y los subrayados funcionales de los enlaces. Sin cambios de fuentes, dependencias o navegación.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. Comparación SHA-256 antes/después de los cinco primeros párrafos, formación, idiomas y skills: idénticos en ambos idiomas. HTML generado: siete párrafos exactos, dos enlaces y ningún trazo SVG ni los textos retirados. Selectores de énfasis válidos en ES/EN.
+- Navegador real en 1920, 1280 y 390px: sin desbordamiento horizontal; arquitectura de software con peso 600 y cero SVG de anotación en la biografía. Entrada al hacer scroll visible en móvil. Sin errores de consola registrados.
+- Capturas: `sobre-mi-texto-limpio-portada.jpg`, `sobre-mi-texto-limpio.jpg` y `sobre-mi-texto-limpio-movil.jpg` en la carpeta de visualizaciones del chat. Se cierra la pestaña temporal y se restablece el viewport.
+- Ideas de diseño propuestas, pendientes de elección: rótulos pequeños para agrupar el contenido, primer párrafo con más jerarquía y cierre destacado tipográficamente. No están implementadas en este cambio.
+
+## Dos grupos, introducción y cierre destacados (9 de octubre de 2026)
+
+- Se agrupan los siete párrafos, sin cambiar ninguna palabra, en «Quién soy» y «Qué me diferencia de la competencia». Ambos son h3 con aria-labelledby para su sección. groupLabels y closingPhrase se mantienen en ES/EN en site.js; los grupos vacíos se omiten.
+- Primer párrafo de hasta 1.55rem y frase final destacada de hasta 1.65rem en fuente display. La frase se presenta dentro del mismo p, sin duplicación. Se mantienen enlaces, negritas, emojis, fondo, transición y geometría del nav.
+- `npm run check`: 42 archivos, 0 errores, 0 warnings y 126 hints. `npm run build`: cuatro páginas, código 0. HTML comprobado: siete párrafos exactos, dos grupos y una frase destacada. SHA-256 del texto completo de los siete párrafos idéntico antes/después en ES/EN.
+- Navegador real: 1920px, lead/body/cierre de 24.8/21.6/26.4px; en 1280px, 21.12/17.92/24.32px; en 390px, lead 18.4px y cierre 19.2px. Rótulo completo en una línea a 390px y dos a 320px, sin overflow interno de About. Revisadas también las vistas de 768px.
+- A 320px hay overflow global existente por ct-email-btn de Contacto: x=20 a x=325, mientras About scrollWidth/clientWidth coinciden en 305. Registrado en Hallazgos-y-Pendientes para la auditoría posterior; ContactSection no se modifica en este cambio.
+- Capturas guardadas antes de la interrupción de red del navegador integrado: `sobre-mi-dos-grupos-portada.jpg` y `sobre-mi-grupos-y-cierre-movil.jpg`. La última recarga de escritorio devolvió ERR_NETWORK_IO_SUSPENDED; no se tomó una nueva captura de escritorio del cierre tras esa interrupción.
+- Preparados Skills-Desarrollo-Web y Prompt-Auditoria-Web: catálogo y fuentes verificados, instalación manual de cuatro skills y auditoría futura con exclusiones y autorización según riesgo. No se instalan skills ni se ejecuta la auditoría en esta sesión.
+
+## Auditoría de las cuatro rutas (10 de octubre de 2026)
+
+- Informe, cobertura, propuestas y capturas: [[Auditoria-Web]]. Correcciones locales en formularios, correo, contrastes y h3 del ejemplo Tools; Hero/About/sidebar intactos por SHA-256.
+- Check inicial: 42 archivos; final: 43 por el servidor de diagnóstico, ambos 0 errores, 0 warnings, 126 hints. Build final: cuatro páginas, exit 0. El sandbox dio EPERM en el Worker; fuera de él compila sin cambios de configuración.
+- npm audit: cero vulnerabilidades conocidas; sin audit fix. Un primer ENOTFOUND del entorno restringido se resolvió al repetir la lectura autorizada.
+- Navegador en 1920, 1280, 768, 390 y 320px en cada ruta: sin overflow final. Errores/válido simulado, teclado, campos opcionales y texto largo comprobados; formulario sin scripts probado como fixture separado.
+- Preview monta React; dev existente registra `_jsxDEV is not a function`. El motor de producción falla por core UMD/Worker módulo; ESM carga en diagnóstico separado, sin aplicar la propuesta. No se completó conversión/descarga/cancelación efectiva.
+- No se probó reduced motion real ni desactivación global de JS, no se midió Lighthouse/CWV ni otros navegadores. Los servidores de prueba temporales se detienen al finalizar.
 
 ## Cómo mantener este vault al día
 

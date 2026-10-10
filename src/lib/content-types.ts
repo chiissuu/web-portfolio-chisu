@@ -107,11 +107,11 @@ export interface SimpleNavContent {
 }
 
 // ---- About ------------------------------------------------------------------
-// Composition: summary cover / Formación + Idiomas / Skills bento.
+// Composition: authored biography / categorized work stack.
 // Every shape below mirrors its field in site.js.
 
 /** A single skill entry: `[name, iconFileName]`. Icon is `null` when the
- * skill has no matching icon asset (see "Astro" in site.js). */
+ * skill has no matching icon asset. */
 export type SkillItem = (string | null)[];
 
 export interface SkillGroup {
@@ -123,12 +123,12 @@ export interface SkillGroup {
 /** Section heading and authored introduction paragraphs, in source order. */
 export interface AboutMeCopy {
   title: string;
+  groupLabels: { intro: string; difference: string };
+  closingPhrase: string;
   paragraphs: readonly string[];
   /** Exact phrases to decorate; paragraphs remain the source of the wording. */
   accents: {
     strong: readonly string[];
-    circle: readonly string[];
-    underline: readonly string[];
     emojis: readonly { text: string; symbol: string }[];
     location: string;
     flags: readonly { text: string; country: string }[];
@@ -136,45 +136,8 @@ export interface AboutMeCopy {
   };
 }
 
-/** Field labels for the Formación "ficha académica" — bilingual UI copy for
- * the fixed fact labels (Institución/Programa/Especialización/Estado
- * actual), separate from `FormacionEntry`'s actual values. */
-export interface FormacionFieldLabels {
-  institution: string;
-  program: string;
-  specialization: string;
-  status: string;
-}
-
-export interface FormacionEntry {
-  institution: string;
-  program: string;
-  specialization: string;
-  status: string;
-  href: string;
-}
-
-export interface FormacionCopy {
-  title: string;
-  labels: FormacionFieldLabels;
-  entry: FormacionEntry;
-}
-
-export interface LanguageEntry {
-  language: string;
-  level: string;
-}
-
-export interface IdiomasCopy {
-  title: string;
-  items: readonly LanguageEntry[];
-}
-
 export interface AboutContent {
   aboutMe: AboutMeCopy;
-  foundationTitle: string;
-  formacion: FormacionCopy;
-  idiomas: IdiomasCopy;
   skillsTitle: string;
   skillGroups: SkillGroup[];
 }
