@@ -1,6 +1,6 @@
 ---
 tags: [hallazgos, pendientes, operacion]
-actualizado: 2026-10-10
+actualizado: 2026-10-23
 fuente: [análisis transversal del código del proyecto]
 ---
 
@@ -29,12 +29,13 @@ La ronda autorizada del 10 de octubre está en [[Auditoria-Web]], con IDs, evide
 | FAQ provisional y referencias desactualizadas | `faq.items[1]` placeholder; `[2]` menciona Drive retirado de About y `[3]` formulario simulado. Propuesta A15 | [[Contenido-por-Seccion]], [[Auditoria-Web]] |
 | Rutas CSS no preparadas para `base` | Fondo del Hero y `@font-face` con rutas absolutas; revisar si se despliega bajo subcarpeta | [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]], [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
 | Metadatos sociales/dominio sin configurar | Layout/config; definir según publicación real | [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]] |
+| Contenido de Servicios y Tools sin actualizar tras separarlas | Las etiquetas «Servicios»/«Tools» repiten el título gráfico; el texto procede de la sección combinada. Siguiente tarea acordada | [[Contenido-por-Seccion]], [[Otras-Secciones-y-Compartidos]] |
 
 ## Prioridad Baja
 
 | Hallazgo | Evidencia / actuación mínima propuesta | Nota relacionada |
 |---|---|---|
-| Inglés incompleto y sin publicar | Falta `hero.personalNote`; verificar contratos y etiquetas antes de crear rutas | [[Bilingue-ES-EN]] |
+| Inglés incompleto y sin publicar | Falta `hero.personalNote`; verificar contratos y etiquetas antes de crear rutas. Tampoco hay títulos gráficos EN para las cinco secciones (usan la tarjeta de texto) | [[Bilingue-ES-EN]] |
 | Comentarios históricos contradicen el código actual | Fuente editorial sí presente, About warm, CTA final eliminado, uso de Lucide, raster de marca | [[00-Empieza-Aqui]] |
 | Código y contenido no usados | Teasers, `ClosingStatement`, `fitWordmarkWidth`, `siteName`/SEO auxiliar según consumidor | [[Otras-Secciones-y-Compartidos]], [[Hero-y-Sidebar]] |
 | Diagnósticos ruidosos del check | Se analiza JS generado de `public/ffmpeg`; 126 hints, sin errores | [[Comandos-y-Pruebas]] |

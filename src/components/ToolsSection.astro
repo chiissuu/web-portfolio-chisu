@@ -1,83 +1,53 @@
 ---
 import { withBase } from "../lib/paths.js";
-import type { ServicesToolsSectionContent } from "../lib/content-types";
+import type { ToolsHomeSectionContent } from "../lib/content-types";
 import SectionHeadingCard from "./SectionHeadingCard.astro";
 
 interface Props {
-  t: ServicesToolsSectionContent;
+  t: ToolsHomeSectionContent;
 }
 
 const { t } = Astro.props as Props;
-const servicesHref = withBase("/servicios/");
 const toolsHref = withBase("/tools/");
+const copy = t.servicesTools.tools;
 const toolExample = t.tools.page.items[0];
 ---
 
-<section class="section-theme-dark" id="services-tools">
+<section class="section-theme-dark" id="tools">
   <div class="section-inner">
-    <SectionHeadingCard text={t.servicesTools.title} as="h2" size="lg" />
+    <SectionHeadingCard text={copy.title} image={copy.titleImage} as="h2" size="lg" />
 
-    <div class="st-columns">
-      <div class="st-col" id="services">
-        <p class="st-col-label">{t.services.eyebrow}</p>
+    <div class="st-col">
+      <p class="st-col-label">{t.tools.eyebrow}</p>
 
-        <p class="st-description editorial-text">
-          {t.servicesTools.services.description.map((segment) =>
-            segment.strong ? <strong>{segment.text}</strong> : segment.text
-          )}
-        </p>
+      <p class="st-description editorial-text">{copy.description}</p>
 
-        <a class="st-cta" href={servicesHref}>
-          <span class="st-cta-label">{t.servicesTools.services.ctaLabel}</span>
-          <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
-        </a>
-      </div>
+      {toolExample && (
+        <article class="st-tool-example">
+          <p class="st-tool-status">{toolExample.status}</p>
+          <h3 class="st-tool-title">{toolExample.title}</h3>
+          <p class="st-tool-text editorial-text editorial-text-muted">{toolExample.text}</p>
+          <div class="st-tool-tags">
+            {toolExample.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+        </article>
+      )}
 
-      <div class="st-divider" aria-hidden="true"></div>
-
-      <div class="st-col" id="tools">
-        <p class="st-col-label">{t.tools.eyebrow}</p>
-
-        <p class="st-description editorial-text">{t.servicesTools.tools.description}</p>
-
-        {toolExample && (
-          <article class="st-tool-example">
-            <p class="st-tool-status">{toolExample.status}</p>
-            <h3 class="st-tool-title">{toolExample.title}</h3>
-            <p class="st-tool-text editorial-text editorial-text-muted">{toolExample.text}</p>
-            <div class="st-tool-tags">
-              {toolExample.tags.map((tag) => <span>{tag}</span>)}
-            </div>
-          </article>
-        )}
-
-        <a class="st-cta" href={toolsHref}>
-          <span class="st-cta-label">{t.servicesTools.tools.ctaLabel}</span>
-          <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
-        </a>
-      </div>
+      <a class="st-cta" href={toolsHref}>
+        <span class="st-cta-label">{copy.ctaLabel}</span>
+        <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
+      </a>
     </div>
   </div>
 </section>
 
 <style>
-  .st-columns {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: clamp(1.75rem, 4vw, 3.5rem);
-    margin-top: 1rem;
-  }
-
   .st-col {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
     min-width: 0;
-  }
-
-  .st-divider {
-    width: 1px;
-    background: var(--theme-border);
+    max-width: 46rem;
   }
 
   .st-col-label {
@@ -90,11 +60,6 @@ const toolExample = t.tools.page.items[0];
 
   .st-description {
     color: var(--theme-text-muted);
-  }
-
-  .st-description strong {
-    color: var(--theme-text);
-    font-weight: 700;
   }
 
   .st-tool-example {
@@ -145,7 +110,7 @@ const toolExample = t.tools.page.items[0];
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: auto;
+    margin-top: 0.5rem;
     padding: 1.1rem 0;
     border-top: 1px solid var(--theme-border);
     font-family: var(--font-display);
@@ -176,16 +141,5 @@ const toolExample = t.tools.page.items[0];
   .st-cta:focus-visible {
     outline: 2px solid var(--color-brand-gold);
     outline-offset: 4px;
-  }
-
-  @media (max-width: 900px) {
-    .st-columns {
-      grid-template-columns: 1fr;
-    }
-
-    .st-divider {
-      width: 100%;
-      height: 1px;
-    }
   }
 </style>

@@ -1,7 +1,7 @@
 ---
 tags: [diseno, css, tokens, responsive]
 aliases: [Sistema-de-Diseno]
-actualizado: 2026-10-10
+actualizado: 2026-10-23
 fuente: [src/layouts/Layout.astro]
 ---
 
@@ -16,17 +16,17 @@ Fuente principal: [Layout.astro](../../src/layouts/Layout.astro). CSS nativo glo
 - Temas de sección: `--theme-*` — el mecanismo clave que permite que un mismo componente (botones, bordes, texto) funcione igual sobre fondo claro u oscuro sin lógica condicional; solo cambia qué tema CSS envuelve a la sección. Esto es lo que permitió intercambiar About y Proyectos entre warm/dark sin tocar [[Hero-y-Sidebar]].
 - Artículos del sidebar: `--art-*`
 - Acentos locales del Hero: `--hx-ui-*`
-- Acentos locales de About: `--ab-accent` y `--ab-tone` (gris `#c9c9c9`)
+- Acentos locales de About: `--ab-accent` (dorado compartido `var(--color-brand-gold)`, `#e0c58b`) y `--ab-copy` (gris `#d4d6d8`)
 
 Colores base: fondo warm `#d5cfbe`, tinta `#1a1919`, dorado `#e0c58b`, dorado oscuro `#8a6420`. Tema dark: degradado `#050505 → #1b1b1f → #050505`.
 
 ## Orden actual de temas por sección
 
-Hero (gráfico dorado sobre fondo estructural oscuro) → About (carbón, clase dark con textura desaturada del Hero que se desvanece) → Proyectos (dark plano, `--section-dark-start`) → Servicios/Tools (dark con degradado) → Contacto (warm) → FAQ (dark). No hay alternancia estricta entre todas las secciones.
+Hero (gráfico dorado sobre fondo estructural oscuro) → About (grafito cálido #24221f, textura suave y halo dorado estático detrás del título) → Proyectos (dark plano, `--section-dark-start`) → Servicios (dark con degradado) → Tools (dark con degradado) → Contacto (warm) → FAQ (dark). Servicios y Tools son secciones separadas desde el 23 de octubre; sus degradados empiezan y acaban en #050505, así que no hay corte en su unión. No hay alternancia estricta entre todas las secciones. About conserva una transición corta desde #050505 en su unión con el Hero; después mantiene el mismo grafito hasta el final del stack.
 
-About usa texto blanco y gris y superficies neutras. Su estado de navegación activa aplica `data-palette="mono"` al sidebar: logo gris oscuro y acentos/botones grises; las demás secciones conservan la paleta dorada. Esta paleta es independiente del tema warm/dark que cada artículo detecta por solapamiento.
+About combina fondo carbón y lectura blanca/gris con la identidad dorada del Hero. El sidebar conserva `data-palette="brand"` en todas las secciones; no se desatura el logo ni se cambian sus botones a plata al entrar en About. El tema warm/dark sigue funcionando por artículo, independiente del acabado dorado. Sus cuatro cajas tienen un bisel dorado de 2px pintado sin alterar el layout. El enlace activo se ilumina con un haz lateral estático; el hundimiento se reserva para la pulsación real.
 
-About presenta un título «SOBRE MÍ» centrado de hasta 5.5rem y siete párrafos en Inter alineados a la izquierda dentro de una columna centrada de hasta 62ch. Dos h3 en display agrupan «Quién soy» y «Qué me diferencia de la competencia». Cuerpo hasta 1.25rem con interlineado 1.85; lead hasta 1.5rem; cierre hasta 2rem. Párrafos separados 2–2.75rem y grupos 4–6rem, con separadores discretos. Se conservan texto gris, negritas blancas, emojis, links y banderas. Mi base actual se retiró. El stack cierra con siete filas de categorías y 42 logos/nombres, sin bento ni pills, y listas de tres columnas en móvil. Se reutiliza rd-reveal por bloque. Ver [[Sobre-Mi]] para los contratos y responsive, y [[Logos-Stack]] para los PNG nuevos.
+About conserva el título PNG dorado original de hasta 40rem alineado con el inicio de su primer párrafo, su h2 accesible y recorte CSS; se retiró únicamente el filtro que lo desaturaba. La biografía ocupa una composición centrada de hasta 66rem: desde 1200px el header y los grupos comparten cuadrícula, los dos h3 quedan en una columna lateral, y el cartel y el texto comienzan en la segunda. Debajo se apilan alineados a la izquierda; una línea fina separa la cabecera de «Quién soy». Inter 400/600 sirve a los siete párrafos literales, con cuerpo hasta 1.2rem e interlineado 1.8, introducción hasta 1.5rem e interlineado 1.7, y columna de lectura de hasta 58ch. Space Grotesk sirve a títulos y cierre. Los idiomas quedan en escala secundaria y el cierre se distingue por una línea dorada lateral. Se conservan enlaces subrayados, banderas y emojis discretos en gris; Madrid tiene texto sólido. El stack sigue secundario, con siete filas y 42 herramientas: icono de 28px y nombre juntos, listas flexibles y dos columnas a ≤640px. Solo el PNG mantiene `rd-reveal`; biografía y stack son visibles sin scripts. Ver [[Sobre-Mi]], [[Auditoria-Sobre-Mi]] y [[Logos-Stack]].
 
 ## Layout de contenido
 
@@ -34,7 +34,7 @@ About presenta un título «SOBRE MÍ» centrado de hasta 5.5rem y siete párraf
 
 Excepción local de About a ≥1200px: centra `.ab-body` entre el borde visible del nav y el borde derecho de la página, con padding simétrico. Usa `--hx-sidebar-padding-inline: clamp(1.25rem, 2.5vw, 2rem)`, compartido con el padding real del sidebar, para descontar su franja transparente. El menú mantiene sus dimensiones. Ver [[Sobre-Mi]] para el límite de ancho interior.
 
-`SectionHeadingCard` (ver [[Otras-Secciones-y-Compartidos]]) permite h1/h2/h3, tamaños lg/md y clase opcional (por defecto h2/lg). La usan Proyectos, Servicios/Tools, Contacto y FAQ; About tiene título propio. `.glass-panel`, `.hx-glass` y `.hx-frosted-card` son acabados **distintos** entre sí — no intercambiables aunque suenen parecido.
+`SectionHeadingCard` (ver [[Otras-Secciones-y-Compartidos]]) permite h1/h2/h3, tamaños lg/md y clase opcional (por defecto h2/lg). La usan Proyectos, Servicios, Tools, Contacto y FAQ; About tiene título propio. En español las cinco muestran un título gráfico WebP en lugar de la tarjeta de cristal (altura de letra común `clamp(5rem, 10vw, 9rem)`; ver [[Otras-Secciones-y-Compartidos]]). `.glass-panel`, `.hx-glass` y `.hx-frosted-card` son acabados **distintos** entre sí — no intercambiables aunque suenen parecido.
 
 ## Fuentes
 
@@ -42,21 +42,23 @@ Remotas (Google Fonts): Space Grotesk, Archivo Black, Inter Tight, Inter, JetBra
 
 Excepción de About: su biografía usa Inter, con pesos reales 400, 500 y 600 ya disponibles, para diferenciar cuerpo y énfasis. Las demás secciones conservan `--font-editorial`.
 
+La prueba de Milesdane Trial se retiró del render el 2026-10-23 para unificar la lectura y evitar su marca en «2». El OTF y su aviso de licencia permanecen archivados junto a las fuentes; no hay un `@font-face` activo ni solicitud de ese archivo. La biografía usa los pesos reales de Inter ya cargados. No se añaden fuentes, dependencias ni solicitudes externas nuevas.
+
 ## Breakpoints y CSS generado
 
 | Condición | Comportamiento |
 |---|---|
-| ≥900px | Hero con posibilidad de morph/sidebar; compensación de contenido; About respeta la reserva del sidebar; portada centrada, formación/idiomas en dos columnas y sin indicador lateral de lectura |
+| ≥900px | Hero con posibilidad de morph/sidebar y compensación de contenido; About respeta la reserva del sidebar; desde 1200px, sus h3 quedan a la izquierda de la prosa |
 | 900–1599px | Tamaños específicos de título, tarjetas y retrato |
 | 900–1399px | Ajustes adicionales de offsets y títulos; deben seguir al bloque general de escritorio |
 | ≥1600px | Retrato y títulos mayores |
 | ≥900px y altura ≤950px | Sidebar más compacto |
 | ≥900px y altura ≤850px | Compactación adicional; enlaces de nav de 36px y CTA de 42px |
-| ≤899px | Menú móvil; sidebar y nav superior ocultos; About en una columna y sin rail |
+| ≤899px | Menú móvil; sidebar y nav superior ocultos; About y categorías del stack se apilan |
 | 641–899px | Reglas de retrato normal/estático que **no sobreviven al build** — ver hallazgo abajo |
 | ≤900px | Proyectos, artículos de Servicios y catálogo de Tools a una columna; Servicios/Tools se apila |
 | ≤700px | Lista de SimpleNav oculta; FAQ, tarjetas de Contacto y formularios a una columna |
-| ≤640px | Hero móvil específico; bento de About a una columna |
+| ≤640px | Hero móvil específico; listas del stack de About con dos columnas |
 | ≤560px | Metadatos y ajustes del conversor a una columna |
 
 A exactamente 900px coexisten sidebar de escritorio y algunos grids de una columna — no hay un único valor universal de breakpoint.

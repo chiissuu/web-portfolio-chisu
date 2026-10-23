@@ -8,6 +8,14 @@ interface Props {
 const { t } = Astro.props as Props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const about = t.about;
+const titleImage = about.aboutMe.titleImage;
+// Hide the PNG's transparent canvas margins without editing the original.
+const titleImageStyle = titleImage && {
+  "aspect-ratio": `${titleImage.crop.width} / ${titleImage.crop.height}`,
+  "--ab-title-image-width": `${100 * titleImage.width / titleImage.crop.width}%`,
+  "--ab-title-image-left": `${-100 * titleImage.crop.x / titleImage.crop.width}%`,
+  "--ab-title-image-top": `${-100 * titleImage.crop.y / titleImage.crop.height}%`,
+};
 
 type ProsePart =
   | { text: string; kind: "text" | "strong" | "location" | "closing" }
@@ -72,55 +80,75 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
   <div class="section-inner ab-inner">
     <div class="ab-body">
       <div class="ab-content">
-        <!-- Reveal each reading group separately so long mobile prose stays visible. -->
+        <!-- The title keeps its existing reveal; the biography is readable immediately. -->
         <header class="ab-cover">
-          <h2 class="ab-title rd-reveal">{about.aboutMe.title}</h2>
-          <div class="ab-cover-prose editorial-text">
+          <h2 class:list={["ab-title", "rd-reveal", { "ab-title--art": !!titleImage }]}>
+            {titleImage ? (
+              <>
+                <span class="ab-title-text">{about.aboutMe.title}</span>
+                <span class="ab-title-art" style={titleImageStyle} aria-hidden="true">
+                  <img
+                    class="ab-title-image"
+                    src={`${base}${titleImage.src}`}
+                    alt=""
+                    width={titleImage.width}
+                    height={titleImage.height}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              </>
+            ) : about.aboutMe.title}
+          </h2>
+          <div class="ab-cover-prose">
             {proseGroups.map((group) => (
-              <section class="ab-prose-group rd-reveal" aria-labelledby={group.headingId}>
+              <section
+                class="ab-prose-group"
+                aria-labelledby={group.headingId}
+              >
                 <h3 class="ab-group-title" id={group.headingId}>{group.title}</h3>
-                {group.paragraphs.map((paragraph, groupIndex) => {
-                  const index = group.offset + groupIndex;
-                  return (
-                    <p class:list={{ "ab-lead": index === 0 }}>
-                      {index === 0 && <span class="ab-emoji" aria-hidden="true">👋</span>}
-                      {index === 1 && <span class="ab-emoji" aria-hidden="true">💻</span>}
-                      {decorateParagraph(paragraph).map((part) => (
-                        part.kind === "strong" ? <strong>{part.text}</strong> :
-                        part.kind === "closing" ? <span class="ab-closing-line">{part.text}</span> :
-                        part.kind === "link" ? (
-                          <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
-                            {decorateParagraph(part.text, strongAnnotations).map((bit) => (
-                              bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
-                            ))}
-                          </a>
-                        ) : part.kind === "emoji" ? (
-                          <span class="ab-icon-word"><span class="ab-emoji" aria-hidden="true">{part.symbol}</span>{part.text}</span>
-                        ) : part.kind === "location" ? (
-                          <strong class="ab-location">
-                            <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
-                            <span class="ab-spain-text">{part.text}</span>
-                          </strong>
-                        ) : part.kind === "flag" ? (
-                          <span class="ab-icon-word">
-                            <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
-                            {part.text}
-                          </span>
-                        ) : part.text
-                      ))}
-                    </p>
-                  );
-                })}
+                <div class="ab-prose-copy">
+                  {group.paragraphs.map((paragraph, groupIndex) => {
+                    const index = group.offset + groupIndex;
+                    return (
+                      <p class:list={{ "ab-lead": index === 0, "ab-languages": index === 2 }}>
+                        {decorateParagraph(paragraph).map((part) => (
+                          part.kind === "strong" ? <strong>{part.text}</strong> :
+                          part.kind === "closing" ? <span class="ab-closing-line">{part.text}</span> :
+                          part.kind === "link" ? (
+                            <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
+                              {decorateParagraph(part.text, strongAnnotations).map((bit) => (
+                                bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
+                              ))}
+                            </a>
+                          ) : part.kind === "emoji" ? (
+                            <span class="ab-icon-word"><span class="ab-emoji" aria-hidden="true">{part.symbol}</span>{part.text}</span>
+                          ) : part.kind === "location" ? (
+                            <strong class="ab-location">
+                              <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
+                              <span class="ab-spain-text">{part.text}</span>
+                            </strong>
+                          ) : part.kind === "flag" ? (
+                            <span class="ab-icon-word">
+                              <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
+                              {part.text}
+                            </span>
+                          ) : part.text
+                        ))}
+                      </p>
+                    );
+                  })}
+                </div>
               </section>
             ))}
           </div>
         </header>
 
         <section class="ab-skills" aria-labelledby="ab-skills-heading">
-          <h3 id="ab-skills-heading" class="ab-section-title rd-reveal">{about.skillsTitle}</h3>
+          <h3 id="ab-skills-heading" class="ab-section-title">{about.skillsTitle}</h3>
           <div class="ab-stack">
             {about.skillGroups.map((group) => (
-              <section class="ab-stack-group rd-reveal" aria-labelledby={`ab-stack-${group.id}`}>
+              <section class="ab-stack-group" aria-labelledby={`ab-stack-${group.id}`}>
                 <h4 class="ab-stack-category" id={`ab-stack-${group.id}`}>{group.title}</h4>
                 <ul class="ab-stack-items">
                   {group.items.map(([name, icon]) => (
@@ -148,21 +176,26 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     /* Let the content and backdrop straddle the pinned Hero's z-index.
        Isolating this section would trap both beneath its opaque backdrop. */
     --ab-blend-height: clamp(10rem, 20svh, 14rem);
-    --ab-accent: #c9c9c9;
-    --theme-text: #f2f2f2;
-    --theme-text-muted: #bdbdbd;
-    --theme-border: rgb(255 255 255 / 18%);
+    --ab-accent: var(--color-brand-gold);
+    --ab-copy: #d4d6d8;
+    --theme-text: #f3f4f5;
+    --theme-text-muted: #adb2b6;
+    --theme-border: rgb(196 204 209 / 18%);
     --theme-surface: rgb(255 255 255 / 4%);
     --theme-surface-strong: rgb(255 255 255 / 8%);
-    /* Match the exposed Hero wrapper at the section edge, then gradually
-       introduce charcoal. The texture below must also start transparent. */
-    background: linear-gradient(
-      180deg,
-      var(--section-dark-start) 0,
-      #191919 var(--ab-blend-height),
-      #121212 1400px,
-      #0d0d0d 100%
-    );
+    /* Preserve the Hero seam, then keep warm graphite through the stack. */
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgb(255 255 255 / 0.8%) 0 1px,
+        transparent 1px 4px
+      ),
+      linear-gradient(
+        180deg,
+        var(--section-dark-start) 0,
+        #24221f var(--ab-blend-height),
+        #24221f 100%
+      );
   }
 
   /* Reuse the Hero asset; only its decorative layer is desaturated.
@@ -178,7 +211,7 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     background-size: cover;
     background-position: center top;
     filter: grayscale(1) brightness(0.65);
-    opacity: 0.55;
+    opacity: 0.12;
     mask-image: linear-gradient(
       180deg,
       transparent 0,
@@ -208,24 +241,27 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
      Cover
      --------------------------------------------------------------------- */
   .ab-cover {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: clamp(3rem, 5vw, 4.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100%, 66rem);
+    margin-inline: auto;
+    justify-items: start;
+    text-align: left;
+    gap: clamp(1.5rem, 2vw, 2rem);
   }
 
   .ab-cover-prose {
-    width: min(100%, 62ch);
+    width: min(100%, 66rem);
     text-align: left;
     font-family: var(--font-body);
-    font-size: clamp(1.05rem, 1.25vw, 1.25rem);
+    font-size: clamp(1.05rem, 1.1vw, 1.2rem);
     font-weight: 400;
-    letter-spacing: -0.015em;
-    line-height: 1.85;
+    letter-spacing: -0.01em;
+    line-height: 1.8;
   }
 
   .ab-title {
+    position: relative;
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(3rem, 7vw, 5.5rem);
@@ -235,14 +271,78 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     color: var(--theme-text);
   }
 
+  .ab-title--art {
+    width: min(100%, 40rem);
+  }
+
+  /* A static glow follows the title at every breakpoint, without moving it. */
+  .ab-title::before {
+    content: "";
+    position: absolute;
+    inset: -55% 0 -70%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      rgb(193 155 61 / 15%) 0,
+      rgb(193 155 61 / 6%) 40%,
+      transparent 72%
+    );
+  }
+
+  .ab-title-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ab-title-art {
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ab-title-image {
+    position: absolute;
+    display: block;
+    width: var(--ab-title-image-width);
+    max-width: none;
+    height: auto;
+    left: var(--ab-title-image-left);
+    top: var(--ab-title-image-top);
+    /* Show the original gold artwork without changing its crop or geometry. */
+  }
+
   .ab-cover-prose p {
-    color: #d0d0d0;
-    max-width: 62ch;
-    margin-inline: auto;
+    color: var(--ab-copy);
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  .ab-prose-group {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .ab-prose-group:first-child {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  .ab-prose-copy {
+    min-width: 0;
+    max-width: 58ch;
+    width: 100%;
   }
 
   .ab-cover-prose p + p {
-    margin-top: clamp(2rem, 3.5vw, 2.75rem);
+    margin-top: clamp(1.75rem, 3vw, 2.25rem);
   }
 
   .ab-prose-group + .ab-prose-group {
@@ -252,30 +352,37 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
   }
 
   .ab-group-title {
-    margin: 0 0 2rem;
-    color: var(--theme-text);
+    margin: 0;
+    color: var(--ab-accent);
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 2vw, 1.6rem);
-    font-weight: 600;
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    font-weight: 500;
     letter-spacing: -0.02em;
-    line-height: 1.4;
+    line-height: 1.35;
     text-wrap: balance;
   }
 
   .ab-cover-prose p.ab-lead {
-    font-size: clamp(1.15rem, 1.5vw, 1.5rem);
-    line-height: 1.8;
+    font-size: clamp(1.2rem, 1.4vw, 1.5rem);
+    line-height: 1.7;
+    letter-spacing: -0.02em;
+    color: var(--theme-text);
+  }
+
+  .ab-cover-prose p.ab-languages {
+    font-size: 0.95em;
+    color: var(--theme-text-muted);
   }
 
   .ab-closing-line {
     display: block;
-    max-width: 32ch;
-    margin: 2.5rem 0 0;
-    padding-top: 2rem;
-    border-top: 1px solid var(--theme-border);
+    max-width: 34ch;
+    margin: 1.75rem 0 0;
+    padding-inline-start: 1.25rem;
+    border-inline-start: 2px solid var(--ab-accent);
     color: var(--theme-text);
     font-family: var(--font-display);
-    font-size: clamp(1.4rem, 2.3vw, 2rem);
+    font-size: clamp(1.35rem, 1.8vw, 1.8rem);
     font-weight: 600;
     letter-spacing: -0.015em;
     line-height: 1.4;
@@ -291,8 +398,9 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     color: var(--theme-text);
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-decoration-color: rgb(242 242 242 / 50%);
-    text-underline-offset: 0.18em;
+    text-decoration-color: rgb(196 204 209 / 45%);
+    text-underline-offset: 0.2em;
+    text-decoration-skip-ink: auto;
     transition: text-decoration-color 0.2s ease;
   }
 
@@ -318,64 +426,50 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
   }
 
   .ab-location {
-    display: inline-block;
-    white-space: nowrap;
+    font-weight: 600;
   }
 
   .ab-spain-text {
-    display: inline-block;
-    line-height: 1.3;
-  }
-
-  @supports (background-clip: text) {
-    .ab-spain-text {
-      /* Light red/yellow stripes stay legible over the charcoal texture. */
-      background-image: linear-gradient(
-        180deg,
-        #ff9292 0% 25%,
-        #ffe599 25% 75%,
-        #ff9292 75% 100%
-      );
-      background-color: #ff9292;
-      background-size: 100% 0.85em;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-clip: text;
-      color: transparent;
-    }
+    color: inherit;
   }
 
   .ab-emoji {
     display: inline-block;
     margin-inline-end: 0.3em;
-    font-size: 0.9em;
+    font-size: 0.85em;
     vertical-align: 0.04em;
+    filter: grayscale(1);
   }
 
   .ab-icon-word {
-    display: inline-block;
-    white-space: nowrap;
+    white-space: normal;
+  }
+
+  .ab-skills {
+    width: min(100%, 66rem);
+    margin-inline: auto;
   }
 
   .ab-section-title {
-    margin: 0 0 clamp(2.5rem, 5vw, 4rem);
-    text-align: center;
+    margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
+    text-align: left;
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
-    letter-spacing: -0.025em;
-    color: var(--theme-text);
+    font-weight: 500;
+    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+    letter-spacing: -0.015em;
+    text-transform: none;
+    color: var(--ab-accent);
     line-height: 1.15;
     text-wrap: balance;
   }
 
-  /* Category rows keep the full stack visible without empty bento cards. */
+  /* Compact reference rows keep the stack secondary to the biography. */
   .ab-stack-group {
     display: grid;
-    grid-template-columns: minmax(10rem, 0.24fr) minmax(0, 1fr);
+    grid-template-columns: minmax(8.5rem, 0.23fr) minmax(0, 1fr);
     align-items: center;
-    gap: clamp(1.5rem, 3vw, 3rem);
-    padding-block: clamp(1.5rem, 3vw, 2rem);
+    gap: clamp(1rem, 2vw, 2rem);
+    padding-block: 0.9rem;
     border-top: 1px solid var(--theme-border);
   }
 
@@ -385,7 +479,7 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
 
   .ab-stack-category {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    font-size: 0.95rem;
     font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.4;
@@ -395,32 +489,34 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
 
   .ab-stack-items {
     list-style: none;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
-    gap: 1.4rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
     margin: 0;
     padding: 0;
   }
 
   .ab-stack-item {
     display: flex;
-    flex-direction: column;
+    min-width: 0;
+    max-width: 100%;
     align-items: center;
-    gap: 0.7rem;
-    color: #d0d0d0;
+    gap: 0.5rem;
+    color: var(--ab-copy);
     font-size: 0.85rem;
     line-height: 1.35;
-    text-align: center;
+    text-align: left;
     overflow-wrap: anywhere;
   }
 
   .ab-stack-icon {
     display: grid;
     place-items: center;
-    width: 3.8rem;
-    height: 3.8rem;
-    padding: 0.7rem;
-    border-radius: 1rem;
+    flex: 0 0 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0.3rem;
+    border-radius: 0.4rem;
     background: #ebebeb;
   }
 
@@ -444,32 +540,41 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
       max-width: calc(var(--container) - 4rem);
       margin-inline: auto;
     }
+
+    .ab-cover,
+    .ab-prose-group {
+      grid-template-columns: minmax(9rem, 0.27fr) minmax(0, 1fr);
+      column-gap: clamp(2rem, 4vw, 4rem);
+      align-items: start;
+    }
+
+    .ab-title {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .ab-cover-prose {
+      grid-column: 1 / -1;
+    }
+
+    .ab-group-title {
+      max-width: 14ch;
+      padding-block-start: 0.15em;
+    }
   }
 
   @media (max-width: 899px) {
     .ab-stack-group {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .ab-stack-items {
-      grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+      gap: 0.85rem;
     }
   }
 
   @media (max-width: 640px) {
     .ab-stack-items {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.5rem 0.6rem;
-    }
-
-    .ab-stack-icon {
-      width: 3.4rem;
-      height: 3.4rem;
-    }
-
-    .ab-stack-item {
-      font-size: 0.78rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem 0.75rem;
     }
   }
 </style>

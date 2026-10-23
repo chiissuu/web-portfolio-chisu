@@ -1,7 +1,7 @@
 ---
 tags: [rutas, navegacion]
 aliases: [Rutas-y-Navegacion]
-actualizado: 2026-10-09
+actualizado: 2026-10-23
 fuente: [src/pages]
 ---
 
@@ -22,7 +22,7 @@ No existen rutas `/en`, detalle de proyecto, Instagram checker, contacto indepen
 
 ## Anclas de la portada
 
-`home`, `about`, `projects`, `services-tools`, `services`, `tools`, `contact`, `faq`. `services` y `tools` son columnas internas de `services-tools`, no secciones principales independientes. Las escenas antiguas de About y sus anclas ya no existen. Sus encabezados internos usan ab-intro-heading, ab-difference-heading, ab-foundation-heading y ab-skills-heading; la navegación principal sigue apuntando a #about (ver [[Sobre-Mi]]).
+`home`, `about`, `projects`, `services`, `tools`, `contact`, `faq`. Desde el 23 de octubre `services` y `tools` son dos secciones principales consecutivas e independientes (Servicios y después Tools); el antiguo contenedor `services-tools` ya no existe. Las escenas antiguas de About y sus anclas ya no existen. Sus encabezados internos usan ab-intro-heading, ab-difference-heading, ab-foundation-heading y ab-skills-heading; la navegación principal sigue apuntando a #about (ver [[Sobre-Mi]]).
 
 ## Tres navegaciones distintas — deliberadamente no equivalentes
 

@@ -12,7 +12,7 @@ const { t } = Astro.props as Props;
 <section class="section-theme-dark" id="faq">
   <div class="section-inner">
     <p class="rd-eyebrow">{t.faq.eyebrow}</p>
-    <SectionHeadingCard text={t.faq.title} as="h2" size="lg" />
+    <SectionHeadingCard text={t.faq.title} image={t.faq.titleImage} as="h2" size="lg" />
 
     <div class="rd-faq-list">
       {t.faq.items.map((item) => (

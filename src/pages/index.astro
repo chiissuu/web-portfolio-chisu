@@ -4,7 +4,8 @@ import HeroExperience from "../components/HeroExperience.astro";
 import AboutSection from "../components/AboutSection.astro";
 import ContactSection from "../components/ContactSection.astro";
 import ProjectsSection from "../components/ProjectsSection.astro";
-import ServicesToolsSection from "../components/ServicesToolsSection.astro";
+import ServicesSection from "../components/ServicesSection.astro";
+import ToolsSection from "../components/ToolsSection.astro";
 import FaqSection from "../components/FaqSection.astro";
 import { content } from "../content/site.js";
 
@@ -16,7 +17,7 @@ const t = content.es;
 
 {/*
   Section order per the redesign spec: Home (hero) -> Sobre mí -> Proyectos ->
-  Servicios y Tools -> Contacto -> FAQ. No footer/closing statement after
+  Servicios -> Tools -> Contacto -> FAQ. No footer/closing statement after
   FAQ — `ClosingStatement.astro` is intentionally not rendered here anymore
   (left in place, unused, rather than deleted — see delivery notes).
 */}
@@ -25,7 +26,8 @@ const t = content.es;
   <main class="home-main">
     <AboutSection t={t} />
     <ProjectsSection t={t} />
-    <ServicesToolsSection t={t} />
+    <ServicesSection t={t} />
+    <ToolsSection t={t} />
     <ContactSection t={t} />
     <FaqSection t={t} />
   </main>

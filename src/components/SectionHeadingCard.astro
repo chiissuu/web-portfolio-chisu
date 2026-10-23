@@ -7,19 +7,52 @@
 // `.section-theme-dark` wrapper it's nested inside, so it never needs to
 // know which theme it's in. This IS the reference "cristal opaco" finish
 // every other glass card in the redesign reuses via that same class.
+//
+// With `image`, the visible title is the supplied transparent artwork
+// instead of the card; `text` stays in the DOM as the accessible heading.
+// The artwork's transparent margins are hidden by CSS only (same technique
+// as About's title) and every title is sized by letter height so all of
+// them read at the same scale regardless of word length.
+import type { TitleImage } from "../lib/content-types";
+
 interface Props {
   text: string;
   as?: "h1" | "h2" | "h3";
   size?: "lg" | "md";
   class?: string;
+  image?: TitleImage;
 }
 
-const { text, as: Tag = "h2", size = "lg", class: className = "" }: Props = Astro.props;
+const { text, as: Tag = "h2", size = "lg", class: className = "", image }: Props = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const artStyle = image && {
+  "--shc-ratio": `${image.crop.width / image.crop.height}`,
+  "--shc-art-width": `${100 * image.width / image.crop.width}%`,
+  "--shc-art-left": `${-100 * image.crop.x / image.crop.width}%`,
+  "--shc-art-top": `${-100 * image.crop.y / image.crop.height}%`,
+};
 ---
 
-<Tag class:list={["shc", `shc-${size}`, className]}>
-  <span class="shc-inner glass-panel">{text}</span>
-</Tag>
+{image ? (
+  <Tag class:list={["shc", "shc-art", className]} style={artStyle}>
+    <span class="shc-text">{text}</span>
+    <span class="shc-art-frame" aria-hidden="true">
+      <img
+        class="shc-art-image"
+        src={`${base}${image.src}`}
+        alt=""
+        width={image.width}
+        height={image.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
+  </Tag>
+) : (
+  <Tag class:list={["shc", `shc-${size}`, className]}>
+    <span class="shc-inner glass-panel">{text}</span>
+  </Tag>
+)}
 
 <style>
   .shc {
@@ -52,5 +85,43 @@ const { text, as: Tag = "h2", size = "lg", class: className = "" }: Props = Astr
     padding: 0.5em 0.7em;
     border-radius: 6px;
     font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+  }
+
+  /* Artwork title: letter height is constant, so width follows each word's
+     own proportions and never exceeds the content column. */
+  .shc-art {
+    --shc-art-height: clamp(5rem, 10vw, 9rem);
+    position: relative;
+    display: block;
+    width: min(100%, calc(var(--shc-art-height) * var(--shc-ratio, 4)));
+    margin-bottom: 1.25rem;
+  }
+
+  .shc-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .shc-art-frame {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--shc-ratio);
+  }
+
+  .shc-art-image {
+    position: absolute;
+    display: block;
+    width: var(--shc-art-width);
+    max-width: none;
+    height: auto;
+    left: var(--shc-art-left);
+    top: var(--shc-art-top);
   }
 </style>

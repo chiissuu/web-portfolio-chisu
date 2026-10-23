@@ -52,6 +52,12 @@ const es = {
   about: {
     aboutMe: {
       title: "SOBRE MÍ",
+      titleImage: {
+        src: "/assets/images/about-title-es.png",
+        width: 2446,
+        height: 1400,
+        crop: { x: 173, y: 454, width: 2084, height: 558 },
+      },
       groupLabels: {
         intro: "Quién soy",
         difference: "Qué me diferencia de la competencia",
@@ -178,6 +184,12 @@ const es = {
   projects: {
     eyebrow: "Proyectos — en construcción",
     title: "Proyectos destacados",
+    titleImage: {
+      src: "/assets/images/section-title-proyectos-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 103, y: 389, width: 1817, height: 436 },
+    },
     note:
       "Plantillas visuales: títulos provisionales, imágenes placeholder y sin enlaces definitivos. Se sustituirán por proyectos reales documentados.",
     items: [
@@ -294,8 +306,14 @@ const es = {
     },
   },
   servicesTools: {
-    title: "Servicios y Tools",
     services: {
+      title: "Servicios",
+      titleImage: {
+        src: "/assets/images/section-title-servicios-es.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 138, y: 391, width: 1743, height: 434 },
+      },
       description: [
         { text: "Combino " },
         { text: "desarrollo técnico", strong: true },
@@ -320,6 +338,13 @@ const es = {
       ctaLabel: "Ir a la página de servicios",
     },
     tools: {
+      title: "Tools",
+      titleImage: {
+        src: "/assets/images/section-title-tools-es.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 535, y: 407, width: 965, height: 414 },
+      },
       description:
         "Desarrollo pequeñas herramientas personales que parten de necesidades concretas y que voy construyendo y publicando progresivamente. El objetivo es crear utilidades sencillas, accesibles y transparentes que resuelvan tareas específicas sin añadir complejidad innecesaria. Esta colección crecerá poco a poco conforme las herramientas estén preparadas para utilizarse.",
       ctaLabel: "Ir a la página de herramientas",
@@ -328,6 +353,12 @@ const es = {
   contact: {
     eyebrow: "Contacto",
     title: "Hablemos de tu próxima idea",
+    titleImage: {
+      src: "/assets/images/section-title-contacto-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 234, y: 396, width: 1562, height: 423 },
+    },
     text: "Abierto a colaborar en proyectos, seguir aprendiendo y construir productos digitales con criterio técnico y visual.",
     emailIntro: "Si prefieres escribirme manualmente, puedes hacerlo mediante este correo:",
     links: {
@@ -359,6 +390,12 @@ const es = {
   faq: {
     eyebrow: "FAQ",
     title: "Preguntas frecuentes",
+    titleImage: {
+      src: "/assets/images/section-title-faq-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 692, y: 423, width: 621, height: 416 },
+    },
     items: [
       {
         q: "¿Tienes experiencia profesional?",
@@ -487,6 +524,12 @@ const en = {
   about: {
     aboutMe: {
       title: "ABOUT ME",
+      titleImage: {
+        src: "/assets/images/about-title-en.png",
+        width: 2446,
+        height: 1400,
+        crop: { x: 139, y: 475, width: 2157, height: 537 },
+      },
       groupLabels: {
         intro: "Who I am",
         difference: "What sets me apart from the competition",
@@ -729,8 +772,8 @@ const en = {
     },
   },
   servicesTools: {
-    title: "Services & Tools",
     services: {
+      title: "Services",
       description: [
         { text: "I combine " },
         { text: "technical development", strong: true },
@@ -753,6 +796,7 @@ const en = {
       ctaLabel: "Go to the services page",
     },
     tools: {
+      title: "Tools",
       description:
         "I build small personal tools that start from concrete needs, and that I keep building and publishing gradually. The goal is to create simple, accessible, and transparent utilities that solve specific tasks without adding unnecessary complexity. This collection will grow little by little as each tool becomes ready to use.",
       ctaLabel: "Go to the tools page",

@@ -12,7 +12,7 @@ const { t } = Astro.props as Props;
 <section class="section-theme-dark" id="projects">
   <div class="section-inner">
     <p class="rd-eyebrow">{t.projects.eyebrow}</p>
-    <SectionHeadingCard text={t.projects.title} as="h2" size="lg" />
+    <SectionHeadingCard text={t.projects.title} image={t.projects.titleImage} as="h2" size="lg" />
     <p class="rd-note editorial-text editorial-text-muted">{t.projects.note}</p>
 
     <div class="rd-projects-grid">

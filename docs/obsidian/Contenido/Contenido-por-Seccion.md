@@ -21,7 +21,7 @@ Dos botones llevan a Proyectos y a Sobre mí. Las métricas son contenido editor
 
 Un único título «SOBRE MÍ» y siete párrafos de presentación:
 
-Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). Los párrafos se alinean a la izquierda en una columna centrada de hasta 62ch, con más espacio entre ideas y grupos. El primer párrafo es algo mayor y la última frase del cierre se destaca con su propio espacio y separador. No se cambia la redacción. Etiquetas y selector de cierre también existen en inglés.
+Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). Los párrafos se alinean a la izquierda en una composición centrada de hasta 66rem, con columna de lectura de hasta 58ch y más espacio entre ideas y grupos (medidas exactas en [[Sobre-Mi]]). El primer párrafo es algo mayor y la última frase del cierre se destaca con su propio espacio y separador. No se cambia la redacción. Etiquetas y selector de cierre también existen en inglés.
 
 - Formación y ubicación: Jesús León Romero Atienza, Ingeniería del Software con mención en Ingeniería de Datos (Big Data), U-TAD (Centro Universitario de Tecnología y Arte Digital), ciudad natal Madrid, España.
 - Base técnica: tres años de formación, full-stack, bases de datos, arquitectura de software y programación de sistemas.
@@ -33,7 +33,7 @@ Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué m
 
 Estos párrafos sustituyen a las cuatro escenas narrativas (Cimientos, Dirección, Producto e Impulso) y sus gráficos. Ya no se publica el título compuesto ni la línea independiente de ciudad e idiomas. Se retiran también los dos CTA de Drive que acompañaban a esas escenas. Detalle de render en [[Sobre-Mi]].
 
-La biografía se presenta en Inter. Los cinco primeros párrafos conservan la redacción aprobada. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado. Madrid/España usa letras en negrita con los colores de la bandera. La base técnica combina emoji 💻 y negritas en full-stack, bases de datos, arquitectura y sistemas. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia y varias capas en negrita. Se retiran todos los círculos/subrayados SVG y su animación; permanecen los subrayados funcionales de los enlaces. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción.
+La biografía se presenta en Inter. Los cinco primeros párrafos conservan la redacción aprobada. La carrera/mención enlaza al grado y el nombre completo de U-TAD al mapa proporcionado. Madrid/España usa negrita sólida, sin degradado ni colores de bandera (se retiraron en la auditoría del 23 de octubre). La base técnica combina emoji 💻 y negritas en full-stack, bases de datos, arquitectura y sistemas. 📚 acompaña U-TAD y banderas locales acompañan los tres idiomas; 👋 y 🎮 conservan su papel. En el perfil, 👟 moda, 🎧 música y 📱 redes sociales; versión propia y varias capas en negrita. Se retiran todos los círculos/subrayados SVG y su animación; permanecen los subrayados funcionales de los enlaces. `aboutMe.accents` mantiene selectores y URLs en ES/EN. El perfil se separa después de la introducción.
 
 «Mi base actual» se retiró por duplicar formación e idiomas. La sección cierra con «MI STACK DE TRABAJO»: filas de categorías y logos visibles, sin las antiguas tarjetas bento ni un CTA final hacia Proyectos.
 
@@ -49,13 +49,17 @@ La biografía se presenta en Inter. Los cinco primeros párrafos conservan la re
 
 42 herramientas en total, todas con recurso de logo local. Los añadidos usan PNG de 96×96; se documentan sus fuentes en [[Logos-Stack]]. Los nombres acompañan siempre a sus imágenes. No son enlaces ni botones y no implican dependencias instaladas en el proyecto.
 
+## Títulos de sección
+
+En la portada, Proyectos, Servicios, Tools, Contacto y FAQ se presentan con un título gráfico (ver [[Otras-Secciones-y-Compartidos]]). El texto de cada `h2`, accesible pero no visible, es: «Proyectos destacados», «Servicios», «Tools», «Hablemos de tu próxima idea» y «Preguntas frecuentes». Las versiones inglesas no tienen arte y muestran la tarjeta de texto.
+
 ## Proyectos
 
 Tres tarjetas provisionales (Full-stack, Data Science, Visual/UI), cada una «Próximamente». Detalle estructural en [[Otras-Secciones-y-Compartidos]].
 
 ## Servicios y Tools en portada
 
-Servicios explica desarrollo técnico y criterio visual, automatización, webs comerciales, asesoramiento previo y auditoría con el cliente. Tools explica la colección de utilidades y muestra como ejemplo la primera herramienta del catálogo. Detalle estructural en [[Otras-Secciones-y-Compartidos]].
+Son dos secciones independientes (Servicios y, a continuación, Tools), cada una con título gráfico propio. El texto procede de la antigua sección combinada y está pendiente de actualización. Servicios explica desarrollo técnico y criterio visual, automatización, webs comerciales, asesoramiento previo y auditoría con el cliente. Tools explica la colección de utilidades y muestra como ejemplo la primera herramienta del catálogo. Detalle estructural en [[Otras-Secciones-y-Compartidos]].
 
 ## Servicios: página independiente
 

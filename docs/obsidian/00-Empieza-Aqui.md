@@ -1,7 +1,7 @@
 ---
 tags: [moc, contexto-agente]
 aliases: [Empieza-Aqui]
-actualizado: 2026-10-10
+actualizado: 2026-10-23
 fuente: [código fuente del proyecto]
 ---
 
@@ -11,7 +11,7 @@ Este vault organiza todo el conocimiento del portfolio personal de **Jesús Leó
 
 Este vault se construyó reestructurando, en notas de Obsidian interconectadas, una auditoría completa del proyecto (revisión del 10 de septiembre de 2026) que ya cumplió su propósito de dar contexto y fue retirada. Desde ahora este vault es la referencia documental única del proyecto — si en algún momento diverge del código, el código fuente manda.
 
-**Estado Git en el momento de crear este vault (2026-10-06):** rama `feat/lower-sections-redesign`, HEAD `7b53ed6` ("chore: create audited portfolio checkpoint"). Cambios locales sin commit ya presentes: [AboutSection.astro](../../src/components/AboutSection.astro), [ProjectsSection.astro](../../src/components/ProjectsSection.astro), [site.js](../../src/content/site.js) y [content-types.ts](../../src/lib/content-types.ts). Son parte del estado documentado — no son un error a revertir.
+**Estado Git (comprobado el 2026-10-23):** rama `feat/lower-sections-redesign`, HEAD `2948631` («feat: refine about and stack and fix video converter»). Antes de la última ronda dorada de About había cambios sin commit en [AboutSection.astro](../../src/components/AboutSection.astro), [HeroExperience.astro](../../src/components/HeroExperience.astro), [site.js](../../src/content/site.js) y [content-types.ts](../../src/lib/content-types.ts), además de recursos nuevos sin seguimiento (fuente Milesdane archivada, iconos sociales y PNG de título). Son parte del estado documentado — no son un error a revertir. Consultar `git status` para el estado actual: esta nota no es un registro en vivo.
 
 ## Qué es esto, en una frase por área
 
@@ -45,7 +45,9 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 
 ## Changelog corto (respecto a la auditoría de agosto 2026)
 
-- About pasó de capítulos numerados a `scenes` + rail + portada propia. Tras la revisión visual del 6 de octubre usa fondo carbón con textura desaturada del Hero y tema dark, título y biografía en una columna sin indicador lateral de lectura. Proyectos conserva su tema oscuro.
+- About pasó de capítulos numerados a `scenes` + rail, y después (octubre) a: PNG dorado de título, siete párrafos en dos grupos, y un stack de 42 herramientas. Su fondo es grafito cálido #24221f con textura suave y halo dorado estático, tema dark, sin rail ni escenas. Proyectos conserva su tema oscuro.
+- Desde el 23 de octubre el sidebar usa siempre la paleta `brand` (dorada); la paleta mono/plata se retiró.
+- Servicios y Tools son ahora dos secciones consecutivas (`#services`, `#tools`) y el sidebar ilumina una sola a la vez. Proyectos, Servicios, Tools, Contacto y FAQ usan títulos gráficos WebP (ver [[Otras-Secciones-y-Compartidos]]). El contenido de Servicios y Tools aún no se ha actualizado.
 - Lucide sí se usa y renderiza en el sidebar (la sospecha de dependencia sin uso quedó descartada).
 - El texto de depuración del conversor ya no existe en el proyecto activo.
 - Se añadió `vite.optimizeDeps.include: ["react-dom/client"]` en `astro.config.mjs` para resolver un fallo de hidratación en dev.
@@ -75,8 +77,11 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 - [[Comandos-y-Pruebas]] — dev/check/build/preview, recorrido de prueba manual
 - [[Hallazgos-y-Pendientes]] — tabla priorizada de pendientes, enlazada por componente
 - [[Skills-Desarrollo-Web]] — selección comprobada de skills e instalación manual
+- [[Prompt-Continuidad-Claude]] — toma de contexto inicial completa y metodología de trabajo con delegación y consumo controlados
 - [[Prompt-Auditoria-Web]] — encargo preparado para una auditoría con Hero/Sobre mí/nav lateral protegidos y cambios según riesgo
 - [[Auditoria-Web]] — ronda ejecutada el 10 de octubre; cambios verificados, evidencias y decisiones pendientes
+- [[Auditoria-Sobre-Mi]] — auditoría y rediseño de About (23 de octubre): fuentes, dorado, nav y fondo grafito
+- [[Logos-Stack]] y [[Logos-Redes]] — procedencia y licencias de los logos del stack y del sidebar
 
 **Inventario**
 - [[Archivos-del-Proyecto]] — los archivos de `src/` + config, cada uno enlazado al código real

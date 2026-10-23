@@ -123,6 +123,13 @@ export interface SkillGroup {
 /** Section heading and authored introduction paragraphs, in source order. */
 export interface AboutMeCopy {
   title: string;
+  /** Original transparent PNG and its visible bounds, cropped only by CSS. */
+  titleImage?: {
+    src: string;
+    width: number;
+    height: number;
+    crop: { x: number; y: number; width: number; height: number };
+  };
   groupLabels: { intro: string; difference: string };
   closingPhrase: string;
   paragraphs: readonly string[];
@@ -156,9 +163,19 @@ export interface ProjectItem {
   status: string;
 }
 
+/** Transparent PNG/WebP used as a section heading. Its visible bounds are cropped
+ * by CSS only; `title` stays as the accessible heading text. */
+export interface TitleImage {
+  src: string;
+  width: number;
+  height: number;
+  crop: { x: number; y: number; width: number; height: number };
+}
+
 export interface ProjectsContent {
   eyebrow: string;
   title: string;
+  titleImage?: TitleImage;
   note: string;
   items: ProjectItem[];
 }
@@ -258,11 +275,12 @@ export interface ToolsSectionContent {
   tools: ToolsContent;
 }
 
-// ---- Services & Tools (merged home-page section) ---------------------------
+// ---- Services & Tools (two separate home-page sections) --------------------
 // A distinct, home-page-only presentation layered on top of the real
 // `services`/`tools` data — it doesn't replace `ServicesContent`/
 // `ToolsContent` (the `/servicios` and `/tools` sub-pages still use those
-// directly), it's the copy for the merged two-column teaser section.
+// directly). Servicios and Tools are two consecutive home sections
+// (`#services`, `#tools`); both read their copy from `servicesTools`.
 
 /** One run of text in the services column's description — `strong: true`
  * segments render as `<strong>`, matching the semantic emphasis the copy
@@ -273,24 +291,33 @@ export interface ServicesToolsTextSegment {
 }
 
 export interface ServicesToolsServicesColumn {
+  /** Accessible heading text; the visual title is `titleImage` when present. */
+  title: string;
+  titleImage?: TitleImage;
   description: readonly ServicesToolsTextSegment[];
   ctaLabel: string;
 }
 
 export interface ServicesToolsToolsColumn {
+  /** Accessible heading text; the visual title is `titleImage` when present. */
+  title: string;
+  titleImage?: TitleImage;
   description: string;
   ctaLabel: string;
 }
 
 export interface ServicesToolsContent {
-  title: string;
   services: ServicesToolsServicesColumn;
   tools: ServicesToolsToolsColumn;
 }
 
-export interface ServicesToolsSectionContent {
-  servicesTools: ServicesToolsContent;
+export interface ServicesHomeSectionContent {
+  servicesTools: Pick<ServicesToolsContent, "services">;
   services: Pick<ServicesContent, "eyebrow">;
+}
+
+export interface ToolsHomeSectionContent {
+  servicesTools: Pick<ServicesToolsContent, "tools">;
   tools: ToolsContent;
 }
 
@@ -336,6 +363,7 @@ export interface ContactFormCopy {
 export interface ContactContent {
   eyebrow: string;
   title: string;
+  titleImage?: TitleImage;
   text: string;
   /** The line introducing the mailto fallback button below the form. */
   emailIntro: string;
@@ -357,6 +385,7 @@ export interface FaqItem {
 export interface FaqContent {
   eyebrow: string;
   title: string;
+  titleImage?: TitleImage;
   items: FaqItem[];
 }
 

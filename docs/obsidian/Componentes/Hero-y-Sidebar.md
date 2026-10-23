@@ -1,6 +1,6 @@
 ---
 tags: [componente, hero, gsap, scrolltrigger, sidebar]
-actualizado: 2026-10-07
+actualizado: 2026-10-23
 fuente: [src/components/HeroExperience.astro]
 ---
 
@@ -20,7 +20,9 @@ Fuente: [HeroExperience.astro](../../../src/components/HeroExperience.astro). Es
 - El sidebar es **hermano exterior** de `.hx-wrap`, fijo y transparente, con cuatro artículos: marca/tagline, métricas, navegación, redes/CTA. Puede desplazarse internamente si no cabe en altura.
 - El botón y el panel del menú móvil también están fuera del Hero. El bloqueo `inert` del resto de la página no debe contenerlos a ellos.
 
-La imagen de marca se centra en su tarjeta mediante `align-self: center`; la descripción inferior usa `text-align: center`. LinkedIn (placeholder), GitHub y Redes Sociales se centran con `align-items: center` y `text-align: center`, y el CTA Contacto con `align-self: center`. Las filas del menú principal mantienen su alineación de icono y etiqueta. Los destinos de morph siguen siendo la imagen y el párrafo reales, medidos por el timeline; no se añaden offsets manuales.
+La imagen de marca se centra en su tarjeta mediante `align-self: center`; la descripción inferior usa `text-align: center`. LinkedIn (placeholder), GitHub y Redes Sociales forman un grupo centrado de filas con PNG dorado de 20px y nombre visible, alineados en dos columnas. Las filas tienen una altura mínima de 24px y el CTA Contacto conserva `align-self: center`. Las filas del menú principal mantienen su alineación de icono y etiqueta. Los destinos de morph siguen siendo la imagen y el párrafo reales, medidos por el timeline; no se añaden offsets manuales.
+
+Los logos sociales son PNG locales transparentes de 96×96, con siluetas reconocibles y el acabado metálico del nav. «Redes Sociales» usa Linktree para corresponder con su destino. Son decorativos (`alt=""`, `aria-hidden="true"`); los nombres y URLs permanecen en texto. LinkedIn sigue siendo un `span` deshabilitado sin `href`, con tooltip y opacidad atenuada hasta disponer de una URL real. GitHub y Linktree conservan foco visible, subrayado en hover/foco y `noopener noreferrer`; no se añade animación. Procedencia y licencias: [[Logos-Redes]].
 
 ## Entrada inicial
 
@@ -68,11 +70,19 @@ Cada artículo del sidebar calcula su solapamiento vertical con **todas** las se
 
 Por eso dos artículos del sidebar pueden tener temas distintos en una misma frontera de scroll — no es un bug, es el diseño. Textos, bordes y separadores interpolan durante 0,3s; con movimiento reducido el cambio es inmediato. Las métricas usan el acento de la paleta del sidebar, independiente del tema warm/dark de cada artículo.
 
-`setActiveSections()` también establece `data-palette` en el sidebar: `mono` cuando About es la sección activa y `brand` en las demás. La paleta mono cambia localmente `--color-brand-gold` a `#c9c9c9` y su variante strong a `#ededed`, de modo que métricas, enlace activo y CTA se vuelven grises. Las tarjetas usan una superficie gris translúcida y el PNG del wordmark recibe `grayscale(1) brightness(0.72)` para verse oscuro. Al salir de About se recuperan el logo y los acentos dorados. Este estado usa los mismos triggers y la sincronización inicial de navegación; no añade observadores ni modifica el morph.
+El sidebar mantiene `data-palette="brand"` en todas las secciones, incluido About. La ronda dorada del 2026-10-23 retiró las reglas de la paleta mono y su asignación condicional en `setActiveSections()`: el logo conserva su dorado original, los botones reutilizan los mismos tokens metálicos del Hero y las tarjetas su superficie translúcida habitual, con contorno metálico dorado de 2px. El seguimiento de sección activa, los temas por artículo y el morph no cambian.
+
+Los siete enlaces del nav, el CTA Contacto y los dos CTA del Hero («Ver Proyectos» y «Sobre Mí») comparten `.hx-metal-button`: bisel de 2px con reflejos claros y oscuros, reflejo diagonal, degradado, grano fino de metal cepillado y esquinas de 3px. `::before` dibuja la cara inclinada −4°; `::after` dibuja un canto fijo con reflejos alternos, visible 3px por debajo (2px en el sidebar de escritorio de altura ≤850px). Las áreas clicables conservan sus dimensiones y posición; cada enlace crea un contexto local con `isolation: isolate`, sin aislar el Hero ni About. Hero y sidebar utilizan los mismos tokens dorados, independientes del tema warm/dark de cada tarjeta. No se duplican los estilos del acabado.
+
+El acabado dorado se aproxima a los tonos del PNG de CHISU: cara #c19b3d, luz #dfc357, sombra #b08a32 y bisel #efd683, evitando el marfil de la versión inicial. El reflejo diagonal usa `--hx-metal-glint` con RGB dorado (244 216 126). Esta corrección afecta solo al color, no al relieve, la textura o la pulsación.
+
+El estado `.is-active` del menú mantiene `--hx-button-offset: 0px`: la cara queda elevada, con brillo 1.12 y un haz dorado fijo en el borde izquierdo mediante sombras interiores. No hay animación infinita. Hover usa −1px en los botones sin seleccionar; la selección conserva 0px. Solo `:active`, declarado después con la misma especificidad, baja 2px la cara, el texto y los iconos, y recupera el fondo/sombra hundidos durante la activación real. La transición sigue en 140ms. El canto y las áreas clicables permanecen fijos. El CTA Contacto inferior no se selecciona permanentemente; se hunde solo al activarlo, igual que los CTA del Hero. Se conservan ARIA, foco visible, entrada GSAP y desactivación de transiciones con movimiento reducido. El menú móvil conserva su estilo.
+
+Las cuatro cajas del sidebar llevan un bisel dorado de 2px con el mismo degradado del borde de los botones. Un `::before` absoluto con máscara compuesta pinta solo el contorno y deja transparente el centro; `pointer-events: none` evita interceptar clics. Se mantiene el borde estructural de 1px, por lo que las dimensiones, padding y destinos del morph no cambian. Sin soporte de máscaras se conserva un borde dorado sólido de reserva. Los temas por artículo siguen controlando texto y separadores, no el contorno dorado.
 
 Este mecanismo es genérico (detecta la clase `.section-theme-dark`, no un ID de sección concreto) — es por eso que intercambiar los temas de About y Proyectos (ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]]) no requirió ningún cambio en este archivo.
 
-La sección activa se calcula con **seis** ScrollTriggers, de `top 45%` a `bottom 45%`, con eventos de entrada en ambos sentidos de scroll. `services-tools` activa a la vez los enlaces de Servicios y Tools. Solo los enlaces que empiezan por `#` reciben `aria-current="location"` — los enlaces a subpáginas pueden resaltarse visualmente pero nunca se anuncian como ubicación actual de esa otra página.
+La sección activa se calcula con **siete** ScrollTriggers (home, about, projects, services, tools, contact y faq), de `top 45%` a `bottom 45%`, con eventos de entrada en ambos sentidos de scroll. Desde el 23 de octubre Servicios (`#services`) y Tools (`#tools`) son secciones separadas: cada una ilumina solo su propio enlace y nunca hay dos enlaces activos a la vez (antes `services-tools` los activaba juntos). El cambio solo tocó el array `NAV_TRIGGER_GROUPS` y sus comentarios; el morph, los temas por artículo y la geometría no se modificaron. Solo los enlaces que empiezan por `#` reciben `aria-current="location"` — los enlaces a subpáginas pueden resaltarse visualmente pero nunca se anuncian como ubicación actual de esa otra página.
 
 Los triggers de tema y sección activa pueden seguir existiendo aunque el sidebar esté oculto en móvil — no deben confundirse con el timeline maestro, que sí está condicionado a escritorio.
 

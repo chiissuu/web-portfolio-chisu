@@ -77,6 +77,9 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 7. Conversor: archivo vacío, formato no admitido, límites exactos y superiores, metadatos no legibles, selección rápida de dos archivos, MP3 en los tres bitrates, y MP4; reproducir las descargas resultantes (ver [[Conversor-de-Video]]).
 8. Cancelar durante la descarga del motor y durante la conversión; reintentar, resetear, repetir el mismo archivo, comprobar el aviso de memoria, y bloquear los recursos del motor para provocar el error de carga.
 
+> [!note] Registro histórico de About (6–9 de octubre)
+> Las secciones fechadas siguientes (hasta «Dos grupos, introducción y cierre destacados») describen estados **ya superados**: fondo bronce, paleta monocroma del sidebar, escenas y diagramas, rail, trazos SVG y Mi base actual. El estado vigente de About (grafito cálido #24221f, dorado, sidebar `brand`, siete párrafos y 42 herramientas) está en [[Sobre-Mi]], [[Hero-y-Sidebar]] y [[Auditoria-Sobre-Mi]]. Se conservan como bitácora de verificación, no como descripción actual.
+
 ## Revisión visual de Sobre mí (6 de octubre de 2026)
 
 - Fondo bronce local, textos marfil y acentos dorados. Portada en una columna; indicador lateral retirado y diagramas junto al texto desde 1280px.
@@ -211,6 +214,13 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - Navegador en 1920, 1280, 768, 390 y 320px en cada ruta: sin overflow final. Errores/válido simulado, teclado, campos opcionales y texto largo comprobados; formulario sin scripts probado como fixture separado.
 - Preview monta React; dev existente registra `_jsxDEV is not a function`. El motor de producción falla por core UMD/Worker módulo; ESM carga en diagnóstico separado, sin aplicar la propuesta. No se completó conversión/descarga/cancelación efectiva.
 - No se probó reduced motion real ni desactivación global de JS, no se midió Lighthouse/CWV ni otros navegadores. Los servidores de prueba temporales se detienen al finalizar.
+
+## Servicios y Tools separadas y títulos gráficos (23 de octubre de 2026)
+
+- La sección combinada se divide en `#services` y `#tools` (componentes nuevos; el combinado se elimina). Cinco títulos WebP aportados por el usuario sustituyen al texto en Proyectos, Servicios, Tools, Contacto y FAQ mediante `SectionHeadingCard`. El sidebar usa siete grupos de sección activa en lugar de seis. Contenido, estilos del resto del Hero, morph y temas por artículo no cambian.
+- `npm run check`: 45 archivos, 0 errores, 0 avisos y 126 hints. `npm run build`: cuatro páginas, código 0. HTML generado: `home > about > projects > services > tools > contact > faq`, sin ids duplicados ni `services-tools`, y las cinco imágenes presentes en `dist`.
+- Navegador (servidor dev del usuario en 4321; Astro no admite un segundo servidor del mismo proyecto): en 1280px, tras recorrer about, projects, services, tools, contact y faq, exactamente un enlace del sidebar activo en cada una, con cambio de Servicios a Tools justo en la frontera del 45%. Títulos a la misma altura de letra (128px en 1280, 80px en 390/320), sin deformar y sin desbordamiento horizontal de página ni de las secciones en 1280, 390 y 320px. Los enlaces `#services`/`#tools` del menú móvil apuntan a las nuevas secciones.
+- Límites: el navegador integrado iba a ~2 fps, así que los recorridos usan esperas largas. No se probó 768/1920px, el menú móvil abierto, teclado, movimiento reducido, lector de pantalla ni el contraste del título dorado sobre el fondo beige de Contacto. No se hizo commit ni push.
 
 ## Cómo mantener este vault al día
 
