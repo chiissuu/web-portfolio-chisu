@@ -32,3 +32,13 @@ const t = content.es;
     <FaqSection t={t} />
   </main>
 </Layout>
+
+<style is:global>
+  /* Every home section paints its own opaque background, so the page colour
+     only ever shows through hairline seams where two sections meet on a
+     fractional pixel (browser zoom, high-DPI scaling). Cream there read as a
+     pale line crossing the page and the sidebar glass; dark makes it vanish. */
+  body.redesign-home {
+    background: var(--section-dark-start);
+  }
+</style>
