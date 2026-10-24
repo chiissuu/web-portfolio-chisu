@@ -132,6 +132,8 @@ export interface AboutMeCopy {
   };
   groupLabels: { intro: string; difference: string };
   closingPhrase: string;
+  /** Link shown under the closing phrase, towards the projects section. */
+  projectsCta: { label: string; href: string };
   paragraphs: readonly string[];
   /** Exact phrases to decorate; paragraphs remain the source of the wording. */
   accents: {
@@ -313,12 +315,12 @@ export interface ServicesToolsContent {
 
 export interface ServicesHomeSectionContent {
   servicesTools: Pick<ServicesToolsContent, "services">;
-  services: Pick<ServicesContent, "eyebrow">;
+  services: { page: Pick<ServicesContent["page"], "articles"> };
 }
 
 export interface ToolsHomeSectionContent {
   servicesTools: Pick<ServicesToolsContent, "tools">;
-  tools: ToolsContent;
+  tools: { page: Pick<ToolsContent["page"], "items"> };
 }
 
 // ---- Contact --------------------------------------------------------------------

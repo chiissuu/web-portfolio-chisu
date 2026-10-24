@@ -59,10 +59,11 @@ const es = {
         crop: { x: 173, y: 454, width: 2084, height: 558 },
       },
       groupLabels: {
-        intro: "Quién soy",
+        intro: "/whoami",
         difference: "Qué me diferencia de la competencia",
       },
       closingPhrase: "proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+      projectsCta: { label: "Ver mis proyectos", href: "#projects" },
       accents: {
         strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "desarrollo full-stack", "bases de datos", "arquitectura de software", "programación de sistemas", "diseño gráfico", "trabajar en equipo", "versión propia", "varias capas"],
         emojis: [
@@ -531,10 +532,11 @@ const en = {
         crop: { x: 139, y: 475, width: 2157, height: 537 },
       },
       groupLabels: {
-        intro: "Who I am",
+        intro: "/whoami",
         difference: "What sets me apart from the competition",
       },
       closingPhrase: "projects with more depth, more personality, and a thoughtfully designed experience.",
+      projectsCta: { label: "View my projects", href: "#projects" },
       accents: {
         strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "full-stack development", "databases", "software architecture", "systems programming", "graphic design", "work as part of a team", "a distinct identity", "several layers"],
         emojis: [
