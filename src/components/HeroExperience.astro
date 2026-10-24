@@ -396,10 +396,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        hugging the sides. */
     --hx-aside-inset: clamp(1.5rem, 6vw, 4rem);
     --portrait-blur: 0px;
-    /* Drives the "|" nav separators' opacity (see `.hx-nav-item` below) —
-       tweened via a proxy object, same pattern as `--portrait-blur`, since
-       a `::after` pseudo-element can't be a direct GSAP tween target. */
-    --nav-sep-opacity: 1;
 
     /* Local black-gold palette for this first visual-harmonization pass.
        Scoped to `.hx-pin` only (not Layout.astro or any shared token) so
@@ -874,14 +870,14 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      hover animation. Color is `--color-ink` (real black), inherited from
      `.hx-nav` — previously dimmed to a fixed 40% opacity, which read as
      gray instead of black even at rest. Opacity now reads ONLY
-     `--nav-sep-opacity`, tweened by the scroll timeline (they have no
-     sidebar equivalent — see Section 4 of the scroll spec) — same
-     custom-property pattern as `--portrait-blur` — so alignment/fade-out
-     behavior on scroll is unchanged, just fully opaque (black) at rest. */
+     the scroll timeline, which tweens their own `opacity` (they have no
+     sidebar equivalent — see Section 4 of the scroll spec). They are tweened
+     directly, not through a proxy + `onUpdate`: a page loaded already
+     scrolled (hot reload, scroll restoration) renders the timeline without
+     firing callbacks, which used to leave the bars visible. */
   .hx-nav-sep {
     align-self: center;
     line-height: 1;
-    opacity: var(--nav-sep-opacity, 1);
     font-weight: 400;
     color: rgba(224, 197, 139, 0.62);
   }
@@ -1998,6 +1994,30 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     overscroll-behavior: none;
   }
 
+  /* Scroll is locked only while the entrance animation plays. Same technique
+     as the mobile menu above, but a separate class so each lock releases
+     independently. `scrollbar-gutter` keeps the (already present) desktop
+     scrollbar's space reserved, so the layout doesn't shift when it locks or
+     unlocks. */
+  :global(html.hx-intro-locked),
+  :global(body.hx-intro-locked) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  :global(html.hx-intro-locked) {
+    scrollbar-gutter: stable;
+  }
+
+  /* Water ripple on loose Hero elements (see src/lib/heroWater.ts): the
+     script sets `--hx-water` to an SVG filter per element and toggles this
+     class only while the pointer moves near it. Applied through a class (not
+     inline) so it never competes with the entrance animation's own inline
+     `filter`. */
+  :global(.hx-water-on) {
+    filter: var(--hx-water);
+  }
+
   /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
      query -- does not touch HTML, script block, GSAP/ScrollTrigger, .hx-wrap,
      .hx-pin, the mobile nav/toggle, the 641-899px tier, or the >=900px
@@ -2124,6 +2144,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { createHeroFluid } from "../lib/heroFluid";
+  import { createHeroWater } from "../lib/heroWater";
 
   // Bundled with the `gsap` package already installed via `npm install` —
   // not an additional dependency.
@@ -2615,6 +2637,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         tl.play();
       }
 
+      // ---- Scroll lock while the entrance plays -----------------------------
+      // Released by `entranceSettled`, which every outcome resolves (played
+      // out, skipped, interrupted, failed or disposed) -- so it follows the
+      // real animation instead of a fixed delay. The timer is only a safety
+      // net in case fonts/decoding never settle, so a visitor can never be
+      // left unable to scroll. Skipped entirely when the entrance won't play
+      // (reduced motion, or the page loads already scrolled). Registered
+      // before `bootScrollTimeline()` awaits the same promise, so the lock is
+      // gone before the scroll timeline measures the page.
+      const INTRO_LOCK_CLASS = "hx-intro-locked";
+      const INTRO_LOCK_MAX_MS = 8000;
+      let introLockTimer: ReturnType<typeof setTimeout> | undefined;
+      function releaseIntroScrollLock() {
+        window.clearTimeout(introLockTimer);
+        document.documentElement.classList.remove(INTRO_LOCK_CLASS);
+        document.body.classList.remove(INTRO_LOCK_CLASS);
+      }
+      if (!prefersReducedMotion && window.scrollY <= 0) {
+        document.documentElement.classList.add(INTRO_LOCK_CLASS);
+        document.body.classList.add(INTRO_LOCK_CLASS);
+        introLockTimer = window.setTimeout(releaseIntroScrollLock, INTRO_LOCK_MAX_MS);
+        void entranceSettled.then(releaseIntroScrollLock);
+      }
+      window.addEventListener("pagehide", releaseIntroScrollLock);
+
       playEntrance().catch((err) => {
         console.error("[HeroExperience] playEntrance failed:", err);
         detachAwaitSkipListener();
@@ -2775,7 +2822,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       }
 
       const blurProxy = { blur: 0 };
-      const navSepProxy = { opacity: 1 };
 
       function buildScrollTimeline() {
         const morphPairs = collectMorphPairs();
@@ -2837,16 +2883,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         // around them moved away, reading as orphaned floating bars.
         // Faded quickly and early (10%->28%) instead, so they're gone
         // before the nav items have travelled far.
-        tl.fromTo(
-          navSepProxy,
-          { opacity: 1 },
-          {
-            opacity: 0,
-            duration: 0.18,
-            onUpdate: () => pinEl.style.setProperty("--nav-sep-opacity", navSepProxy.opacity.toFixed(3)),
-          },
-          0.1
-        );
+        const navSeps = Array.from(pinEl.querySelectorAll<HTMLElement>(".hx-nav-sep"));
+        tl.fromTo(navSeps, { opacity: 1 }, { opacity: 0, duration: 0.18 }, 0.1);
 
         // Elements with NO sidebar equivalent (portrait, title, chip
         // card, actions, personal note): fade out early and quickly
@@ -2951,7 +2989,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
       function clearScrollDrivenState() {
         pinEl.style.removeProperty("--portrait-blur");
-        pinEl.style.removeProperty("--nav-sep-opacity");
+        gsap.set(Array.from(pinEl.querySelectorAll<HTMLElement>(".hx-nav-sep")), { clearProps: "opacity" });
         const morphSources = Array.from(introMotionEl.querySelectorAll<HTMLElement>("[data-morph-source]"));
         const noTargetGroup = collectNoTargetGroup();
         gsap.set([...morphSources, ...noTargetGroup], { clearProps: "all" });
@@ -3238,6 +3276,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
       return () => {
         entranceDisposed = true;
+        releaseIntroScrollLock();
+        window.removeEventListener("pagehide", releaseIntroScrollLock);
         detachAwaitSkipListener();
         detachPlayingInterruptListener();
         if (entranceTl) {
@@ -3262,5 +3302,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     }, wrapEl);
 
     document.addEventListener("astro:before-swap", () => ctx.revert());
+  }
+
+  // Pointer "liquid smear" over the background art. A separate layer inside
+  // `.hx-pin-fade` (so it fades/desaturates with it on scroll); it does not
+  // touch the timeline, the morph or any animated element. No-op without a
+  // fine pointer, with reduced motion, or without WebGL2.
+  {
+    const pinFadeEl = document.getElementById("hx-pin-fade");
+    if (pinFadeEl) {
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const fluid = createHeroFluid(pinFadeEl, `${base}/assets/images/hero-background-gold-alternative.png`);
+      document.addEventListener("astro:before-swap", () => fluid?.destroy());
+    }
+
+    // Same ripple on the loose elements: wordmark, headline, metrics, note,
+    // chips and tagline. Buttons, navigation and the portrait are left out.
+    const water = createHeroWater([
+      ".hx-wordmark-image",
+      ".hx-title-block",
+      ".hx-metric-value",
+      ".hx-metric-label",
+      ".hx-personal-note",
+      ".hx-chip",
+      ".hx-tagline",
+    ]);
+    document.addEventListener("astro:before-swap", () => water?.destroy());
   }
 </script>
