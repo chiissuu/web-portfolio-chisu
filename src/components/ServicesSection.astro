@@ -1,7 +1,8 @@
 ---
 import { withBase } from "../lib/paths.js";
 import type { ServicesHomeSectionContent } from "../lib/content-types";
-import SectionHeadingCard from "./SectionHeadingCard.astro";
+import ShowcaseSection from "./ShowcaseSection.astro";
+import ShowcaseCard from "./ShowcaseCard.astro";
 
 interface Props {
   t: ServicesHomeSectionContent;
@@ -10,91 +11,29 @@ interface Props {
 const { t } = Astro.props as Props;
 const servicesHref = withBase("/servicios/");
 const copy = t.servicesTools.services;
+const articles = t.services.page.articles;
 ---
 
-<section class="section-theme-dark" id="services">
-  <div class="section-inner">
-    <SectionHeadingCard text={copy.title} image={copy.titleImage} as="h2" size="lg" />
+<ShowcaseSection
+  id="services"
+  title={copy.title}
+  titleImage={copy.titleImage}
+  ctaHref={servicesHref}
+  ctaLabel={copy.ctaLabel}
+>
+  <p slot="intro">
+    {copy.description.map((segment) =>
+      segment.strong ? <strong>{segment.text}</strong> : segment.text
+    )}
+  </p>
 
-    <div class="st-col">
-      <p class="st-col-label">{t.services.eyebrow}</p>
-
-      <p class="st-description editorial-text">
-        {copy.description.map((segment) =>
-          segment.strong ? <strong>{segment.text}</strong> : segment.text
-        )}
-      </p>
-
-      <a class="st-cta" href={servicesHref}>
-        <span class="st-cta-label">{copy.ctaLabel}</span>
-        <span class="st-cta-arrow" aria-hidden="true">&#8594;</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<style>
-  .st-col {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    min-width: 0;
-    max-width: 46rem;
-  }
-
-  .st-col-label {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--theme-text-muted);
-  }
-
-  .st-description {
-    color: var(--theme-text-muted);
-  }
-
-  .st-description strong {
-    color: var(--theme-text);
-    font-weight: 700;
-  }
-
-  /* Large typographic CTA — full clickable block, not a small pill button. */
-  .st-cta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    padding: 1.1rem 0;
-    border-top: 1px solid var(--theme-border);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
-    color: var(--theme-text);
-    transition: gap 0.25s ease, color 0.25s ease;
-  }
-
-  .st-cta-arrow {
-    display: inline-block;
-    transition: transform 0.25s ease;
-    color: var(--color-brand-gold);
-    font-size: 1.3em;
-  }
-
-  .st-cta:hover,
-  .st-cta:focus-visible {
-    gap: 1.6rem;
-    color: var(--color-brand-gold);
-  }
-
-  .st-cta:hover .st-cta-arrow,
-  .st-cta:focus-visible .st-cta-arrow {
-    transform: translateX(6px);
-  }
-
-  .st-cta:focus-visible {
-    outline: 2px solid var(--color-brand-gold);
-    outline-offset: 4px;
-  }
-</style>
+  {articles.map((article, index) => (
+    <ShowcaseCard
+      number={String(index + 1).padStart(2, "0")}
+      title={article.title}
+      text={article.text}
+      tags={article.tags}
+      href={servicesHref}
+    />
+  ))}
+</ShowcaseSection>

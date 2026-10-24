@@ -1,0 +1,131 @@
+---
+// Shell shared by the home "Servicios" and "Tools" sections: warm-graphite
+// background (same recipe as About), artwork title with a static gold halo,
+// an introduction slot, a card grid slot, an optional extra slot and an
+// optional text CTA. The first of the
+// two sets `blend` so it fades in from the black of the section above; the
+// second continues the same graphite, so their seam is invisible.
+import type { TitleImage } from "../lib/content-types";
+import SectionHeadingCard from "./SectionHeadingCard.astro";
+
+interface Props {
+  id: string;
+  title: string;
+  titleImage?: TitleImage;
+  ctaHref?: string;
+  ctaLabel?: string;
+  blend?: boolean;
+}
+
+const { id, title, titleImage, ctaHref, ctaLabel, blend = false } = Astro.props as Props;
+---
+
+<section class:list={["section-theme-dark", "sc-section", { "sc-section--blend": blend }]} id={id}>
+  <div class="section-inner sc-inner">
+    <SectionHeadingCard text={title} image={titleImage} halo as="h2" size="lg" />
+
+    <div class="sc-intro editorial-text">
+      <slot name="intro" />
+    </div>
+
+    <div class="sc-grid">
+      <slot />
+    </div>
+
+    <slot name="after" />
+
+    {ctaHref && ctaLabel && (
+      <a class="sc-cta" href={ctaHref}>
+        <span class="sc-cta-label">{ctaLabel}</span>
+        <span class="sc-cta-arrow" aria-hidden="true">&#8594;</span>
+      </a>
+    )}
+  </div>
+</section>
+
+<style>
+  .sc-section {
+    --sc-blend-height: clamp(10rem, 20svh, 14rem);
+    --theme-text: #f3f4f5;
+    --theme-text-muted: #adb2b6;
+    --theme-border: rgb(196 204 209 / 18%);
+    --theme-surface: rgb(255 255 255 / 4%);
+    --theme-surface-strong: rgb(255 255 255 / 8%);
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.8%) 0 1px, transparent 1px 4px),
+      #24221f;
+  }
+
+  .sc-section--blend {
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.8%) 0 1px, transparent 1px 4px),
+      linear-gradient(
+        180deg,
+        var(--section-dark-start) 0,
+        #24221f var(--sc-blend-height),
+        #24221f 100%
+      );
+  }
+
+  .sc-intro {
+    max-width: 46rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    color: var(--theme-text-muted);
+  }
+
+  .sc-intro :global(strong) {
+    color: var(--theme-text);
+    font-weight: 700;
+  }
+
+  .sc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Large typographic CTA — full clickable block, not a small pill button. */
+  .sc-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--theme-border);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--theme-text);
+    transition: gap 0.25s ease, color 0.25s ease;
+  }
+
+  .sc-cta-arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+    color: var(--color-brand-gold);
+    font-size: 1.3em;
+  }
+
+  .sc-cta:hover,
+  .sc-cta:focus-visible {
+    gap: 1.6rem;
+    color: var(--color-brand-gold);
+  }
+
+  .sc-cta:hover .sc-cta-arrow,
+  .sc-cta:focus-visible .sc-cta-arrow {
+    transform: translateX(6px);
+  }
+
+  .sc-cta:focus-visible {
+    outline: 2px solid var(--color-brand-gold);
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 900px) {
+    .sc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

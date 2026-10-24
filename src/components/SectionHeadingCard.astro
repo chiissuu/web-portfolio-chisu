@@ -21,9 +21,11 @@ interface Props {
   size?: "lg" | "md";
   class?: string;
   image?: TitleImage;
+  /** Static gold glow behind the artwork, as behind About's title. Artwork only. */
+  halo?: boolean;
 }
 
-const { text, as: Tag = "h2", size = "lg", class: className = "", image }: Props = Astro.props;
+const { text, as: Tag = "h2", size = "lg", class: className = "", image, halo = false }: Props = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const artStyle = image && {
   "--shc-ratio": `${image.crop.width / image.crop.height}`,
@@ -34,7 +36,7 @@ const artStyle = image && {
 ---
 
 {image ? (
-  <Tag class:list={["shc", "shc-art", className]} style={artStyle}>
+  <Tag class:list={["shc", "shc-art", { "shc-halo": halo }, className]} style={artStyle}>
     <span class="shc-text">{text}</span>
     <span class="shc-art-frame" aria-hidden="true">
       <img
@@ -111,8 +113,22 @@ const artStyle = image && {
   .shc-art-frame {
     display: block;
     position: relative;
+    z-index: 1;
     overflow: hidden;
     aspect-ratio: var(--shc-ratio);
+  }
+
+  .shc-halo::before {
+    content: "";
+    position: absolute;
+    inset: -55% 0 -70%;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 45%,
+      rgb(193 155 61 / 15%) 0,
+      rgb(193 155 61 / 6%) 40%,
+      transparent 72%
+    );
   }
 
   .shc-art-image {

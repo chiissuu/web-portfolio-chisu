@@ -1,0 +1,132 @@
+---
+// "Mi stack de trabajo": the tools grouped by area, as compact reference rows.
+// It lives under the projects (what I build, then what I build it with); it
+// used to close the About section. Reads the section's `--theme-*` tokens.
+import type { SkillGroup } from "../lib/content-types";
+
+interface Props {
+  title: string;
+  groups: readonly SkillGroup[];
+  base: string;
+}
+
+const { title, groups, base } = Astro.props as Props;
+---
+
+<section class="sk-skills" aria-labelledby="sk-skills-heading">
+  <h3 id="sk-skills-heading" class="sk-title">{title}</h3>
+  <div class="sk-stack">
+    {groups.map((group) => (
+      <section class="sk-group" aria-labelledby={`sk-${group.id}`}>
+        <h4 class="sk-category" id={`sk-${group.id}`}>{group.title}</h4>
+        <ul class="sk-items">
+          {group.items.map(([name, icon]) => (
+            <li class="sk-item">
+              <span class="sk-icon" aria-hidden="true">
+                {icon && <img src={`${base}/assets/skills/${icon}`} alt="" width="48" height="48" loading="lazy" decoding="async" />}
+              </span>
+              <span>{name}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</section>
+
+<style>
+  .sk-skills {
+    width: min(100%, 66rem);
+    margin: clamp(3rem, 6vw, 5rem) auto 0;
+  }
+
+  .sk-title {
+    margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+    letter-spacing: -0.015em;
+    text-transform: none;
+    color: var(--color-brand-gold);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .sk-group {
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.23fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--theme-border);
+  }
+
+  .sk-group:last-child {
+    border-bottom: 1px solid var(--theme-border);
+  }
+
+  .sk-category {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.4;
+    color: var(--theme-text);
+    overflow-wrap: anywhere;
+  }
+
+  .sk-items {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sk-item {
+    display: flex;
+    min-width: 0;
+    max-width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d4d6d8;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .sk-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0.3rem;
+    border-radius: 0.4rem;
+    background: #ebebeb;
+  }
+
+  .sk-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @media (max-width: 899px) {
+    .sk-group {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sk-items {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem 0.75rem;
+    }
+  }
+</style>
