@@ -222,6 +222,76 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - Navegador (servidor dev del usuario en 4321; Astro no admite un segundo servidor del mismo proyecto): en 1280px, tras recorrer about, projects, services, tools, contact y faq, exactamente un enlace del sidebar activo en cada una, con cambio de Servicios a Tools justo en la frontera del 45%. Títulos a la misma altura de letra (128px en 1280, 80px en 390/320), sin deformar y sin desbordamiento horizontal de página ni de las secciones en 1280, 390 y 320px. Los enlaces `#services`/`#tools` del menú móvil apuntan a las nuevas secciones.
 - Límites: el navegador integrado iba a ~2 fps, así que los recorridos usan esperas largas. No se probó 768/1920px, el menú móvil abierto, teclado, movimiento reducido, lector de pantalla ni el contraste del título dorado sobre el fondo beige de Contacto. No se hizo commit ni push.
 
+## Auditoría y tarjetas de Servicios y Tools (23 de octubre de 2026)
+
+- Informe, decisiones y pendientes: [[Auditoria-Servicios-Tools]]. Nuevos `ShowcaseSection` y `ShowcaseCard`; fondo grafito como About; mini títulos eliminados; tarjetas con imagen provisional para los tres servicios y las dos herramientas.
+- `npm run check`: 47 archivos, 0 errores, 0 avisos y 126 hints. `npm run build`: cuatro páginas, código 0. HTML: 5 tarjetas (3 a `/servicios/`, 1 al conversor, 1 inerte).
+- Navegador sobre la compilación de producción (vista previa en 4322): 1280, 768, 390 y 320px sin desbordamiento. El servidor dev del usuario (4321) sirvió CSS desfasado de los componentes nuevos: reiniciar `npm run dev`. El panel del navegador se ocultó durante la ronda: no se repitió el seguimiento del enlace activo del sidebar (sin cambios en su lógica) ni se probó el foco con teclado real.
+
+## Bloqueo de scroll durante la entrada del Hero (23 de octubre de 2026)
+
+- Implementación y razonamiento en [[Hero-y-Sidebar]]: clase `hx-intro-locked`, liberación por `entranceSettled`, red de seguridad de 8 s. Cambios solo en `HeroExperience.astro` (un bloque CSS global y un bloque de script antes de `playEntrance()` más una línea en la limpieza).
+- `npm run check`: 47 archivos, 0 errores, 0 avisos y 126 hints. `npm run build`: cuatro páginas, código 0.
+- Probado cargando la compilación en un iframe y registrando la clase cada 2 ms: bloqueo a ~54 ms y liberación a ~2,2 s con fotogramas forzados (propiedades de la animación limpias y sidebar activo en «home» después); con ancla, ~30 ms; con el panel oculto, liberación por el temporizador a los 8 s.
+- Límites: no se probó con una rueda de ratón, táctil ni teclado reales (el bloqueo es el mismo `overflow: hidden` del menú móvil), ni con `prefers-reduced-motion` real (el camino se revisó en código), ni en Safari/Firefox. Con un navegador real y conexión lenta, el bloqueo durará lo que tarden fuentes y retrato en cargar, con tope de 8 s.
+
+## Auditoría y rediseño de Contacto (23 de octubre de 2026)
+
+- Informe y decisiones: [[Auditoria-Contacto]]. Contacto pasa de beige a grafito, se reorganiza en formulario (panel) + canales directos y se re-estila el formulario (solo `ContactSection.astro` y el bloque de estilos de `ContactForm.astro`).
+- `npm run check`: 47 archivos, 0 errores, 0 avisos y 126 hints. `npm run build`: cuatro páginas, código 0.
+- Navegador sobre la compilación de producción: 1280, 1024, 390 y 320px sin desbordamiento; error con campos vacíos (foco en el primero, contrastes 7,4:1 a 14,4:1); sidebar con «Contacto» iluminado; frontera Tools → Contacto sin hueco. Límites: sin hover/teclado reales, movimiento reducido, lector de pantalla, envío válido ni autorrelleno.
+
+## Efecto del ratón en el Hero y hilo dorado de Sobre mí (23 de octubre de 2026)
+
+- Detalle en [[Hero-y-Sidebar]] (efecto del ratón, nuevo `src/lib/heroFluid.ts`, un bloque al final del script del Hero) y [[Sobre-Mi]] (hilo dorado, reescritura de la biografía en `AboutSection.astro`). Sin dependencias nuevas.
+- `npm run check`: 48 archivos, 0 errores, 0 avisos y 126 hints. `npm run build`: cuatro páginas, código 0. Comparación del HTML generado con `site.js`: los siete párrafos idénticos (se descuentan solo los emojis decorativos).
+- Navegador sobre la compilación de producción: efecto del ratón medido con eventos de puntero sintéticos (cifras en [[Hero-y-Sidebar]]); hilo con 9/9 nodos encendidos al final, sin desbordamiento a 1280, 1024, 390 y 320px; con fotogramas forzados en un iframe, el Hero arranca, el scroll se libera y el sidebar marca Inicio, Sobre mí y Tools.
+- Límites: el panel del navegador iba tan lento que las lecturas directas de la animación del Hero no eran fiables (se repitieron en iframe). No se vio el efecto del ratón con un cursor real ni en un monitor de alta frecuencia; sin pruebas en GPU integrada o portátil.
+
+## Agua en los elementos sueltos del Hero (24 de octubre de 2026)
+
+- Detalle y razonamiento en [[Hero-y-Sidebar]]. Nuevo `src/lib/heroWater.ts`, una regla CSS global (`.hx-water-on`) y un bloque en el script del Hero. Sin dependencias.
+- `npm run check`: 49 archivos, 0 errores, 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Se calibró el filtro con pruebas aisladas (ruido directo, ruido opaco y `feImage`) y se comprobó sobre el wordmark real; a escala 30–40 la deformación es suave y localizada bajo el «blob». Una primera versión (ruido de dos octavas, frecuencia alta) daba un zigzag poco acuoso y se suavizó.
+- Límites: el efecto se vio con un puntero sintético en un iframe y capturas, no con un ratón real; no se midió el coste en GPU integrada ni en Safari/Firefox (el filtro `feImage` dinámico puede comportarse distinto en Safari). Los textos pequeños (chips, métricas) se comprobaron por estado y no con captura ampliada.
+
+## Tarjetas apagadas, más separación y chispas en el hilo de Sobre mí (24 de octubre de 2026)
+
+- Detalle en [[Sobre-Mi]] (sección «Hilo dorado»). Solo cambió `AboutSection.astro` (CSS y script); ningún texto ni dependencia.
+- `npm run check`: 49 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- En un iframe con fotogramas forzados: 0 nodos encendidos al cargar, 9/9 al final (escritorio y móvil), sin chispas residuales, sin desbordamiento, sin explosión al subir. Se capturó el estallido congelado a ~100ms.
+- Se corrigió un detalle real durante la prueba: al activar el modo apagado las tarjetas habrían hecho un fundido visible de encendidas a apagadas; ahora nacen apagadas (`ab-nt`).
+- Límites: no se vio a velocidad real (las transiciones CSS se detienen en el navegador de pruebas, se verificó con ellas desactivadas) ni con una rueda de ratón; no se probó movimiento reducido real (revisado en código).
+
+## Hilo de Sobre mí al centro de la pantalla, paso 08 y tarjetas doradas (24 de octubre de 2026)
+
+- Detalle en [[Sobre-Mi]]. Cambian `AboutSection.astro` (marcado, CSS, script) y `site.js` (el rótulo `groupLabels.intro` pasa a «/whoami» en ES y EN; en inglés antes era «Who I am»).
+- `npm run check`: 49 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobación nodo a nodo en la compilación de producción: cada uno de los 10 nodos se enciende al cruzar el centro de la pantalla (a 1280 y 390px). Dos trampas del entorno de pruebas: el panel oculto no emite eventos `scroll` para `scrollTo` programático (se disparan a mano) y `requestAnimationFrame` debe parchearse **antes** de que cargue la página (se inyecta en un `srcdoc`), porque GSAP captura la función original.
+- Límites: no se vio con una rueda de ratón real ni a velocidad real de las transiciones.
+
+## Ilustraciones satélite en Sobre mí (24 de octubre de 2026)
+
+- Detalle en [[Sobre-Mi]]. Nuevo `AboutSatellite.astro`; `AboutSection.astro` solo importa el componente y añade la lista `satelliteKinds`. Copia de seguridad previa en `backups/`.
+- `npm run check`: 50 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en iframe (`requestAnimationFrame` parcheado, transiciones desactivadas): las ocho ilustraciones se encienden con su tarjeta; se detectó y corrigió que las capas de la 07 se veían tenues aun apagadas (el relleno no se ocultaba con el trazo).
+- Límites: no se vieron las animaciones de dibujado a velocidad real (las transiciones CSS se detienen en el navegador de pruebas), ni el ecualizador en movimiento; el aspecto final se juzgó por capturas reducidas.
+
+## Fondo de obsidiana, placas de subtítulo y borde del Hero (24 de octubre de 2026)
+
+- Detalle en [[Sobre-Mi]]. Cambios: `AboutSection.astro` (fondo, placas, script), asset `about-veins.webp` y su script generador. Copias previas en `backups/` (`*.pre-obsidiana-2026-10-24`).
+- `npm run check`: 51 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en iframe: los 10 nodos siguen encendiéndose al cruzar el centro (30px antes apagados, 6px después encendidos); 10 brillos, todos encendidos al final; sin desbordamiento a 1440, 1100 y 390px; el stack de herramientas sigue legible sobre las venas; la placa del segundo subtítulo no cruza el hilo.
+- Borde del Hero: se reprodujo escalando el iframe (zoom fraccionario) y se vio que la línea clara desaparece con el arreglo.
+- Límites: el brillo en movimiento (la ventana de venas siguiendo el haz) se juzgó por capturas fijas, no a velocidad real; el rendimiento de las capas con máscara en GPU integrada y móvil no está medido.
+
+## Proyectos con el nuevo formato, stack movido, iconos y enlace (24 de octubre de 2026, noche)
+
+- Detalle en [[Sobre-Mi]] y [[Otras-Secciones-y-Compartidos]]. Nuevo `SkillsStack.astro`; reescrito `ProjectsSection.astro`; `ShowcaseSection` con CTA opcional y slot `after`; contenido `aboutMe.projectsCta`. Copias previas en `backups/` (`*.pre-proyectos-2026-10-24`).
+- `npm run check`: 52 archivos, 0 errores y 0 avisos (126 sugerencias previas). `npm run build`: cuatro páginas, código 0.
+- Comprobado en iframe: el CTA apunta a `#projects`; 5 iconos dibujados; el stack está en `#projects` y no en `#about`; Proyectos queda marcado en el sidebar durante el stack; la placa `/whoami` termina con 7 caracteres de ancho; sin la línea clara en los límites Hero/Sobre mí y Sobre mí/Proyectos al escalar la página.
+- Límites: no se vio el tecleo ni los resplandores en movimiento; no se probó en un móvil real.
+
 ## Cómo mantener este vault al día
 
 Actualizar junto al cambio de código: rutas, contratos, límites, estados, fuentes y hallazgos afectados. Volver a medir antes de copiar resultados de build o tamaños de archivo — no asumir que siguen igual. El contenido de [[Contenido-por-Seccion]] es una instantánea de `site.js`: al editar ese archivo, hay que regenerar o actualizar la nota — nunca debe convertirse en una segunda fuente de la aplicación. No dejar un hallazgo marcado como abierto en [[Hallazgos-y-Pendientes]] cuando el código y una prueba pertinente ya confirmen que está resuelto.

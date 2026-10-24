@@ -22,6 +22,7 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 | [public/assets/icons/social/linktree-gold.png](../../../public/assets/icons/social/linktree-gold.png) | 5.935 | Logo dorado decorativo del sidebar (Redes Sociales / Linktree) |
 | [public/assets/images/about-title-en.png](../../../public/assets/images/about-title-en.png) | 1.830.850 | Título PNG «ABOUT ME»; referenciado en `content.en`, aún sin ruta inglesa |
 | [public/assets/images/about-title-es.png](../../../public/assets/images/about-title-es.png) | 1.814.007 | Título PNG «SOBRE MÍ» (2446×1400), activo; recorte solo por CSS |
+| [public/assets/images/about-veins.webp](../../../public/assets/images/about-veins.webp) | 328.428 | Venas doradas extraídas de la textura del Hero (1600×1832, reflejada), fondo de Sobre mí — ver [[Sobre-Mi]] |
 | [public/assets/images/hero-background-gold-alternative.png](../../../public/assets/images/hero-background-gold-alternative.png) | 2.341.187 | Fondo activo del Hero mediante CSS y textura desaturada de About |
 | [public/assets/images/hero-background-gold.png](../../../public/assets/images/hero-background-gold.png) | 4.666.957 | Variante conservada; solo aparece mencionada en un comentario del Hero |
 | [public/assets/images/hero-wordmark-gold.png](../../../public/assets/images/hero-wordmark-gold.png) | 1.991.664 | Marca del Hero y sidebar |

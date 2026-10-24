@@ -21,7 +21,7 @@ Dos botones llevan a Proyectos y a Sobre mí. Las métricas son contenido editor
 
 Un único título «SOBRE MÍ» y siete párrafos de presentación:
 
-Se presentan en dos grupos con h3: «Quién soy» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). Los párrafos se alinean a la izquierda en una composición centrada de hasta 66rem, con columna de lectura de hasta 58ch y más espacio entre ideas y grupos (medidas exactas en [[Sobre-Mi]]). El primer párrafo es algo mayor y la última frase del cierre se destaca con su propio espacio y separador. No se cambia la redacción. Etiquetas y selector de cierre también existen en inglés.
+Se presentan en dos grupos con h3: «/whoami» (los tres primeros) y «Qué me diferencia de la competencia» (los cuatro restantes). Desde el 23 de octubre cada párrafo es una tarjeta numerada (`01`–`08`) sobre un hilo dorado que se dibuja con el scroll (disposición y medidas en [[Sobre-Mi]]); la frase de cierre («proyectos con más profundidad…») es desde el 24 de octubre su propia tarjeta con un botón «Ver mis proyectos» (`aboutMe.projectsCta`), el paso 08, partida del final del último párrafo sin alterar el texto. No se cambia la redacción. Etiquetas y selector de cierre también existen en inglés.
 
 - Formación y ubicación: Jesús León Romero Atienza, Ingeniería del Software con mención en Ingeniería de Datos (Big Data), U-TAD (Centro Universitario de Tecnología y Arte Digital), ciudad natal Madrid, España.
 - Base técnica: tres años de formación, full-stack, bases de datos, arquitectura de software y programación de sistemas.
@@ -55,11 +55,11 @@ En la portada, Proyectos, Servicios, Tools, Contacto y FAQ se presentan con un t
 
 ## Proyectos
 
-Tres tarjetas provisionales (Full-stack, Data Science, Visual/UI), cada una «Próximamente». Detalle estructural en [[Otras-Secciones-y-Compartidos]].
+Tres tarjetas provisionales (Full-stack, Data Science, Visual/UI), cada una «Próximamente», en el formato de Servicios/Tools y seguidas del stack de trabajo (que antes cerraba Sobre mí). Detalle estructural en [[Otras-Secciones-y-Compartidos]].
 
 ## Servicios y Tools en portada
 
-Son dos secciones independientes (Servicios y, a continuación, Tools), cada una con título gráfico propio. El texto procede de la antigua sección combinada y está pendiente de actualización. Servicios explica desarrollo técnico y criterio visual, automatización, webs comerciales, asesoramiento previo y auditoría con el cliente. Tools explica la colección de utilidades y muestra como ejemplo la primera herramienta del catálogo. Detalle estructural en [[Otras-Secciones-y-Compartidos]].
+Son dos secciones independientes (Servicios y, a continuación, Tools), cada una con título gráfico propio, una introducción y tarjetas con imagen provisional (ver [[Otras-Secciones-y-Compartidos]]). Las tarjetas reutilizan `services.page.articles` y `tools.page.items`; los textos no se han reescrito. Servicios explica desarrollo técnico y criterio visual, automatización, webs comerciales, asesoramiento previo y auditoría con el cliente. Tools explica la colección de utilidades y muestra como ejemplo la primera herramienta del catálogo. Detalle estructural en [[Otras-Secciones-y-Compartidos]].
 
 ## Servicios: página independiente
 
@@ -72,7 +72,7 @@ Título, introducción, y tres artículos con tags: automatización de procesos,
 
 ## Contacto y FAQ
 
-Contacto: LinkedIn (deshabilitado), GitHub, «Redes Sociales» (Linktree), texto de disponibilidad, formulario, y `mailto:jesusleonromero233@gmail.com`.
+Contacto: texto de disponibilidad, formulario, y los canales directos: `mailto:jesusleonromero233@gmail.com`, LinkedIn (deshabilitado), GitHub y «Redes Sociales» (Linktree). Sin cambios de texto en el rediseño; la disposición está en [[Otras-Secciones-y-Compartidos]].
 
 FAQ: experiencia profesional, disponibilidad freelance, acceso al trabajo de diseño, mejor vía de contacto. La segunda respuesta es un placeholder; la cuarta menciona el formulario.
 

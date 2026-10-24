@@ -98,3 +98,9 @@ Validación: build final de cuatro rutas; Astro check con 0 errores, 0 avisos y 
 El contraste calculado del texto secundario sobre la base es 7.42:1; incluso sobre una composición conservadora del máximo del halo es aproximadamente 5.75:1, antes de la textura. Son cálculos de colores, no una auditoría píxel a píxel de todos los fondos. Capturas `about-warm-graphite-desktop.jpg`, `about-warm-graphite-mobile.jpg`, datos `about-warm-graphite-narrow.json` y snapshot `about-warm-graphite-before.astro` en el directorio local de visualizaciones. Sin commit, push ni despliegue.
 
 Se preparó [[Prompt-Continuidad-Claude]] con lectura inicial ordenada del vault, consulta selectiva posterior y delegación mínima. [[Skills-Desarrollo-Web]] incorpora la investigación de fuentes primarias sobre tres skills y recomendaciones de consumo/modelos, comprobadas el 23 de octubre de 2026. No se instalaron skills ni se cambió el modelo de ninguna suscripción.
+
+## Ronda del 23 de octubre (tarde): el hilo dorado
+
+Petición: mejorar la estructura visual del texto de Sobre mí (hueco bajo «Quién soy», fondo plano) con una presentación creativa en GSAP, sin cambiar textos ni el cartel. Inspiración analizada: el «About» de heynesh.com (una curva que se dibuja con el scroll uniendo tarjetas alternas con año). Como el texto aprobado no tiene fechas, los nodos se numeran 01–07.
+
+Hallazgos (1440px): columna de rótulo vacía (~325 px y ~450 px), texto ocupando 58 % del ancho, tres escalas tipográficas en el primer grupo, separación entre párrafos de solo 1,25 líneas y cortes malos («U-/TAD», líneas sueltas). Se aplicó el hilo dorado y la escala única; detalle, medidas y verificación en [[Sobre-Mi]]. Límites: no se probó con ratón o táctil reales ni con lector de pantalla; el movimiento reducido y la ausencia de JS se revisaron en el código, no en el navegador.

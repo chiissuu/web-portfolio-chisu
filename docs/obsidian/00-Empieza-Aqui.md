@@ -47,7 +47,8 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 
 - About pasó de capítulos numerados a `scenes` + rail, y después (octubre) a: PNG dorado de título, siete párrafos en dos grupos, y un stack de 42 herramientas. Su fondo es grafito cálido #24221f con textura suave y halo dorado estático, tema dark, sin rail ni escenas. Proyectos conserva su tema oscuro.
 - Desde el 23 de octubre el sidebar usa siempre la paleta `brand` (dorada); la paleta mono/plata se retiró.
-- Servicios y Tools son ahora dos secciones consecutivas (`#services`, `#tools`) y el sidebar ilumina una sola a la vez. Proyectos, Servicios, Tools, Contacto y FAQ usan títulos gráficos WebP (ver [[Otras-Secciones-y-Compartidos]]). El contenido de Servicios y Tools aún no se ha actualizado.
+- Servicios y Tools son ahora dos secciones consecutivas (`#services`, `#tools`) y el sidebar ilumina una sola a la vez. Proyectos, Servicios, Tools, Contacto y FAQ usan títulos gráficos WebP (ver [[Otras-Secciones-y-Compartidos]]). Ambas muestran ahora tarjetas con imagen provisional sobre el mismo fondo grafito que Sobre mí (ver [[Auditoria-Servicios-Tools]]).
+- Contacto dejó de ser la sección clara: mismo grafito, formulario en panel y canales directos a la derecha (ver [[Auditoria-Contacto]]). El Hero bloquea el scroll mientras reproduce su entrada y, con un ratón, el fondo se deforma como un líquido que sigue al cursor, y el wordmark, el titular, el lema, la nota, los chips y las métricas se ondulan como agua (botones, navegación y retrato no) (ver [[Hero-y-Sidebar]]). La biografía de Sobre mí es ahora un hilo dorado con siete tarjetas que se enciende con el scroll (ver [[Sobre-Mi]]).
 - Lucide sí se usa y renderiza en el sidebar (la sospecha de dependencia sin uso quedó descartada).
 - El texto de depuración del conversor ya no existe en el proyecto activo.
 - Se añadió `vite.optimizeDeps.include: ["react-dom/client"]` en `astro.config.mjs` para resolver un fallo de hidratación en dev.
@@ -81,6 +82,8 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 - [[Prompt-Auditoria-Web]] — encargo preparado para una auditoría con Hero/Sobre mí/nav lateral protegidos y cambios según riesgo
 - [[Auditoria-Web]] — ronda ejecutada el 10 de octubre; cambios verificados, evidencias y decisiones pendientes
 - [[Auditoria-Sobre-Mi]] — auditoría y rediseño de About (23 de octubre): fuentes, dorado, nav y fondo grafito
+- [[Auditoria-Servicios-Tools]] — auditoría de coherencia y transiciones de Servicios/Tools, tarjetas y pendientes
+- [[Auditoria-Contacto]] — auditoría y rediseño de Contacto: fondo, tipografía, organización y contrastes
 - [[Logos-Stack]] y [[Logos-Redes]] — procedencia y licencias de los logos del stack y del sidebar
 
 **Inventario**

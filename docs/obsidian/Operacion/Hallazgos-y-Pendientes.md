@@ -29,7 +29,14 @@ La ronda autorizada del 10 de octubre está en [[Auditoria-Web]], con IDs, evide
 | FAQ provisional y referencias desactualizadas | `faq.items[1]` placeholder; `[2]` menciona Drive retirado de About y `[3]` formulario simulado. Propuesta A15 | [[Contenido-por-Seccion]], [[Auditoria-Web]] |
 | Rutas CSS no preparadas para `base` | Fondo del Hero y `@font-face` con rutas absolutas; revisar si se despliega bajo subcarpeta | [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]], [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
 | Metadatos sociales/dominio sin configurar | Layout/config; definir según publicación real | [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]] |
-| Contenido de Servicios y Tools sin actualizar tras separarlas | Las etiquetas «Servicios»/«Tools» repiten el título gráfico; el texto procede de la sección combinada. Siguiente tarea acordada | [[Contenido-por-Seccion]], [[Otras-Secciones-y-Compartidos]] |
+| Receta de fondo grafito (#24221f + grano) repetida | Está en About, `ShowcaseSection` y Contacto; centralizar en un token de `Layout.astro` cuando se pueda tocar | [[Auditoria-Contacto]] |
+| FAQ no sigue el patrón de Contacto/Servicios/Tools | Conserva etiqueta sobre el título y su degradado oscuro propio | [[Auditoria-Contacto]] |
+| Proyectos no sigue el patrón de Servicios/Tools | Tarjeta antigua (`rd-project-card`) y fondo negro plano entre dos secciones de grafito; corte seco Sobre mí → Proyectos. Propuesta: migrarlo a `ShowcaseCard`/`ShowcaseSection` | [[Auditoria-Servicios-Tools]] |
+| Tarjetas de Servicios y Tools sin imágenes reales | Hueco `.sc-media`; los contratos `ServiceArticle` y `ToolItem` no tienen campo de imagen | [[Auditoria-Servicios-Tools]] |
+
+## Resuelto: borde sobre el nav en el primer scroll (24 de octubre de 2026)
+
+El usuario ve, en el primer scroll tras mostrarse la primera tarjeta de Sobre mí, «un pequeño borde que sobreescribe el nav». No se ha podido reproducir con certeza. Candidato visto: durante el morph del Hero (progreso ~58–75 %) las dos tarjetas de métricas del Hero (`hx-metric-card`, con borde) se cruzan con la tarjeta de estadísticas del sidebar, y los enlaces del nav del Hero con los botones del sidebar. Con el scroll completado no queda ningún elemento con borde fuera del sidebar sobre su zona. **Resuelto** con la captura del usuario: era una rendija de subpíxel entre el Hero y `.ab-section` por la que asomaba el fondo crema del `body` (ver [[Sobre-Mi]]); se tapa con una sombra oscura de 2px sobre la sección. El candidato anterior (tarjetas de métricas del Hero) no era la causa.
 
 ## Prioridad Baja
 
