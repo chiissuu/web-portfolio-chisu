@@ -1,5 +1,6 @@
 ---
 import type { AboutSectionContent } from "../lib/content-types";
+import AboutSatellite from "./AboutSatellite.astro";
 
 interface Props {
   t: AboutSectionContent;
@@ -25,7 +26,6 @@ type ProsePart =
 const accents = about.aboutMe.accents;
 const strongAnnotations: ProsePart[] = accents.strong.map((text) => ({ text, kind: "strong" }));
 const annotations = ([
-  { text: about.aboutMe.closingPhrase, kind: "closing" },
   ...accents.links.map(({ text, href }) => ({ text, href, kind: "link" as const })),
   ...strongAnnotations,
   ...accents.emojis.map(({ text, symbol }) => ({ text, symbol, kind: "emoji" as const })),
@@ -49,6 +49,38 @@ const proseGroups = [
     offset: introParagraphCount,
   },
 ].filter(({ paragraphs }) => paragraphs.length > 0);
+
+// The closing sentence of the last paragraph is shown as its own step; the
+// authored text is untouched (both parts concatenate back to the paragraph).
+type JourneyStep = { kind: "prose" | "closing"; text: string; index: number };
+const closingPhrase = about.aboutMe.closingPhrase;
+let stepCounter = 0;
+const journeyGroups = proseGroups.map((group) => ({
+  ...group,
+  steps: group.paragraphs
+    .flatMap((paragraph): Omit<JourneyStep, "index">[] =>
+      closingPhrase && paragraph.endsWith(closingPhrase) && paragraph.length > closingPhrase.length
+        ? [
+            { kind: "prose", text: paragraph.slice(0, -closingPhrase.length).trimEnd() },
+            { kind: "closing", text: closingPhrase },
+          ]
+        : [{ kind: "prose", text: paragraph }]
+    )
+    .map((step): JourneyStep => ({ ...step, index: stepCounter++ })),
+}));
+
+// One decorative illustration per step, shown in the empty half beside it.
+const satelliteKinds = ["terminal", "stack", "languages", "venn", "team", "culture", "layers", "project"];
+
+// Line icons (24px grid) standing in for the emojis of the authored copy,
+// keyed by the emoji so the copy itself is untouched.
+const glyphs: Record<string, string> = {
+  "📚": '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  "🎮": '<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>',
+  "👟": '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+  "🎧": '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  "📱": '<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>',
+};
 
 // Keep authored copy as plain text: Astro escapes every part, including accents.
 function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = annotations): ProsePart[] {
@@ -75,8 +107,13 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
 <section
   class="section-theme-dark ab-section"
   id="about"
-  style={`--ab-texture: url("${base}/assets/images/hero-background-gold-alternative.png")`}
+  style={`--ab-veins: url("${base}/assets/images/about-veins.webp")`}
 >
+  <!-- Obsidian backdrop: gold veins from the Hero's texture, lit near the thread. -->
+  <div class="ab-bg" data-ab-bg aria-hidden="true">
+    <div class="ab-veins"></div>
+    <div class="ab-beam"><div class="ab-veins ab-veins--lit"></div></div>
+  </div>
   <div class="section-inner ab-inner">
     <div class="ab-body">
       <div class="ab-content">
@@ -100,70 +137,72 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
               </>
             ) : about.aboutMe.title}
           </h2>
-          <div class="ab-cover-prose">
-            {proseGroups.map((group) => (
-              <section
-                class="ab-prose-group"
-                aria-labelledby={group.headingId}
-              >
-                <h3 class="ab-group-title" id={group.headingId}>{group.title}</h3>
-                <div class="ab-prose-copy">
-                  {group.paragraphs.map((paragraph, groupIndex) => {
-                    const index = group.offset + groupIndex;
+          <div class="ab-journey" data-ab-journey>
+            {journeyGroups.map((group) => (
+              <section class="ab-prose-group" aria-labelledby={group.headingId}>
+                <div class="ab-marker">
+                  <span class="ab-marker-dot" data-ab-node aria-hidden="true"></span>
+                  <span class="ab-marker-link" aria-hidden="true"></span>
+                  <h3
+                    class:list={["ab-group-title", { "ab-group-title--type": group.offset === 0 }]}
+                    id={group.headingId}
+                    style={`--chars:${group.title.length}`}
+                  ><span class="ab-group-text">{group.title}</span><span class="ab-cursor" aria-hidden="true"></span></h3>
+                </div>
+                <ol class="ab-steps">
+                  {group.steps.map((step) => {
                     return (
-                      <p class:list={{ "ab-lead": index === 0, "ab-languages": index === 2 }}>
-                        {decorateParagraph(paragraph).map((part) => (
-                          part.kind === "strong" ? <strong>{part.text}</strong> :
-                          part.kind === "closing" ? <span class="ab-closing-line">{part.text}</span> :
-                          part.kind === "link" ? (
-                            <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
-                              {decorateParagraph(part.text, strongAnnotations).map((bit) => (
-                                bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
-                              ))}
+                      <li class:list={["ab-step", step.index % 2 === 0 ? "ab-step--left" : "ab-step--right", { "ab-step--closing": step.kind === "closing" }]}>
+                        <span class="ab-step-node" data-ab-node aria-hidden="true"></span>
+                        <span class="ab-step-num" aria-hidden="true">{String(step.index + 1).padStart(2, "0")}</span>
+                        {step.kind === "closing" ? (
+                          <>
+                            <p class="ab-closing-text">{step.text}</p>
+                            <a class="ab-cta" href={about.aboutMe.projectsCta.href}>
+                              <span>{about.aboutMe.projectsCta.label}</span>
+                              <span class="ab-cta-arrow" aria-hidden="true">&#8594;</span>
                             </a>
-                          ) : part.kind === "emoji" ? (
-                            <span class="ab-icon-word"><span class="ab-emoji" aria-hidden="true">{part.symbol}</span>{part.text}</span>
-                          ) : part.kind === "location" ? (
-                            <strong class="ab-location">
-                              <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
-                              <span class="ab-spain-text">{part.text}</span>
-                            </strong>
-                          ) : part.kind === "flag" ? (
-                            <span class="ab-icon-word">
-                              <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
-                              {part.text}
-                            </span>
-                          ) : part.text
-                        ))}
-                      </p>
+                          </>
+                        ) : (
+                        <p>
+                            {decorateParagraph(step.text).map((part) => (
+                              part.kind === "strong" ? <strong>{part.text}</strong> :
+                              part.kind === "link" ? (
+                                <a class="ab-inline-link" href={part.href} target="_blank" rel="noopener noreferrer">
+                                  {decorateParagraph(part.text, strongAnnotations).map((bit) => (
+                                    bit.kind === "strong" ? <strong>{bit.text}</strong> : bit.text
+                                  ))}
+                                </a>
+                              ) : part.kind === "emoji" ? (
+                                <span class:list={["ab-icon-word", { "ab-nowrap": part.text.length <= 8 }]}>{glyphs[part.symbol] ? (
+                                  <svg class="ab-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false" set:html={glyphs[part.symbol]} />
+                                ) : (
+                                  <span class="ab-emoji" aria-hidden="true">{part.symbol}</span>
+                                )}{part.text}</span>
+                              ) : part.kind === "location" ? (
+                                <strong class="ab-location">
+                                  <img class="ab-flag" src={`${base}/assets/icons/flags/es.svg`} alt="" aria-hidden="true" />
+                                  <span class="ab-spain-text">{part.text}</span>
+                                </strong>
+                              ) : part.kind === "flag" ? (
+                                <span class="ab-icon-word">
+                                  <img class="ab-flag" src={`${base}/assets/icons/flags/${part.country}.svg`} alt="" aria-hidden="true" />
+                                  {part.text}
+                                </span>
+                              ) : part.text
+                            ))}
+                        </p>
+                        )}
+                        {satelliteKinds[step.index] && <AboutSatellite kind={satelliteKinds[step.index]} base={base} />}
+                      </li>
                     );
                   })}
-                </div>
+                </ol>
               </section>
             ))}
           </div>
         </header>
 
-        <section class="ab-skills" aria-labelledby="ab-skills-heading">
-          <h3 id="ab-skills-heading" class="ab-section-title">{about.skillsTitle}</h3>
-          <div class="ab-stack">
-            {about.skillGroups.map((group) => (
-              <section class="ab-stack-group" aria-labelledby={`ab-stack-${group.id}`}>
-                <h4 class="ab-stack-category" id={`ab-stack-${group.id}`}>{group.title}</h4>
-                <ul class="ab-stack-items">
-                  {group.items.map(([name, icon]) => (
-                    <li class="ab-stack-item">
-                      <span class="ab-stack-icon" aria-hidden="true">
-                        {icon && <img src={`${base}/assets/skills/${icon}`} alt="" width="48" height="48" loading="lazy" decoding="async" />}
-                      </span>
-                      <span>{name}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   </div>
@@ -193,32 +232,103 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
       linear-gradient(
         180deg,
         var(--section-dark-start) 0,
-        #24221f var(--ab-blend-height),
-        #24221f 100%
+        #0d0c0a var(--ab-blend-height),
+        #0b0a09 calc(100% - 10rem),
+        var(--section-dark-start) 100%
       );
   }
 
-  /* Reuse the Hero asset; only its decorative layer is desaturated.
-     Feather both edges to avoid a hard seam during the Hero crossfade. */
-  .ab-section::before {
-    content: "";
+  /* Obsidian: near-black glass with a faint diagonal sheen and gold veins taken
+     from the Hero's texture (see scripts/generate-about-veins.mjs). The veins
+     are dim by default; a window that follows the thread's front shows the
+     same image brighter (full strength at the front, ~40% over what the thread
+     has already crossed). Both layers move by transform only. */
+  .ab-bg {
     position: absolute;
-    inset: 0 0 auto;
-    height: min(1400px, 100%);
+    inset: 0;
     z-index: 0;
+    overflow: hidden;
     pointer-events: none;
-    background-image: var(--ab-texture);
-    background-size: cover;
-    background-position: center top;
-    filter: grayscale(1) brightness(0.65);
-    opacity: 0.12;
+    background:
+      radial-gradient(90% 36% at 60% 0%, rgb(224 197 139 / 7%), transparent 70%),
+      linear-gradient(
+          115deg,
+          transparent 0 34%,
+          rgb(255 255 255 / 2.6%) 43%,
+          rgb(255 255 255 / 0.5%) 50%,
+          transparent 57% 100%
+        )
+        0 0 / 100% 1100px repeat-y;
     mask-image: linear-gradient(
       180deg,
       transparent 0,
       #000 var(--ab-blend-height),
-      rgb(0 0 0 / 80%) 45%,
+      #000 calc(100% - 10rem),
       transparent 100%
     );
+  }
+
+  .ab-veins {
+    position: absolute;
+    inset: 0;
+    background: var(--ab-veins) center top / 100% auto repeat-y;
+    opacity: 0.14;
+  }
+
+  .ab-beam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1200px;
+    height: 1500px;
+    overflow: hidden;
+    opacity: 0;
+    will-change: transform;
+    transition: opacity 0.6s ease;
+    mask-image:
+      linear-gradient(
+        180deg,
+        rgb(0 0 0 / 30%) 0,
+        rgb(0 0 0 / 30%) calc(100% - 700px),
+        rgb(0 0 0 / 85%) calc(100% - 330px),
+        transparent 100%
+      ),
+      linear-gradient(
+        90deg,
+        transparent 0,
+        rgb(0 0 0 / 55%) 22%,
+        #000 50%,
+        rgb(0 0 0 / 55%) 78%,
+        transparent 100%
+      );
+    mask-repeat: no-repeat;
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
+  }
+
+  .ab-bg.ab-bg--live .ab-beam {
+    opacity: 1;
+  }
+
+  .ab-veins--lit {
+    inset: auto;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    will-change: transform;
+  }
+
+  /* Soft gold backlight behind each lit card and heading plate. */
+  .ab-bg :global(.ab-glow) {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(224 197 139 / 22%), rgb(224 197 139 / 7%) 58%, transparent);
+    opacity: 0;
+    transition: opacity 0.9s ease;
+  }
+
+  .ab-bg :global(.ab-glow.is-lit) {
+    opacity: 1;
   }
 
   .ab-inner {
@@ -248,16 +358,6 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     justify-items: start;
     text-align: left;
     gap: clamp(1.5rem, 2vw, 2rem);
-  }
-
-  .ab-cover-prose {
-    width: min(100%, 66rem);
-    text-align: left;
-    font-family: var(--font-body);
-    font-size: clamp(1.05rem, 1.1vw, 1.2rem);
-    font-weight: 400;
-    letter-spacing: -0.01em;
-    line-height: 1.8;
   }
 
   .ab-title {
@@ -318,78 +418,435 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     /* Show the original gold artwork without changing its crop or geometry. */
   }
 
-  .ab-cover-prose p {
-    color: var(--ab-copy);
+/* ---------------------------------------------------------------------
+     Journey: seven authored paragraphs as cards on a gold thread. The thread
+     (an SVG built by the script below) is drawn by scroll and lights each
+     node. Without the script, a plain gold line and fully lit cards remain.
+     --------------------------------------------------------------------- */
+  .ab-journey {
+    --ab-gutter: clamp(3.5rem, 7vw, 6rem);
+    position: relative;
+    width: min(100%, 62rem);
+    text-align: left;
+    font-family: var(--font-body);
+  }
+
+  .ab-journey::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    width: 1px;
+    background: linear-gradient(180deg, rgb(224 197 139 / 45%), rgb(224 197 139 / 12%));
+  }
+
+  .ab-journey.ab-js::before {
+    display: none;
+  }
+
+  /* The SVG is created by the script, so it has no scoping attribute. */
+  .ab-journey :global(.ab-thread) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .ab-journey :global(.ab-thread path) {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ab-journey :global(.ab-thread-base) {
+    stroke: rgb(224 197 139 / 22%);
+    stroke-width: 1.5;
+  }
+
+  .ab-journey :global(.ab-thread-fill) {
+    stroke: var(--ab-accent);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px rgb(224 197 139 / 55%));
+  }
+
+  .ab-prose-group {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ab-prose-group + .ab-prose-group {
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* The two sub-headings are plates (the cards' metallic bevel) set beside the
+     thread's node, with a short branch to it, so the thread never crosses
+     the text. */
+  .ab-marker {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding-block: 0.5rem;
+  }
+
+  .ab-marker-dot {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: calc(50% - 7px);
+    margin-top: -7px;
+  }
+
+  .ab-marker-link {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: calc(50% + 7px);
+    width: 2.25rem;
+    height: 2px;
+    margin-top: -1px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, rgb(239 214 131 / 90%), rgb(224 197 139 / 35%));
+    transform-origin: left center;
+    transition: transform 0.45s ease 0.1s;
+  }
+
+  .ab-group-title {
+    position: relative;
+    isolation: isolate;
+    grid-column: 2;
+    justify-self: start;
+    display: inline-flex;
+    align-items: baseline;
+    margin: 0 0 0 2.75rem;
+    max-width: calc(100% - 2.75rem);
+    padding: 0.6rem 1.05rem 0.65rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: #f6e7b8;
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.35;
+    text-wrap: balance;
+    transition: border-color 0.6s ease;
+  }
+
+  .ab-group-title::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    padding: 2px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity 0.7s ease;
+  }
+
+  .ab-group-title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3%) 0 1px, transparent 1px 3px),
+      linear-gradient(145deg, rgb(150 112 36 / 62%) 0%, rgb(104 78 28 / 42%) 42%, rgb(58 47 25 / 30%) 100%);
+    box-shadow: inset 0 1px 0 rgb(255 240 190 / 22%);
+    transition: opacity 0.7s ease;
+  }
+
+  .ab-group-text,
+  .ab-cursor {
+    transition: opacity 0.7s ease 0.12s, filter 0.7s ease 0.12s;
+  }
+
+  .ab-cursor {
+    align-self: center;
+    width: 0.5em;
+    height: 1.1em;
+    margin-left: 0.3rem;
+    border-radius: 1px;
+    background: currentColor;
+  }
+
+  /* Monospace, so the typed width is exactly one `ch` per character and the
+     cursor, which follows the text, travels with the letters. */
+  .ab-group-title--type .ab-group-text {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+    width: calc(var(--chars, 7) * 1ch);
+  }
+
+  .ab-journey.ab-js .ab-marker-dot.is-lit ~ .ab-group-title--type .ab-group-text {
+    animation: ab-type calc(var(--chars, 7) * 80ms) steps(var(--chars, 7)) 0.3s both;
+  }
+
+  @keyframes ab-type {
+    from {
+      width: 0;
+    }
+  }
+
+  .ab-journey.ab-js .ab-marker-dot.is-lit ~ .ab-group-title .ab-cursor {
+    animation: ab-caret 1.1s steps(1) 1s infinite;
+  }
+
+  @keyframes ab-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-marker-link {
+    transform: scaleX(0);
+    transition-delay: 0s;
+  }
+
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-group-title {
+    border-color: rgb(196 204 209 / 10%);
+  }
+
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-group-title::before,
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-group-title::after {
+    opacity: 0;
+  }
+
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-group-title .ab-group-text,
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) ~ .ab-group-title .ab-cursor {
+    opacity: 0.06;
+    filter: blur(2.5px);
+  }
+
+  .ab-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ab-step {
+    position: relative;
+    width: calc((100% - var(--ab-gutter)) / 2);
+    padding: 1.1rem 1.35rem 1.4rem;
+    border: 1px solid rgb(224 197 139 / 40%);
+    border-radius: 14px;
+    background: var(--theme-surface);
+    box-shadow: 0 0 32px rgb(224 197 139 / 10%);
+    transition: border-color 0.6s ease, background-color 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .ab-step > p,
+  .ab-step > .ab-step-num {
+    transition: opacity 0.7s ease 0.12s, filter 0.7s ease 0.12s, color 0.4s ease;
+  }
+
+  /* Lit cards: metallic gold bevel (the nav buttons' gradient, painted as a
+     2px ring with a composite mask) over a dark gold fill. The fill peaks at
+     ~60% of rgb(150 112 36) over the graphite, about #624d21: body text
+     (#d4d6d8) keeps a contrast near 5.5:1 there, and more elsewhere. */
+  .ab-step {
+    isolation: isolate;
+  }
+
+  .ab-step::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    padding: 2px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity 0.7s ease;
+  }
+
+  .ab-step::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3%) 0 1px, transparent 1px 3px),
+      linear-gradient(145deg, rgb(150 112 36 / 62%) 0%, rgb(104 78 28 / 42%) 42%, rgb(58 47 25 / 30%) 100%);
+    box-shadow: inset 0 1px 0 rgb(255 240 190 / 22%);
+    transition: opacity 0.7s ease;
+  }
+
+  .ab-journey.ab-js .ab-step:not(.is-lit)::before,
+  .ab-journey.ab-js .ab-step:not(.is-lit)::after {
+    opacity: 0;
+  }
+
+  .ab-step--closing p.ab-closing-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.9vw, 1.85rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    color: var(--theme-text);
+    text-wrap: balance;
+  }
+
+  /* Gold metal pill, same palette as the nav buttons. */
+  .ab-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+    padding: 0.6rem 1.15rem;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #1a1406;
+    background:
+      linear-gradient(180deg, #dfc357, #c19b3d 48%, #b08a32) padding-box,
+      linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32) border-box;
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 65%),
+      inset 0 -1px 2px rgb(0 0 0 / 22%),
+      0 2px 6px rgb(0 0 0 / 40%);
+    transition: transform 0.25s ease, opacity 0.7s ease 0.12s, filter 0.7s ease 0.12s;
+  }
+
+  .ab-cta:hover,
+  .ab-cta:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  .ab-cta:focus-visible {
+    outline: 2px solid var(--ab-accent);
+    outline-offset: 4px;
+  }
+
+  .ab-cta-arrow {
+    transition: transform 0.25s ease;
+  }
+
+  .ab-cta:hover .ab-cta-arrow,
+  .ab-cta:focus-visible .ab-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  .ab-step--right {
+    align-self: flex-end;
+  }
+
+  /* Generous space between cards: each one is a stop on the thread. */
+  .ab-step + .ab-step {
+    margin-top: clamp(3.5rem, 8vw, 6.5rem);
+  }
+
+  .ab-step-num {
+    display: inline-flex;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 999px;
+    background: rgb(5 5 5 / 35%);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    color: var(--ab-accent);
+    transition: color 0.4s ease;
+  }
+
+  .ab-step p {
+    margin: 0;
+    color: var(--ab-copy);
+    font-size: clamp(1rem, 1.05vw, 1.08rem);
+    line-height: 1.7;
+    letter-spacing: -0.01em;
     overflow-wrap: anywhere;
     text-wrap: pretty;
   }
 
-  .ab-prose-group {
-    display: grid;
-    gap: 1.5rem;
+  .ab-step-node,
+  .ab-marker-dot {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--ab-accent);
+    border-radius: 50%;
+    background: var(--ab-accent);
+    box-shadow: 0 0 0 5px rgb(224 197 139 / 16%), 0 0 14px rgb(224 197 139 / 50%);
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
 
-  .ab-prose-group:first-child {
-    padding-top: clamp(1.5rem, 3vw, 2.5rem);
-    border-top: 1px solid var(--theme-border);
+  .ab-step-node {
+    position: absolute;
+    z-index: 2;
+    top: 1.75rem;
+    margin-top: -7px;
   }
 
-  .ab-prose-copy {
-    min-width: 0;
-    max-width: 58ch;
-    width: 100%;
+  .ab-step--left .ab-step-node {
+    right: -8px;
   }
 
-  .ab-cover-prose p + p {
-    margin-top: clamp(1.75rem, 3vw, 2.25rem);
+  .ab-step--right .ab-step-node {
+    left: -8px;
   }
 
-  .ab-prose-group + .ab-prose-group {
-    margin-top: clamp(4rem, 7vw, 6rem);
-    padding-top: clamp(2rem, 4vw, 3rem);
-    border-top: 1px solid var(--theme-border);
+  /* With the script, nodes and cards start unlit and light up as the thread
+     reaches them; reduced motion keeps everything lit (no `ab-js` styling). */
+  /* While the script switches the journey off (first frame only), no
+     transition runs, so the cards are born switched off instead of fading out. */
+  .ab-journey.ab-nt .ab-step,
+  .ab-journey.ab-nt .ab-step > p,
+  .ab-journey.ab-nt .ab-step > .ab-step-num,
+  .ab-journey.ab-nt .ab-cta,
+  .ab-journey.ab-nt .ab-step-node,
+  .ab-journey.ab-nt .ab-marker-dot,
+  .ab-journey.ab-nt .ab-marker-link,
+  .ab-journey.ab-nt .ab-group-title,
+  .ab-journey.ab-nt .ab-group-title::before,
+  .ab-journey.ab-nt .ab-group-title::after,
+  .ab-journey.ab-nt .ab-group-text,
+  .ab-journey.ab-nt .ab-cursor {
+    transition: none;
   }
 
-  .ab-group-title {
-    margin: 0;
-    color: var(--ab-accent);
-    font-family: var(--font-display);
-    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.35;
-    text-wrap: balance;
+  /* An unlit card is switched off: faint outline, content hidden until the
+     thread arrives (it stays in the DOM, so screen readers still get it). */
+  .ab-journey.ab-js .ab-step:not(.is-lit) {
+    border-color: rgb(196 204 209 / 10%);
+    background: rgb(255 255 255 / 1.5%);
+    box-shadow: none;
   }
 
-  .ab-cover-prose p.ab-lead {
-    font-size: clamp(1.2rem, 1.4vw, 1.5rem);
-    line-height: 1.7;
-    letter-spacing: -0.02em;
-    color: var(--theme-text);
+  .ab-journey.ab-js .ab-step:not(.is-lit) > p,
+  .ab-journey.ab-js .ab-step:not(.is-lit) > .ab-step-num,
+  .ab-journey.ab-js .ab-step:not(.is-lit) > .ab-cta {
+    opacity: 0.06;
+    filter: blur(2.5px);
   }
 
-  .ab-cover-prose p.ab-languages {
-    font-size: 0.95em;
-    color: var(--theme-text-muted);
+  .ab-journey.ab-js .ab-step-node:not(.is-lit),
+  .ab-journey.ab-js .ab-marker-dot:not(.is-lit) {
+    border-color: rgb(224 197 139 / 40%);
+    background: #24221f;
+    box-shadow: none;
   }
 
-  .ab-closing-line {
-    display: block;
-    max-width: 34ch;
-    margin: 1.75rem 0 0;
-    padding-inline-start: 1.25rem;
-    border-inline-start: 2px solid var(--ab-accent);
-    color: var(--theme-text);
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 1.8vw, 1.8rem);
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    line-height: 1.4;
-    text-wrap: balance;
-  }
-
-  .ab-cover-prose strong {
+  .ab-journey strong {
     color: var(--theme-text);
     font-weight: 600;
   }
@@ -441,89 +898,25 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     filter: grayscale(1);
   }
 
+  .ab-glyph {
+    display: inline-block;
+    width: 1.05em;
+    height: 1.05em;
+    margin-inline-end: 0.35em;
+    vertical-align: -0.17em;
+    fill: none;
+    stroke: #efd683;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
   .ab-icon-word {
     white-space: normal;
   }
 
-  .ab-skills {
-    width: min(100%, 66rem);
-    margin-inline: auto;
-  }
-
-  .ab-section-title {
-    margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
-    text-align: left;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
-    letter-spacing: -0.015em;
-    text-transform: none;
-    color: var(--ab-accent);
-    line-height: 1.15;
-    text-wrap: balance;
-  }
-
-  /* Compact reference rows keep the stack secondary to the biography. */
-  .ab-stack-group {
-    display: grid;
-    grid-template-columns: minmax(8.5rem, 0.23fr) minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(1rem, 2vw, 2rem);
-    padding-block: 0.9rem;
-    border-top: 1px solid var(--theme-border);
-  }
-
-  .ab-stack-group:last-child {
-    border-bottom: 1px solid var(--theme-border);
-  }
-
-  .ab-stack-category {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.4;
-    color: var(--theme-text);
-    overflow-wrap: anywhere;
-  }
-
-  .ab-stack-items {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem 1.25rem;
-    margin: 0;
-    padding: 0;
-  }
-
-  .ab-stack-item {
-    display: flex;
-    min-width: 0;
-    max-width: 100%;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--ab-copy);
-    font-size: 0.85rem;
-    line-height: 1.35;
-    text-align: left;
-    overflow-wrap: anywhere;
-  }
-
-  .ab-stack-icon {
-    display: grid;
-    place-items: center;
-    flex: 0 0 1.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    padding: 0.3rem;
-    border-radius: 0.4rem;
-    background: #ebebeb;
-  }
-
-  .ab-stack-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  .ab-icon-word.ab-nowrap {
+    white-space: nowrap;
   }
 
   @media (min-width: 1200px) {
@@ -541,8 +934,7 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
       margin-inline: auto;
     }
 
-    .ab-cover,
-    .ab-prose-group {
+    .ab-cover {
       grid-template-columns: minmax(9rem, 0.27fr) minmax(0, 1fr);
       column-gap: clamp(2rem, 4vw, 4rem);
       align-items: start;
@@ -553,28 +945,349 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
       justify-self: start;
     }
 
-    .ab-cover-prose {
+    .ab-journey {
       grid-column: 1 / -1;
-    }
-
-    .ab-group-title {
-      max-width: 14ch;
-      padding-block-start: 0.15em;
+      justify-self: center;
     }
   }
 
   @media (max-width: 899px) {
-    .ab-stack-group {
-      grid-template-columns: 1fr;
-      gap: 0.85rem;
+    .ab-journey {
+      padding-inline-start: 2.25rem;
     }
-  }
 
-  @media (max-width: 640px) {
-    .ab-stack-items {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.65rem 0.75rem;
+    .ab-journey::before {
+      inset-inline-start: 0.6rem;
+    }
+
+    .ab-step,
+    .ab-step--right {
+      width: 100%;
+      align-self: stretch;
+    }
+
+    .ab-step + .ab-step {
+      margin-top: 2.75rem;
+    }
+
+    .ab-step--left .ab-step-node,
+    .ab-step--right .ab-step-node {
+      right: auto;
+      left: calc(-1.65rem - 8px);
+    }
+
+    .ab-marker {
+      display: flex;
+      justify-content: flex-start;
+      padding-block: 0.5rem;
+      margin-block-end: 0.9rem;
+    }
+
+    .ab-group-title {
+      margin: 0;
+      max-width: 100%;
+    }
+
+    .ab-marker-link {
+      display: none;
+    }
+
+    .ab-marker-dot {
+      inset-inline-start: calc(-1.65rem - 7px);
     }
   }
 </style>
+
+<script>
+  import { gsap } from "gsap";
+
+  // Draws the gold thread through the journey's nodes. The drawn front is the
+  // point of the path that sits at the vertical centre of the screen, so each
+  // node (and its card) lights up, with a burst of sparks, exactly when it is
+  // in the middle of the viewport. Positions are measured from the DOM, so the
+  // same code produces the weaving desktop thread and the straight left-rail
+  // mobile one, and it is rebuilt whenever the layout changes.
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const SPARK_COLORS = ["#fff3c4", "#e0c58b", "#c19b3d", "#efd683"];
+  const LINE = 0.5; // fraction of the viewport height where nodes light up
+  const SAMPLE = 2; // px between samples when mapping a screen line to a path length
+  const BEAM_W = 1200; // size of the bright-veins window (see .ab-beam)
+  const BEAM_H = 1500;
+  const BEAM_AHEAD = 320; // how far the window reaches below the thread's front
+
+  // Flash + ring + sparks at (x, y), in the journey's own coordinates.
+  function burst(layer: HTMLElement, x: number, y: number, node: HTMLElement, card: HTMLElement | null) {
+    const created: HTMLElement[] = [];
+    const make = (css: string) => {
+      const el = document.createElement("span");
+      el.setAttribute("aria-hidden", "true");
+      el.style.cssText = "position:absolute;pointer-events:none;border-radius:50%;" + css;
+      layer.append(el);
+      created.push(el);
+      return el;
+    };
+    const flash = make(
+      `left:${x}px;top:${y}px;width:64px;height:64px;margin:-32px 0 0 -32px;background:radial-gradient(circle, rgb(255 240 190 / 90%) 0, rgb(224 197 139 / 40%) 40%, transparent 70%);`
+    );
+    const ring = make(
+      `left:${x}px;top:${y}px;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid #efd683;box-shadow:0 0 10px rgb(224 197 139 / 70%);`
+    );
+    const tl = gsap.timeline({ onComplete: () => created.forEach((el) => el.remove()) });
+    tl.fromTo(flash, { scale: 0.2, opacity: 1 }, { scale: 3, opacity: 0, duration: 0.6, ease: "power2.out" }, 0);
+    tl.fromTo(ring, { scale: 0.4, opacity: 0.95 }, { scale: 6, opacity: 0, duration: 0.9, ease: "power2.out" }, 0);
+
+    // Fast, bright sparks.
+    for (let i = 0; i < 20; i++) {
+      const size = 3 + Math.random() * 3.5;
+      const color = SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)];
+      const spark = make(
+        `left:${x}px;top:${y}px;width:${size}px;height:${size}px;margin:${-size / 2}px 0 0 ${-size / 2}px;background:${color};box-shadow:0 0 8px 2px rgb(255 224 140 / 80%);`
+      );
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 60 + Math.random() * 95;
+      tl.fromTo(
+        spark,
+        { x: 0, y: 0, scale: 1, opacity: 1 },
+        {
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance + 10 + Math.random() * 24,
+          scale: 0.1,
+          opacity: 0,
+          duration: 0.6 + Math.random() * 0.6,
+          ease: "power2.out",
+        },
+        Math.random() * 0.05
+      );
+    }
+    // Slow embers that drift down and fade.
+    for (let i = 0; i < 14; i++) {
+      const size = 1.5 + Math.random() * 2;
+      const ember = make(
+        `left:${x}px;top:${y}px;width:${size}px;height:${size}px;margin:${-size / 2}px 0 0 ${-size / 2}px;background:#efd683;box-shadow:0 0 6px 1px rgb(224 197 139 / 70%);`
+      );
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 25 + Math.random() * 70;
+      tl.fromTo(
+        ember,
+        { x: 0, y: 0, opacity: 1 },
+        {
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance + 40 + Math.random() * 60,
+          opacity: 0,
+          duration: 1 + Math.random() * 0.6,
+          ease: "power1.out",
+        },
+        0.05 + Math.random() * 0.15
+      );
+    }
+
+    gsap.fromTo(node, { scale: 2 }, { scale: 1, duration: 0.55, ease: "back.out(3)", clearProps: "transform" });
+    if (card) {
+      gsap.fromTo(
+        card,
+        { boxShadow: "0 0 44px 6px rgb(224 197 139 / 55%)" },
+        { boxShadow: "0 0 32px 0 rgb(224 197 139 / 10%)", duration: 1.1, ease: "power2.out", clearProps: "boxShadow" }
+      );
+    }
+  }
+
+  function initJourney(root: HTMLElement) {
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-ab-node]"));
+    if (nodes.length < 2) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("class", "ab-thread");
+    svg.setAttribute("aria-hidden", "true");
+    const base = document.createElementNS(SVG_NS, "path");
+    base.setAttribute("class", "ab-thread-base");
+    const fill = document.createElementNS(SVG_NS, "path");
+    fill.setAttribute("class", "ab-thread-fill");
+    svg.append(base, fill);
+    root.prepend(svg);
+
+    // Sparks are drawn above the cards, never inside the thread SVG.
+    const layer = document.createElement("div");
+    layer.setAttribute("aria-hidden", "true");
+    layer.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:3;";
+    root.append(layer);
+
+    if (!reduced) {
+      root.classList.add("ab-js", "ab-nt");
+      requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("ab-nt")));
+    }
+
+    // Obsidian backdrop: a window of brighter veins rides the thread's front,
+    // and a soft glow lights behind each card or heading plate once it is lit.
+    const bg = root.closest<HTMLElement>(".ab-section")?.querySelector<HTMLElement>("[data-ab-bg]") ?? null;
+    const beam = bg?.querySelector<HTMLElement>(".ab-beam") ?? null;
+    const brightVeins = beam?.querySelector<HTMLElement>(".ab-veins--lit") ?? null;
+    const glows: HTMLElement[] = [];
+    let offX = 0;
+    let offY = 0;
+
+    let total = 0;
+    let lengths: number[] = [];
+    let points: { x: number; y: number }[] = [];
+    let ys: number[] = [];
+    const state = { d: 0 }; // drawn length of the thread
+    let prevD = 0;
+    const wasLit: boolean[] = nodes.map(() => false);
+
+    function build() {
+      const box = root.getBoundingClientRect();
+      points = nodes.map((node) => {
+        const r = node.getBoundingClientRect();
+        return { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top };
+      });
+      svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+
+      if (bg) {
+        const bgBox = bg.getBoundingClientRect();
+        offX = box.left - bgBox.left;
+        offY = box.top - bgBox.top;
+        if (brightVeins) {
+          brightVeins.style.width = `${bgBox.width}px`;
+          brightVeins.style.height = `${bgBox.height}px`;
+        }
+        glows.splice(0).forEach((glow) => glow.remove());
+        nodes.forEach((node, i) => {
+          const target =
+            node.closest<HTMLElement>(".ab-step") ??
+            node.parentElement?.querySelector<HTMLElement>(".ab-group-title") ??
+            node;
+          const r = target.getBoundingClientRect();
+          const w = r.width * 1.6;
+          const h = r.height * 2;
+          const glow = document.createElement("div");
+          glow.className = "ab-glow";
+          glow.style.cssText = `left:${r.left - bgBox.left + r.width / 2 - w / 2}px;top:${r.top - bgBox.top + r.height / 2 - h / 2}px;width:${w}px;height:${h}px;`;
+          glow.classList.toggle("is-lit", wasLit[i]);
+          bg.append(glow);
+          glows.push(glow);
+        });
+      }
+
+      const segments = points.slice(1).map((p, i) => {
+        const a = points[i];
+        const my = (a.y + p.y) / 2;
+        return `M ${a.x} ${a.y} C ${a.x} ${my} ${p.x} ${my} ${p.x} ${p.y}`;
+      });
+      const d = `M ${points[0].x} ${points[0].y} ` + segments.map((seg) => seg.replace(/^M [^C]+/, "")).join(" ");
+      base.setAttribute("d", d);
+      fill.setAttribute("d", d);
+
+      const probe = document.createElementNS(SVG_NS, "path");
+      lengths = [0];
+      let acc = 0;
+      segments.forEach((seg) => {
+        probe.setAttribute("d", seg);
+        acc += probe.getTotalLength();
+        lengths.push(acc);
+      });
+      total = fill.getTotalLength();
+      fill.style.strokeDasharray = `${total}`;
+
+      // y (journey coordinates) at regular steps along the path; y only grows.
+      const n = Math.ceil(total / SAMPLE) + 1;
+      ys = Array.from({ length: n }, (_, i) => fill.getPointAtLength(Math.min(i * SAMPLE, total)).y);
+
+      state.d = reduced ? total : lengthAtLine();
+      prevD = state.d;
+      render(false);
+    }
+
+    // Path length whose point is level with the screen's centre line.
+    function lengthAtLine(): number {
+      if (ys.length < 2) return 0;
+      const y = window.innerHeight * LINE - root.getBoundingClientRect().top;
+      if (y <= ys[0]) return 0;
+      if (y >= ys[ys.length - 1]) return total;
+      let lo = 0;
+      let hi = ys.length - 1;
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (ys[mid] <= y) lo = mid;
+        else hi = mid;
+      }
+      const t = (y - ys[lo]) / (ys[hi] - ys[lo] || 1);
+      return Math.min(total, (lo + t) * SAMPLE);
+    }
+
+    // Rides the veins' bright window along the drawn thread. Window and inner
+    // image move in opposite directions, so the image stays put in the section.
+    function placeBeam(drawn: number) {
+      if (!bg || !beam || !brightVeins || total === 0) return;
+      const p = fill.getPointAtLength(Math.min(drawn, total));
+      const wx = offX + p.x - BEAM_W / 2;
+      const wy = offY + p.y - (BEAM_H - BEAM_AHEAD);
+      beam.style.transform = `translate3d(${wx}px,${wy}px,0)`;
+      brightVeins.style.transform = `translate3d(${-wx}px,${-wy}px,0)`;
+      bg.classList.toggle("ab-bg--live", drawn > 0.5);
+    }
+
+    const inView = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    };
+
+    // `celebrate` is true only for scroll-driven updates: a rebuild after a
+    // resize, or a page that loads already scrolled, lights nodes silently.
+    function render(celebrate: boolean) {
+      const drawn = state.d;
+      const forward = drawn > prevD;
+      fill.style.strokeDashoffset = `${total - drawn}`;
+      if (!reduced) placeBeam(drawn);
+      nodes.forEach((node, i) => {
+        const lit = reduced || (drawn > 0.5 && drawn >= (lengths[i] ?? Infinity) - 2);
+        if (lit === wasLit[i]) return;
+        wasLit[i] = lit;
+        const card = node.closest<HTMLElement>(".ab-step");
+        node.classList.toggle("is-lit", lit);
+        card?.classList.toggle("is-lit", lit);
+        glows[i]?.classList.toggle("is-lit", lit);
+        if (lit && celebrate && forward && !reduced && inView(node)) {
+          burst(layer, points[i].x, points[i].y, node, card);
+        }
+      });
+      prevD = drawn;
+    }
+
+    build();
+
+    if (reduced) return;
+
+    // The front eases toward the centre line instead of jumping.
+    let frame = 0;
+    const follow = () => {
+      frame = 0;
+      gsap.to(state, {
+        d: lengthAtLine(),
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: true,
+        onUpdate: () => render(true),
+      });
+    };
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!frame) frame = requestAnimationFrame(follow);
+      },
+      { passive: true }
+    );
+
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+    new ResizeObserver(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 120);
+    }).observe(root);
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 120);
+    });
+    void document.fonts?.ready.then(() => build());
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-ab-journey]").forEach(initJourney);
+</script>
