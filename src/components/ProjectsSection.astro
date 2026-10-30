@@ -1,10 +1,13 @@
 ---
-// Projects in the same format as Servicios and Tools (artwork title, intro,
-// preview cards), followed by the stack of tools used to build them. It is the
-// first of the graphite sections, so it fades in from the black of Sobre mí.
+// Projects as a horizontal rail: on desktop the section pins and scrolling
+// slides the cards sideways (see ShowcaseSection), with a counter and a
+// progress line, and the card at the current position in focus. The stack of
+// tools used to build them follows. Light section (satin champagne) after the
+// dark Sobre mí.
 import type { AboutSectionContent, ProjectsSectionContent } from "../lib/content-types";
 import ShowcaseSection from "./ShowcaseSection.astro";
-import ShowcaseCard from "./ShowcaseCard.astro";
+import ProjectCard from "./ProjectCard.astro";
+import ProjectMoreCard from "./ProjectMoreCard.astro";
 import SkillsStack from "./SkillsStack.astro";
 
 interface Props {
@@ -13,20 +16,36 @@ interface Props {
 
 const { t } = Astro.props as Props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// The introduction is authored plain; the key phrases listed in the content are
+// set in bold, like the accents of Sobre mí.
+const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const keys = t.projects.noteStrong ?? [];
+const noteParts = keys.length
+  ? t.projects.note.split(new RegExp(`(${keys.map(escape).join("|")})`, "g")).filter(Boolean)
+  : [t.projects.note];
 ---
 
-<ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} blend>
-  <p slot="intro">{t.projects.note}</p>
+<ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} backdrop="champagne" rail iris center>
+  <p slot="intro">
+    {noteParts.map((part) => (keys.includes(part) ? <strong>{part}</strong> : part))}
+  </p>
 
   {t.projects.items.map((project) => (
-    <ShowcaseCard
+    <ProjectCard
       number={project.id}
-      eyebrow={project.category}
+      eyebrow={project.status ? `${project.category} · ${project.status}` : project.category}
       title={project.title}
-      text={project.status}
+      text={project.description}
       tags={project.tags}
+      href={project.href}
+      art={project.art}
+      metric={project.metric}
+      live={!!project.status}
     />
   ))}
+
+  <ProjectMoreCard label={t.projects.moreLabel} href={t.projects.moreHref} />
 
   <SkillsStack slot="after" title={t.about.skillsTitle} groups={t.about.skillGroups} base={base} />
 </ShowcaseSection>

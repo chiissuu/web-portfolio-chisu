@@ -1,0 +1,120 @@
+---
+// Gold line illustrations for the project cards, one motif per project, until
+// real screenshots exist. Decorative (the card's text says what the project is).
+interface Props {
+  kind: string;
+}
+
+const { kind } = Astro.props as Props;
+
+// A small neural network: input, hidden and output layers, fully connected.
+const layers = [
+  { x: 30, count: 4, gap: 24 },
+  { x: 100, count: 5, gap: 19 },
+  { x: 170, count: 2, gap: 34 },
+];
+const nodes = layers.map(({ x, count, gap }) =>
+  Array.from({ length: count }, (_, i) => ({ x, y: 65 + (i - (count - 1) / 2) * gap }))
+);
+const links = nodes.slice(0, -1).flatMap((from, l) => from.flatMap((a) => nodes[l + 1].map((b) => ({ a, b }))));
+
+// A hub with satellites, one of them not connected back (dashed).
+const satellites = Array.from({ length: 6 }, (_, i) => {
+  const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+  return { x: 100 + Math.cos(angle) * 48, y: 65 + Math.sin(angle) * 44, loose: i === 4 };
+});
+---
+
+<svg
+  class="pj-art-svg"
+  viewBox="0 0 200 130"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  focusable="false"
+  aria-hidden="true"
+>
+  {kind === "network" && (
+    <>
+      <g stroke-opacity="0.35" stroke-width="1">
+        {links.map(({ a, b }) => <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} />)}
+      </g>
+      {nodes.flat().map((n) => <circle cx={n.x} cy={n.y} r="6" fill="#0f0e0a" />)}
+      <circle cx={nodes[2][0].x} cy={nodes[2][0].y} r="6" fill="currentColor" stroke="none" />
+    </>
+  )}
+  {kind === "cache" && (
+    <>
+      <rect x="10" y="38" width="36" height="54" rx="6" />
+      <path d="M22 54h12M22 65h12M22 76h12" stroke-opacity="0.6" />
+      {[0, 1, 2, 3].map((i) => (
+        <rect x="80" y={22 + i * 24} width="46" height="16" rx="3" fill={i === 1 ? "currentColor" : "none"} fill-opacity="0.35" />
+      ))}
+      {[0, 1, 2, 3, 4, 5].map((i) => <rect x="158" y={14 + i * 18} width="32" height="12" rx="2" stroke-opacity="0.6" />)}
+      <path d="M46 65h28M68 59l6 6-6 6" />
+      <path d="M126 46h26M146 40l6 6-6 6" stroke-dasharray="3 4" />
+    </>
+  )}
+  {kind === "order" && (
+    <>
+      <rect x="58" y="8" width="62" height="114" rx="10" />
+      <path d="M78 16h22" stroke-opacity="0.6" />
+      {[0, 1, 2].map((i) => (
+        <>
+          <circle cx="74" cy={44 + i * 20} r="5" />
+          <path d={`M86 ${44 + i * 20}h24`} stroke-opacity="0.7" />
+        </>
+      ))}
+      <rect x="70" y="100" width="38" height="12" rx="6" fill="currentColor" fill-opacity="0.45" />
+      <path d="M128 106c20 0 12-34 30-34s8-24 20-30" stroke-dasharray="3 5" />
+      <path d="M178 42a8 8 0 1 0-0.1 0z" />
+      <path d="M12 106h30M12 94h20" stroke-opacity="0.5" />
+    </>
+  )}
+  {kind === "shop" && (
+    <>
+      {[0, 1, 2].map((i) => (
+        <g transform={`translate(${14 + i * 60} ${i === 1 ? 14 : 26})`}>
+          <rect width="52" height="84" rx="6" />
+          <rect x="6" y="6" width="40" height="40" rx="4" stroke-opacity="0.7" />
+          <path d="M8 56h36M8 64h24" stroke-opacity="0.6" />
+          <circle cx="12" cy="74" r="3" fill="currentColor" stroke="none" />
+          <path d="M20 74h18" />
+        </g>
+      ))}
+    </>
+  )}
+  {kind === "graph" && (
+    <>
+      {satellites.map((s) => (
+        <line x1="100" y1="65" x2={s.x} y2={s.y} stroke-dasharray={s.loose ? "3 5" : undefined} stroke-opacity={s.loose ? 0.6 : 1} />
+      ))}
+      <circle cx="100" cy="65" r="12" fill="currentColor" fill-opacity="0.4" />
+      {satellites.map((s) => <circle cx={s.x} cy={s.y} r="7" fill="#0f0e0a" />)}
+      <path d={`M${satellites[4].x - 3} ${satellites[4].y - 3}l6 6m0-6l-6 6`} stroke-width="1.4" />
+    </>
+  )}
+  {kind === "target" && (
+    <>
+      <circle cx="100" cy="65" r="50" />
+      <circle cx="100" cy="65" r="34" stroke-opacity="0.8" />
+      <circle cx="100" cy="65" r="18" stroke-opacity="0.7" />
+      <circle cx="100" cy="65" r="5" fill="currentColor" stroke="none" />
+      <path d="M100 8v22M100 100v22M43 65h22M135 65h22" stroke-opacity="0.6" />
+      <circle cx="146" cy="38" r="4" fill="currentColor" stroke="none" />
+      <circle cx="62" cy="88" r="4" fill="currentColor" stroke="none" fill-opacity="0.6" />
+    </>
+  )}
+</svg>
+
+<style>
+  .pj-art-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgb(239 214 131 / 45%));
+  }
+</style>

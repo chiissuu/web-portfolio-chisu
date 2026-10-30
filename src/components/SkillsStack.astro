@@ -1,7 +1,8 @@
 ---
-// "Mi stack de trabajo": the tools grouped by area, as compact reference rows.
-// It lives under the projects (what I build, then what I build it with); it
-// used to close the About section. Reads the section's `--theme-*` tokens.
+// "Mi stack de trabajo": the tools grouped by area, as a mosaic of dark glass
+// cards (the bevel of the project cards) with large logo tiles that lift on
+// hover. It lives under the projects (what I build, then what I build it with)
+// on a light section, so the cards are dark on purpose.
 import type { SkillGroup } from "../lib/content-types";
 
 interface Props {
@@ -11,21 +12,33 @@ interface Props {
 }
 
 const { title, groups, base } = Astro.props as Props;
+
+// Columns each card spans (of 12), so the bigger areas get more room:
+// Software, Bases de datos | Web, Data, Herramientas | Diseño, Documentación.
+const spans = [6, 6, 4, 4, 4, 6, 6];
+const columns = (count: number) => (count <= 4 ? count : Math.ceil(count / 2));
 ---
 
-<section class="sk-skills" aria-labelledby="sk-skills-heading">
-  <h3 id="sk-skills-heading" class="sk-title">{title}</h3>
-  <div class="sk-stack">
-    {groups.map((group) => (
-      <section class="sk-group" aria-labelledby={`sk-${group.id}`}>
-        <h4 class="sk-category" id={`sk-${group.id}`}>{group.title}</h4>
+<section class="sk-skills" aria-labelledby="sk-skills-heading" data-sk>
+  <h3 id="sk-skills-heading" class="sk-plate">
+    <span class="sk-plate-text">{title}</span>
+    <span class="sk-cursor" aria-hidden="true"></span>
+  </h3>
+
+  <div class="sk-grid">
+    {groups.map((group, index) => (
+      <section class="sk-card" style={`--span:${spans[index] ?? 6};--cols:${columns(group.items.length)}`} aria-labelledby={`sk-${group.id}`}>
+        <header class="sk-head">
+          <h4 class="sk-category" id={`sk-${group.id}`}>{group.title}</h4>
+          <span class="sk-count" aria-hidden="true">{String(group.items.length).padStart(2, "0")}</span>
+        </header>
         <ul class="sk-items">
-          {group.items.map(([name, icon]) => (
-            <li class="sk-item">
+          {group.items.map(([name, icon], i) => (
+            <li class="sk-item" style={`--i:${i}`}>
               <span class="sk-icon" aria-hidden="true">
                 {icon && <img src={`${base}/assets/skills/${icon}`} alt="" width="48" height="48" loading="lazy" decoding="async" />}
               </span>
-              <span>{name}</span>
+              <span class="sk-name">{name}</span>
             </li>
           ))}
         </ul>
@@ -40,73 +53,134 @@ const { title, groups, base } = Astro.props as Props;
     margin: clamp(3rem, 6vw, 5rem) auto 0;
   }
 
-  .sk-title {
-    margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
-    text-align: left;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
-    letter-spacing: -0.015em;
-    text-transform: none;
-    color: var(--color-brand-gold);
-    line-height: 1.15;
-    text-wrap: balance;
+  /* Heading plate: dark, with the metallic bevel, like /whoami in Sobre mí
+     (which is gold on black); here it is black so it stands out on champagne. */
+  .sk-plate {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: baseline;
+    width: fit-content;
+    margin: 0 auto clamp(1.5rem, 3vw, 2.25rem);
+    padding: 0.65rem 1.2rem 0.7rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #1d1a12, #0f0e0a);
+    box-shadow: 0 8px 22px rgb(60 40 5 / 25%);
+    color: #f6e7b8;
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.35;
   }
 
-  .sk-group {
+  .sk-plate::before,
+  .sk-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    padding: 2px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .sk-cursor {
+    align-self: center;
+    width: 0.5em;
+    height: 1.1em;
+    margin-left: 0.3rem;
+    border-radius: 1px;
+    background: currentColor;
+    animation: sk-caret 1.1s steps(1) infinite;
+  }
+
+  @keyframes sk-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .sk-grid {
     display: grid;
-    grid-template-columns: minmax(8.5rem, 0.23fr) minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(1rem, 2vw, 2rem);
-    padding-block: 0.9rem;
-    border-top: 1px solid var(--theme-border);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.1rem;
   }
 
-  .sk-group:last-child {
-    border-bottom: 1px solid var(--theme-border);
+  .sk-card {
+    position: relative;
+    isolation: isolate;
+    grid-column: span var(--span);
+    padding: 1.1rem 1.25rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background:
+      radial-gradient(120% 90% at 85% 0%, rgb(224 197 139 / 10%), transparent 60%),
+      linear-gradient(145deg, #1d1a13, #100f0b);
+    box-shadow: 0 14px 34px rgb(60 40 5 / 22%), inset 0 1px 0 rgb(255 240 190 / 12%);
+  }
+
+  .sk-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .sk-category {
+    margin: 0;
     font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.4;
-    color: var(--theme-text);
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    color: #f3e6bf;
     overflow-wrap: anywhere;
   }
 
+  .sk-count {
+    padding: 0.15rem 0.55rem;
+    border: 1px solid rgb(224 197 139 / 35%);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: #d8c58b;
+  }
+
   .sk-items {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 1rem 0.6rem;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
   .sk-item {
     display: flex;
-    min-width: 0;
-    max-width: 100%;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    color: #d4d6d8;
-    font-size: 0.85rem;
-    line-height: 1.35;
-    text-align: left;
-    overflow-wrap: anywhere;
+    gap: 0.45rem;
+    min-width: 0;
+    text-align: center;
   }
 
   .sk-icon {
     display: grid;
     place-items: center;
-    flex: 0 0 1.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    padding: 0.3rem;
-    border-radius: 0.4rem;
-    background: #ebebeb;
+    width: 3.2rem;
+    height: 3.2rem;
+    padding: 0.6rem;
+    border-radius: 0.85rem;
+    background: #efede7;
+    box-shadow: 0 6px 14px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 70%);
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease;
   }
 
   .sk-icon img {
@@ -115,18 +189,69 @@ const { title, groups, base } = Astro.props as Props;
     object-fit: contain;
   }
 
-  @media (max-width: 899px) {
-    .sk-group {
-      grid-template-columns: 1fr;
-      gap: 0.85rem;
+  .sk-name {
+    font-size: 0.7rem;
+    line-height: 1.25;
+    color: #b9bdc0;
+    overflow-wrap: anywhere;
+    transition: color 0.25s ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sk-item:hover .sk-icon {
+      transform: translateY(-5px) scale(1.07);
+      box-shadow: 0 12px 22px rgb(0 0 0 / 45%), 0 0 0 1px rgb(239 214 131 / 70%), 0 0 20px rgb(239 214 131 / 40%);
+    }
+
+    .sk-item:hover .sk-name {
+      color: #f3e6bf;
     }
   }
 
-  @media (max-width: 640px) {
+  /* Entrance (only with script and motion): the cards' items rise in turn as
+     each card comes into view. Without it, everything is simply visible. */
+  .sk-skills.sk-js .sk-item,
+  .sk-skills.sk-js .sk-head {
+    transition: opacity 0.5s ease calc(var(--i, 0) * 45ms), transform 0.5s cubic-bezier(0.23, 1, 0.32, 1) calc(var(--i, 0) * 45ms);
+  }
+
+  .sk-skills.sk-js .sk-card:not(.is-in) .sk-item,
+  .sk-skills.sk-js .sk-card:not(.is-in) .sk-head {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  @media (max-width: 899px) {
+    .sk-card {
+      grid-column: 1 / -1;
+    }
+
     .sk-items {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.65rem 0.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sk-cursor {
+      animation: none;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-sk]").forEach((root) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    root.classList.add("sk-js");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2 }
+    );
+    root.querySelectorAll(".sk-card").forEach((card) => observer.observe(card));
+  });
+</script>
