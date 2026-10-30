@@ -162,7 +162,15 @@ export interface ProjectItem {
   category: string;
   tags: string[];
   title: string;
+  description: string;
+  /** Illustration motif of the card (see ProjectArt.astro). */
+  art?: string;
+  /** A headline figure shown big on the card. */
+  metric?: { value: string; label: string };
+  /** Short state shown after the category ("In progress"); empty when there is none to show. */
   status: string;
+  /** Repository or live page; without it the card is not a link. */
+  href?: string;
 }
 
 /** Transparent PNG/WebP used as a section heading. Its visible bounds are cropped
@@ -179,6 +187,11 @@ export interface ProjectsContent {
   title: string;
   titleImage?: TitleImage;
   note: string;
+  /** Phrases of `note` set in bold. */
+  noteStrong?: string[];
+  /** Last item of the row: a link to the rest of the work. */
+  moreLabel: string;
+  moreHref: string;
   items: ProjectItem[];
 }
 
