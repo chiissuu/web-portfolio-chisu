@@ -200,6 +200,10 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
                 </ol>
               </section>
             ))}
+            <!-- Where the thread leaves Sobre mí: its last node lights the dawn. -->
+            <div class="ab-marker ab-marker--exit">
+              <span class="ab-marker-dot" data-ab-node aria-hidden="true"></span>
+            </div>
           </div>
         </header>
 
@@ -496,6 +500,18 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
     inset-block-start: 50%;
     inset-inline-start: calc(50% - 7px);
     margin-top: -7px;
+  }
+
+  .ab-marker--exit {
+    display: block;
+    min-height: 5.5rem;
+    padding-block: 0;
+  }
+
+  /* The thread's last stop: it lights up as the iris scene of Proyectos
+     takes over (see ShowcaseSection). */
+  .ab-journey.ab-js .ab-marker--exit .ab-marker-dot.is-lit {
+    box-shadow: 0 0 0 8px rgb(224 197 139 / 22%), 0 0 30px 8px rgb(239 214 131 / 70%);
   }
 
   .ab-marker-link {
@@ -1119,7 +1135,8 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
 
     // Obsidian backdrop: a window of brighter veins rides the thread's front,
     // and a soft glow lights behind each card or heading plate once it is lit.
-    const bg = root.closest<HTMLElement>(".ab-section")?.querySelector<HTMLElement>("[data-ab-bg]") ?? null;
+    const section = root.closest<HTMLElement>(".ab-section");
+    const bg = section?.querySelector<HTMLElement>("[data-ab-bg]") ?? null;
     const beam = bg?.querySelector<HTMLElement>(".ab-beam") ?? null;
     const brightVeins = beam?.querySelector<HTMLElement>(".ab-veins--lit") ?? null;
     const glows: HTMLElement[] = [];
@@ -1246,6 +1263,8 @@ function decorateParagraph(paragraph: string, rules: readonly ProsePart[] = anno
         node.classList.toggle("is-lit", lit);
         card?.classList.toggle("is-lit", lit);
         glows[i]?.classList.toggle("is-lit", lit);
+        // The iris scene of Proyectos waits for this node's own animation.
+        if (i === nodes.length - 1) window.dispatchEvent(new CustomEvent("ab-exit-lit", { detail: { lit } }));
         if (lit && celebrate && forward && !reduced && inView(node)) {
           burst(layer, points[i].x, points[i].y, node, card);
         }
