@@ -8,8 +8,13 @@
 // CSS background with an alpha equal to the effect's strength: where nothing
 // moved the canvas is fully transparent, so the original image is untouched.
 //
+// On top of the smear there is a water layer: the same texture also holds a
+// height field (z = height, w = previous height) stepped with the wave
+// equation, so every movement sends out rings. The render pass bends the image
+// along the slope of that field (refraction) and lights it from one side.
+//
 // Only runs for a fine pointer with hover and without reduced motion; the
-// loop stops by itself a couple of seconds after the pointer rests.
+// loop stops by itself a few seconds after the pointer rests.
 
 export interface HeroFluid {
   destroy(): void;
@@ -35,7 +40,8 @@ uniform vec2 uPoint;
 uniform vec2 uVel;
 uniform float uRadius;
 void main() {
-  vec2 v = texture(uPrev, vUv).xy;
+  vec4 self = texture(uPrev, vUv);
+  vec2 v = self.xy;
   // Self-advection: the field drags itself along its own direction.
   vec2 adv = texture(uPrev, vUv - v * 0.035 * uDt).xy;
   // Diffusion: soften toward the neighbours.
@@ -46,14 +52,26 @@ void main() {
     texture(uPrev, vUv - vec2(0.0, uTexel.y)).xy);
   vec2 nv = mix(adv, avg, min(0.35 * uDt, 1.0));
   // Fade, independent of the display's refresh rate.
-  nv *= pow(0.982, uDt);
+  nv *= pow(0.95, uDt);
   // Pointer splat.
   vec2 d = vUv - uPoint;
   d.x *= uAspect;
   nv += uVel * exp(-dot(d, d) / uRadius);
   nv = clamp(nv, -1.0, 1.0);
   if (length(nv) < 0.002) nv = vec2(0.0);
-  outColor = vec4(nv, 0.0, 1.0);
+
+  // Water: wave equation on a height field (height in z, previous in w).
+  float wsum =
+    texture(uPrev, vUv + vec2(uTexel.x, 0.0)).z +
+    texture(uPrev, vUv - vec2(uTexel.x, 0.0)).z +
+    texture(uPrev, vUv + vec2(0.0, uTexel.y)).z +
+    texture(uPrev, vUv - vec2(0.0, uTexel.y)).z;
+  float h = (wsum * 0.5 - self.w) * pow(0.925, uDt);
+  // Each movement drops a ring-making bump along the pointer's path.
+  h += min(length(uVel) * 0.9, 0.42) * exp(-dot(d, d) / (uRadius * 0.7));
+  h = clamp(h, -0.5, 0.5);
+  if (abs(h) < 0.0004 && abs(self.z) < 0.0004) h = 0.0;
+  outColor = vec4(nv, h, self.z);
 }`;
 
 const RENDER_FRAG = `#version 300 es
@@ -63,18 +81,38 @@ out vec4 outColor;
 uniform sampler2D uSim;
 uniform sampler2D uImg;
 uniform vec2 uCover;
+uniform vec2 uTexel;
 void main() {
-  vec2 v = texture(uSim, vUv).xy;
+  vec4 s = texture(uSim, vUv);
+  vec2 v = s.xy;
+  // Slope of the water surface.
+  vec2 g = 0.5 * vec2(
+    texture(uSim, vUv + vec2(uTexel.x, 0.0)).z - texture(uSim, vUv - vec2(uTexel.x, 0.0)).z,
+    texture(uSim, vUv + vec2(0.0, uTexel.y)).z - texture(uSim, vUv - vec2(0.0, uTexel.y)).z);
+  float slope = length(g);
   float m = smoothstep(0.015, 0.7, length(v) * 1.5);
-  vec2 uv = (vUv - 0.5) * uCover + 0.5 - v * 0.05;
-  float r = 0.011 * m;
+  float wave = smoothstep(0.0005, 0.004, slope);
+  // Calm water: nothing to draw, so skip the image fetches.
+  if (m <= 0.0 && wave <= 0.0) {
+    outColor = vec4(0.0);
+    return;
+  }
+  // Refraction through the water plus the old smear.
+  vec2 uv = (vUv - 0.5) * uCover + 0.5 - v * 0.05 - g * 0.28 * uCover;
+  float r = 0.01 * m;
   vec3 c = texture(uImg, uv).rgb;
   for (int i = 0; i < 8; i++) {
+    if (m <= 0.0) break;
     float a = 6.2831853 * float(i) / 8.0;
     c += texture(uImg, uv + vec2(cos(a), sin(a)) * r).rgb;
   }
-  c /= 9.0;
-  float alpha = smoothstep(0.0, 0.3, m);
+  c /= (m > 0.0 ? 9.0 : 1.0);
+  // Light from the upper left: slopes facing it shine, the others darken.
+  float lit = dot(g, normalize(vec2(-0.55, 0.83)));
+  c += vec3(1.0, 0.9, 0.62) * max(lit, 0.0) * 2.4;
+  c *= 1.0 - min(max(-lit, 0.0) * 4.0, 0.25);
+  c = clamp(c, 0.0, 1.0);
+  float alpha = max(smoothstep(0.0, 0.3, m), wave);
   outColor = vec4(c * alpha, alpha);
 }`;
 
@@ -176,6 +214,7 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
     sim: gl.getUniformLocation(renderProgram, "uSim"),
     img: gl.getUniformLocation(renderProgram, "uImg"),
     cover: gl.getUniformLocation(renderProgram, "uCover"),
+    texel: gl.getUniformLocation(renderProgram, "uTexel"),
   };
 
   let destroyed = false;
@@ -205,15 +244,15 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
     if (!gl || destroyed) return;
     const rect = container.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return;
-    // Half resolution is plenty: the effect is a blur and is stretched by CSS.
-    const w = Math.max(2, Math.round(rect.width * 0.5));
-    const h = Math.max(2, Math.round(rect.height * 0.5));
+    // About a third of the resolution is plenty: the effect is a blur and is stretched by CSS.
+    const w = Math.max(2, Math.round(rect.width * 0.35));
+    const h = Math.max(2, Math.round(rect.height * 0.35));
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
     }
-    const sw = 192;
-    const sh = Math.max(16, Math.round((192 * rect.height) / rect.width));
+    const sw = 144;
+    const sh = Math.max(16, Math.round((144 * rect.height) / rect.width));
     if (!targets || sw !== simW || sh !== simH) {
       disposeTargets();
       const a = makeTarget(gl, sw, sh);
@@ -228,7 +267,7 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
       for (const t of targets) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo);
         gl.viewport(0, 0, sw, sh);
-        gl.clearColor(0, 0, 0, 1);
+        gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
       }
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -258,7 +297,7 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
     if (pending.has) {
       gl.uniform2f(simU.point, pending.x, pending.y);
       gl.uniform2f(simU.vel, pending.vx, pending.vy);
-      gl.uniform1f(simU.radius, 0.0035 + Math.min(Math.hypot(pending.vx, pending.vy), 1) * 0.004);
+      gl.uniform1f(simU.radius, (0.0035 + Math.min(Math.hypot(pending.vx, pending.vy), 1) * 0.004) * 0.7);
       pending.has = false;
       pending.vx = 0;
       pending.vy = 0;
@@ -285,6 +324,7 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
     gl.bindTexture(gl.TEXTURE_2D, imageTex);
     gl.uniform1i(renderU.img, 1);
     gl.uniform2f(renderU.cover, sx, sy);
+    gl.uniform2f(renderU.texel, 1 / simW, 1 / simH);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     if (now < activeUntil) {
@@ -327,7 +367,7 @@ export function createHeroFluid(container: HTMLElement, imageUrl: string): HeroF
       pending.x = x;
       pending.y = y;
       pending.has = true;
-      activeUntil = performance.now() + 2600;
+      activeUntil = performance.now() + 1500;
       start();
     }
     lastX = x;
