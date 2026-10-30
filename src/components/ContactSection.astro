@@ -3,6 +3,7 @@ import { Mail } from "lucide-astro";
 import ContactForm from "./ContactForm.astro";
 import type { ContactSectionContent } from "../lib/content-types";
 import SectionHeadingCard from "./SectionHeadingCard.astro";
+import SectionBackdrop from "./SectionBackdrop.astro";
 
 interface Props {
   t: ContactSectionContent;
@@ -13,7 +14,8 @@ const links = t.contact.links;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
-<section class="section-theme-dark ct-section" id="contact">
+<section class="section-theme-dark ct-section bd-host" id="contact">
+  <SectionBackdrop kind="dawn" />
   <div class="section-inner">
     <SectionHeadingCard text={t.contact.title} image={t.contact.titleImage} halo as="h2" size="lg" />
 
@@ -70,24 +72,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 </section>
 
 <style>
-  /* Same warm graphite as About / Servicios / Tools, continuing from Tools
-     without a seam, and fading to the black FAQ starts from below. */
+  /* Dark section; its background is the "dawn" SectionBackdrop layer. */
   .ct-section {
-    --ct-blend-end: clamp(8rem, 16svh, 12rem);
     --theme-text: #f3f4f5;
     --theme-text-muted: #adb2b6;
     --theme-border: rgb(196 204 209 / 18%);
     --theme-surface: rgb(255 255 255 / 4%);
     --theme-surface-strong: rgb(255 255 255 / 8%);
     color-scheme: dark;
-    background:
-      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.8%) 0 1px, transparent 1px 4px),
-      linear-gradient(
-        180deg,
-        #24221f 0,
-        #24221f calc(100% - var(--ct-blend-end)),
-        var(--section-dark-start) 100%
-      );
+    background: #0b0a09;
   }
 
   .ct-lead {

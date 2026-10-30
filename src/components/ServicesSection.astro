@@ -1,5 +1,4 @@
 ---
-import { withBase } from "../lib/paths.js";
 import type { ServicesHomeSectionContent } from "../lib/content-types";
 import ShowcaseSection from "./ShowcaseSection.astro";
 import ShowcaseCard from "./ShowcaseCard.astro";
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const { t } = Astro.props as Props;
-const servicesHref = withBase("/servicios/");
 const copy = t.servicesTools.services;
 const articles = t.services.page.articles;
 ---
@@ -18,8 +16,7 @@ const articles = t.services.page.articles;
   id="services"
   title={copy.title}
   titleImage={copy.titleImage}
-  ctaHref={servicesHref}
-  ctaLabel={copy.ctaLabel}
+  backdrop="blueprint"
 >
   <p slot="intro">
     {copy.description.map((segment) =>
@@ -33,7 +30,6 @@ const articles = t.services.page.articles;
       title={article.title}
       text={article.text}
       tags={article.tags}
-      href={servicesHref}
     />
   ))}
 </ShowcaseSection>

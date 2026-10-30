@@ -9,7 +9,6 @@ interface Props {
 }
 
 const { t } = Astro.props as Props;
-const toolsHref = withBase("/tools/");
 const copy = t.servicesTools.tools;
 const items = t.tools.page.items;
 ---
@@ -18,8 +17,7 @@ const items = t.tools.page.items;
   id="tools"
   title={copy.title}
   titleImage={copy.titleImage}
-  ctaHref={toolsHref}
-  ctaLabel={copy.ctaLabel}
+  backdrop="brushed"
 >
   <p slot="intro">{copy.description}</p>
 
