@@ -1,24 +1,26 @@
 ---
 tags: [rutas, navegacion]
 aliases: [Rutas-y-Navegacion]
-actualizado: 2026-10-23
+actualizado: 2026-10-29
 fuente: [src/pages]
 ---
 
 # Rutas y navegación
 
-## Las 4 rutas
+## Las 2 rutas (desde el 29 de octubre de 2026)
+
+Se eliminaron las subpáginas `/servicios/`, `/tools/` y `/tools/video-converter/` y se adoptó una regla: **cada cosa tiene su propia página directa, sin una página «índice» intermedia** (antes: Tools → Conversor, dos redirecciones). El conversor pasó a `/video-converters/`.
 
 | Ruta | Archivo bajo `src/pages/` | Estructura |
 |---|---|---|
-| `/` | [index.astro](../../src/pages/index.astro) | Layout + Hero + main con About, Proyectos, Servicios/Tools, Contacto y FAQ |
-| `/servicios/` | [servicios/index.astro](../../src/pages/servicios/index.astro) | Layout + SimpleNav + ServicesPageContent + ServicesForm |
-| `/tools/` | [tools/index.astro](../../src/pages/tools/index.astro) | Layout + SimpleNav + ToolsPageContent |
-| `/tools/video-converter/` | [tools/video-converter/index.astro](../../src/pages/tools/video-converter/index.astro) | Layout + SimpleNav + VideoConverterPageContent + isla React |
+| `/` | [index.astro](../../src/pages/index.astro) | Layout + Hero + main con About, Proyectos, Servicios, Tools, Contacto y FAQ |
+| `/video-converters/` | [video-converters/index.astro](../../src/pages/video-converters/index.astro) | Layout + SimpleNav + VideoConverterPageContent + isla React |
+
+Las rutas antiguas devuelven 404 (el sitio aún no estaba publicado, así que no hay redirecciones). Los archivos de las páginas eliminadas están en `backups/paginas-eliminadas-2026-10-29/` (`.astro.bak`). **Se conservan sin montar** `ServicesPageContent`, `ToolsPageContent`, `ServicesForm`, `ServicesTeaser` y `ToolsTeaser` y el contenido `services.page`/`tools.page` (la portada usa sus artículos y herramientas), para recuperarlos cuando se decida. El nombre de la ruta, en plural, es el que pidió el usuario; cambiarlo es mover la carpeta y el enlace de `site.js`. Las tarjetas de Servicios y Tools de la portada ya no llevan el botón final (`ctaLabel`, ahora sin uso en `site.js`); las de Servicios no son enlaces y, en Tools, solo el conversor lo es.
 
 Todas usan `lang="es"` y `bodyClass="redesign"`. Solo la portada añade `redesign-home`, que activa la reserva de espacio del sidebar y la excepción de clic central (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]). Los cambios de página son cargas completas — no se instala `ClientRouter`.
 
-No existen rutas `/en`, detalle de proyecto, Instagram checker, contacto independiente, política de privacidad, página de gracias ni 404 personalizada.
+No existen rutas `/en`, `/servicios`, `/tools`, detalle de proyecto, Instagram checker, contacto independiente, política de privacidad, página de gracias ni 404 personalizada.
 
 ## Anclas de la portada
 
@@ -26,12 +28,12 @@ No existen rutas `/en`, detalle de proyecto, Instagram checker, contacto indepen
 
 ## Tres navegaciones distintas — deliberadamente no equivalentes
 
-Este es un punto fácil de "corregir por error" si no se conoce: las tres difieren a propósito en orden y en destino de Servicios/Tools.
+Las tres difieren a propósito en el orden (desde el 29 de octubre ya no en el destino de Servicios/Tools: las tres usan anclas de la portada).
 
 | Navegación | Orden | Destino de Servicios/Tools | Excepciones |
 |---|---|---|---|
 | Superior del Hero y menú móvil | Inicio, Sobre mí, Contacto, Proyectos, Servicios, Tools | `#services`, `#tools` | Seis enlaces; no incluyen FAQ |
-| Sidebar (tras el morph) | Inicio, Sobre mí, Proyectos, Servicios, Tools, Contacto, FAQ | `/servicios/`, `/tools/` | Siete enlaces con iconos Lucide |
+| Sidebar (tras el morph) | Inicio, Sobre mí, Proyectos, Servicios, Tools, Contacto, FAQ | `#services`, `#tools` (antes `/servicios/`, `/tools/`) | Siete enlaces con iconos Lucide |
 | SimpleNav de subpáginas | Sobre mí, Contacto, Proyectos, Servicios, Tools | `/#services`, `/#tools`, con `withBase` | La marca CHIISSUU vuelve a `/`; a ≤700px desaparece la lista pero la marca permanece |
 
 Detalle del sidebar (morph, temas, sección activa) en [[Hero-y-Sidebar]].

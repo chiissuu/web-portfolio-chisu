@@ -12,6 +12,9 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 |---|---|
 | [scripts/generate-about-veins.mjs](../../../scripts/generate-about-veins.mjs) | Genera `about-veins.webp` a partir de la textura del Hero (`sharp`), ver [[Sobre-Mi]] |
 | [scripts/copy-ffmpeg-core.mjs](../../../scripts/copy-ffmpeg-core.mjs) | Copia del motor instalado a `public/ffmpeg` |
+| [src/pages/video-converters/index.astro](../../../src/pages/video-converters/index.astro) | Única ruta aparte de la portada (antes `/tools/video-converter/`); ver [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] |
+| [src/components/SectionBackdrop.astro](../../../src/components/SectionBackdrop.astro) | Capas de fondo de Proyectos, Servicios, Tools, Contacto y FAQ (`champagne`, `blueprint`, `brushed`, `dawn`, `ivory`) — ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
+| [src/components/ProjectCard.astro](../../../src/components/ProjectCard.astro) | Tarjeta alta del carrusel de Proyectos (arte a toda la tarjeta, tags, texto y flecha) — ver [[Otras-Secciones-y-Compartidos]] |
 | [src/components/SkillsStack.astro](../../../src/components/SkillsStack.astro) | «Mi stack de trabajo» (categorías y logos), bajo Proyectos; antes dentro de Sobre mí — ver [[Sobre-Mi]] |
 | [src/components/AboutSatellite.astro](../../../src/components/AboutSatellite.astro) | Ilustraciones de línea dorada al lado de cada tarjeta del hilo de Sobre mí (ocho variantes, decorativas) — ver [[Sobre-Mi]] |
 | [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Título PNG dorado, siete párrafos en dos grupos y stack de 42 herramientas; formación e idiomas van dentro de la biografía — ver [[Sobre-Mi]] |
@@ -50,16 +53,15 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/lib/forms/types.ts](../../../src/lib/forms/types.ts) | Datos de ambos formularios y estado/resultado |
 | [src/lib/forms/validate.ts](../../../src/lib/forms/validate.ts) | Validadores de campos y email |
 | [src/lib/heroFluid.ts](../../../src/lib/heroFluid.ts) | Efecto del ratón sobre el fondo del Hero: WebGL2 sin dependencias, ver [[Hero-y-Sidebar]] |
-| [src/lib/heroWater.ts](../../../src/lib/heroWater.ts) | Ondulación de agua con filtros SVG sobre wordmark, titular, lema, nota, chips y métricas del Hero, ver [[Hero-y-Sidebar]] |
 | [src/lib/paths.js](../../../src/lib/paths.js) | Prefijo de `BASE_URL` para enlaces internos |
 | [src/lib/videoConverter/constants.ts](../../../src/lib/videoConverter/constants.ts) | Límites, extensiones, bitrates y directorio FFmpeg |
 | [src/lib/videoConverter/ffmpegClient.ts](../../../src/lib/videoConverter/ffmpegClient.ts) | Carga de Worker, conversión, cancelación y FS virtual |
 | [src/lib/videoConverter/types.ts](../../../src/lib/videoConverter/types.ts) | Etapas, archivo seleccionado, resultado y errores de validación |
 | [src/lib/videoConverter/utils.ts](../../../src/lib/videoConverter/utils.ts) | Metadatos, validación, memoria y nombres de salida |
 | [src/pages/index.astro](../../../src/pages/index.astro) | Ruta: `/` |
-| [src/pages/servicios/index.astro](../../../src/pages/servicios/index.astro) | Ruta: `/servicios/` |
-| [src/pages/tools/index.astro](../../../src/pages/tools/index.astro) | Ruta: `/tools/` |
-| [src/pages/tools/video-converter/index.astro](../../../src/pages/tools/video-converter/index.astro) | Ruta: `/tools/video-converter/` |
+| `src/pages/servicios/index.astro` | **Eliminada el 29 de octubre de 2026** (respaldo en `backups/paginas-eliminadas-2026-10-29/`); era la ruta `/servicios/` |
+| `src/pages/tools/index.astro` | **Eliminada el 29 de octubre de 2026** (mismo respaldo); era la ruta `/tools/` |
+| `src/pages/tools/video-converter/index.astro` | **Movida** a `src/pages/video-converters/index.astro` (ruta `/video-converters/`) |
 
 ## Configuración revisada
 

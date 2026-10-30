@@ -84,11 +84,21 @@ Al mover el ratón por el Hero, el fondo se **desplaza y se desenfoca como un l�
 - **Ajustes:** intensidad del desplazamiento (`0.05`) y del desenfoque (`0.011`) en el shader de dibujo; tamaño y arrastre de la salpicadura en `onPointerMove` y en `SIM_FRAG`.
 - **Medido:** capa totalmente transparente en reposo; con el ratón en movimiento ~18 % del lienzo con alfa 255, 11 497 px con alfa ≤92 a los 1,2 s y 0 px a los ~5 s.
 
+### Marco de las tarjetas del sidebar sobre fondos dorados (26 de octubre de 2026)
+
+Sobre la placa de oro cepillado de Tools (y el champán de Proyectos) el borde dorado y el relleno tostado de las tarjetas se confundían con el fondo. `.hx-sidebar-article` suma, además del brillo interior, un **filo exterior marrón** de 1px (`0 0 0 1px rgb(60 40 5 / 60%)`) y una **sombra cálida** suave (`0 8px 24px rgb(60 40 5 / 35%)`). Sobre secciones oscuras apenas se aprecian. El cambio de texto blanco/negro por tarjeta no se toca (decisión del usuario). Los rectángulos de morph no cambian (las sombras no afectan a la caja). Copia previa: `backups/HeroExperience.astro.pre-sidebar-borde-2026-10-26`.
+
 ### Barras «|» del nav que quedaban visibles tras recargar desplazado (24 de octubre de 2026)
 
 Síntoma: al recargarse la página por un cambio de código (sin F5) con el scroll ya en Sobre mí, las dos barras `|` que separan Proyectos / Servicios / Tools seguían a la vista sobre el Hero; desaparecían al subir y bajar. Causa: su opacidad dependía de una variable CSS (`--nav-sep-opacity`) escrita por el `onUpdate` de un tween sobre un objeto proxy. Al cargar con el scroll restaurado, GSAP coloca la línea de tiempo en su posición final sin disparar callbacks, así que la variable se quedaba en 1 (los demás elementos del Hero se animan directamente sobre el DOM y no sufren esto). Arreglo: el tween actúa ahora sobre el `opacity` de los `.hx-nav-sep` y `clearScrollDrivenState` lo limpia con `clearProps`; se eliminó la variable. Medido: cargado en `scrollY = 2600`, las 4 barras tienen opacidad 0 (antes 1); cargado arriba, 1. `--portrait-blur` sigue usando el mismo patrón proxy, pero el retrato ya está a opacidad 0 en esa posición, así que no se ve.
 
+### Agua del fondo más visible (30 de octubre de 2026)
+
+`heroFluid.ts` añade un campo de alturas con ecuación de onda: cada movimiento del ratón emite anillos que desvían (refracción) e iluminan la imagen del fondo. Detalle y valores a ajustar en [[Comandos-y-Pruebas]].
+
 ### Agua también en los elementos sueltos (24 de octubre de 2026)
+
+> **Revertido el 30 de octubre de 2026:** el usuario pidió que el efecto de agua vuelva a aplicarse solo al fondo. Se quitó la llamada a `createHeroWater`, la regla `.hx-water-on` y el archivo `src/lib/heroWater.ts` (copias en `backups/heroWater.ts.pre-sin-agua-elementos-2026-10-30.bak` y `backups/HeroExperience.astro.pre-sin-agua-elementos-2026-10-30.bak`). La descripción de abajo se conserva solo como historia por si se quiere recuperar.
 
 El efecto del fondo se dibuja en su propio lienzo. El wordmark, el titular, el lema, la nota, los chips y las métricas son nodos HTML que el Hero anima y mueve al sidebar, así que no se pueden «pintar» en ese lienzo sin sustituirlos. En su lugar, cada uno recibe un **filtro SVG** propio ([heroWater.ts](../../../src/lib/heroWater.ts)):
 

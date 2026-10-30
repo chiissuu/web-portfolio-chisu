@@ -292,6 +292,163 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - Comprobado en iframe: el CTA apunta a `#projects`; 5 iconos dibujados; el stack está en `#projects` y no en `#about`; Proyectos queda marcado en el sidebar durante el stack; la placa `/whoami` termina con 7 caracteres de ancho; sin la línea clara en los límites Hero/Sobre mí y Sobre mí/Proyectos al escalar la página.
 - Límites: no se vio el tecleo ni los resplandores en movimiento; no se probó en un móvil real.
 
+## Carrusel horizontal de Proyectos (25 de octubre de 2026)
+
+- Detalle en [[Otras-Secciones-y-Compartidos]]. Nuevos `ProjectCard.astro` y modo `rail` de `ShowcaseSection.astro`; seis proyectos de relleno en `site.js`.
+- `npm run check`: 53 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en iframe cargando la página ya desplazada a varias posiciones (el navegador de pruebas no entrega eventos de scroll a ScrollTrigger): antes del anclaje la fila está en x=0; durante, el panel pasa a `position: fixed` y la fila se desplaza 1:1 con el scroll (0, −500, −1000, −1318px); a los 1318px la última tarjeta queda en el borde derecho y después se libera. Sin desbordamiento horizontal en la página a 1440 y 390px; a 390px no hay pin ni espaciadores y la fila se desliza con `overflow-x: auto`.
+- Se vio y corrigió que las tarjetas pasaban por debajo del sidebar translúcido (el texto se transparentaba): máscara de desvanecimiento a la izquierda.
+- Límites: no se probó con rueda de ratón real ni con `prefers-reduced-motion` real; el easing del `scrub` y la sensación del anclaje solo se pueden juzgar en directo.
+- Para inspeccionar el vídeo de referencia se sirvió una copia temporal (`python -m http.server`) y se miraron fotogramas en el navegador de pruebas; el servidor se cerró.
+
+## Cinco fondos nuevos, alternando claro y oscuro (25 de octubre de 2026)
+
+- Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Nuevo `SectionBackdrop.astro`; cambios en `ShowcaseSection`, `ShowcaseCard`, `SkillsStack`, `ProjectsSection`, `ServicesSection`, `ToolsSection`, `ContactSection` y `FaqSection`. Copias previas en `backups/` (`*.pre-fondos-2026-10-25`).
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en iframe (escala 0,556, página cargada a la posición de cada sección): los cinco fondos se dibujan, las costuras claro/oscuro se ven, el carrusel de Proyectos funciona sobre el fondo claro, el stack es legible sobre champán y los acordeones del FAQ sobre marfil.
+- Límites: los movimientos (deriva de las venas, pulsos, linterna del puntero, polvo) no se vieron en vivo; el contraste del sidebar sobre las secciones claras solo se miró en capturas reducidas; no se probó en móvil real.
+
+## Ajustes de fondos tras la primera revisión (26 de octubre de 2026)
+
+- Petición del usuario: Proyectos con venas doradas en lugar de casi negras; Servicios con líneas más tenues (tapaban textos y carteles); Tools cambiado por completo (blanco con puntos grises, sin dorado ni coherencia); Contacto se queda; FAQ más complejo. Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Copias previas en `backups/` (`*.pre-ajuste-fondos-2026-10-26`).
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en capturas reducidas: venas doradas visibles sobre el champán; cuadrícula de Servicios casi imperceptible con tarjetas legibles; Tools con dorado cepillado y anillos grabados; FAQ con «?» de oro y contornos flotando.
+- Límites: los movimientos (brillo diagonal y reflejo de Tools, deriva de los «?» y brillo del pan de oro) no se vieron en vivo; el contraste del texto de la tarjeta de marca del sidebar sobre Tools sigue flojo cuando el límite con Servicios pasa por detrás (problema del sidebar, no tocado).
+
+## Transiciones entre secciones (26 de octubre de 2026)
+
+- Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Cambios en `SectionBackdrop.astro`, `AboutSection.astro` (nodo de salida + horizonte) y `ShowcaseSection.astro` (revelado del título). Copias previas en `backups/` (`*.pre-transiciones-2026-10-26`).
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado en capturas reducidas de los cinco pasos: degradados continuos; `ab-arrived` activo al llegar el hilo; el revelado del título pasa de `inset(0 53 % 0 0)` a `inset(0 0 0 0)` según el scroll. Se vio una hebra tenue en el paso Sobre mí → Proyectos aun tras el solape de 2px (zoom fraccionario del banco de pruebas).
+- Límites: el efecto en movimiento (sol que sube, revelado al hacer scroll con rueda) no se vio en vivo.
+
+## Marco del sidebar sobre fondos dorados (26 de octubre de 2026)
+
+- Detalle en [[Hero-y-Sidebar]]. Solo CSS de `.hx-sidebar-article` en `HeroExperience.astro`. `npm run check` 0 errores y 0 avisos; `npm run build` cuatro páginas.
+- Comprobado en capturas: sobre Tools las tarjetas se separan del oro; sobre Contacto (oscuro) no hay diferencia apreciable.
+
+## Transiciones: iris y ondas de oro (26 de octubre de 2026, tarde)
+
+- Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Cambios en `SectionBackdrop.astro` (ondas), `ShowcaseSection.astro` (iris), `AboutSection.astro` (se quita la franja de amanecer; el nodo de salida se mantiene) y `ProjectsSection.astro`. Copias previas en `backups/` (`*.pre-iris-ondas-2026-10-26`).
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado cargando la página a distintos puntos del anclaje (el navegador de pruebas no entrega scroll a ScrollTrigger): la luz baja por el hilo, se enciende el punto, el círculo crece descubriendo el champán con el aro dorado, y a continuación aparece el título de Proyectos; las cuatro ondas se ven nítidas sobre los límites con Servicios, Tools, Contacto y FAQ. A 390px el iris está apagado (panel oculto, onda visible, sin espaciadores y sin desbordamiento horizontal).
+- Límites: no se vio el movimiento a velocidad real con la rueda; el coste de repintado de la máscara del iris en GPU integrada no está medido.
+
+## Iris, segunda versión (26 de octubre de 2026, noche)
+
+- Petición del usuario (contando pasos de rueda): el haz tardaba ~7 pasos en reaccionar, el sidebar quedaba con texto negro sobre el panel oscuro y el título de Proyectos no aparecía hasta ~7 pasos después de abrirse el círculo. Rehecho como se describe en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Copia previa: `backups/ShowcaseSection.astro.pre-iris-v2-2026-10-26`.
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado cargando la página a S0+130, +380, +530, +680 y +1068px: la luz baja por el hilo, el círculo se abre sobre el título y las tarjetas reales de Proyectos, el sidebar cambia de blanco a negro al ser alcanzado, y el carrusel (anclado) arranca sin salto justo al terminar (la fila se desplaza 351px tras 350px de scroll); sin desbordamiento horizontal.
+- Límites: no se vio con rueda real ni con scroll suave; el recuento de pasos es una estimación (≈100px por paso).
+
+## Iris, tercera versión (26 de octubre de 2026, noche)
+
+- Petición del usuario: el trazo del hilo se veía antes de llegar al último nodo; y al abrirse el círculo, Proyectos aparecía cortado por la sección anterior (borde plano arriba y franja negra). Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Copia previa: `backups/ShowcaseSection.astro.pre-iris-v3-2026-10-26`.
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado a S0−120, +330, +470 y +585px (S0 = último nodo a mitad de pantalla, recorrido total 606px): sin trazo antes de S0; el círculo es redondo también por arriba; sin franja de Sobre mí; a +585px todo es champán, también tras el sidebar.
+- Límites: no se vio con rueda real; el recuento en pasos de rueda es una estimación.
+
+## Iris, cuarta versión (26 de octubre de 2026, noche)
+
+- Petición del usuario (tres fallos): el siguiente recorrido se pintaba antes de que el hilo llegara al nodo y éste hiciera su animación; al seguir, se quitaba todo lo de arriba y el recorrido quedaba cortado; y el trazo seguía pintado hasta llegar a Proyectos. Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]]. Copias previas: `backups/ShowcaseSection.astro.pre-iris-v4-2026-10-26` y `AboutSection.astro.pre-iris-v4-2026-10-26`.
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado: a S0−150 y saltando a S0+320 el nodo se enciende a ~0,4s y la línea sigue en 0; con el evento `ab-exit-lit` reproducido a mano (el banco de pruebas no entrega scroll a ScrollTrigger) la secuencia sale en orden: 0,7s de espera, línea 0 → 1, punto 0,45 → 1, círculo y desvanecimiento de la línea; a S0+230 la tarjeta 08 y el hilo siguen enteros y la luz baja hasta el punto; a S0+560 queda todo champán sin ningún trazo.
+- Límites: no se vio con rueda real ni con el scroll suave del navegador; los tiempos de las compuertas (0,7 / 0,5 / 0,25 / 0,7s) son una primera estimación.
+
+## Proyectos reales y ajuste final del iris (27 de octubre de 2026)
+
+- Contenido: ver [[Contenido-por-Seccion]]. `ProjectItem` gana `description` y `href?`; `ProjectsSection` pasa `description` como texto, `categoría · estado` como eyebrow y `href` a `ProjectCard`, que abre los enlaces externos en pestaña nueva. Copias previas en `backups/` (`*.pre-proyectos-reales-2026-10-26`, `ShowcaseSection.astro.pre-padding-2026-10-26`).
+- Iris: con el iris activo la sección Proyectos pierde el padding superior (`.sc-section[data-iris="on"] .sc-inner`), así el título ya está donde lo ancla el carrusel cuando termina el círculo (sección y bloque empiezan en el mismo punto: 3757px); y Sobre mí deja de contar como sección oscura para el sidebar al 90 % del recorrido, para que el texto de las tarjetas pase a negro un paso antes.
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0. Comprobado: seis tarjetas, cinco enlaces `_blank`, título y texto de las tarjetas legibles en el carrusel, título anclado arriba tras el iris.
+- Pendiente de confirmar con el usuario: que la exactitud de 0,99 del clasificador sea ya un resultado medido.
+
+## Iris, quinta versión (27 de octubre de 2026)
+
+- Petición del usuario: el haz del punto final se cortaba plano en el límite con la sección anterior; y al llegar a Proyectos el texto de las tarjetas del sidebar seguía en blanco hasta el siguiente scroll (y al volver arriba ya salía negro). Detalle en [[03-Sistema-de-Diseno|Sistema-de-Diseno]] y [[Hero-y-Sidebar]]. Copias: `backups/ShowcaseSection.astro.pre-glow-2026-10-27`, `HeroExperience.astro.pre-theme-check-2026-10-27`.
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: cuatro páginas, código 0.
+- Comprobado: a S0+230, +560 y en el inicio del anclaje las tarjetas del sidebar quedan en `dark`, `warm` y `warm`; forzando el cambio de clases y emitiendo `hx-theme-check` pasan de `dark` a `warm` sin mover el scroll; el resplandor continúa sobre el límite sin corte ni línea clara.
+- Límites: no se vio con rueda real.
+
+## Subpáginas eliminadas y conversor en /video-converters/ (29 de octubre de 2026)
+
+- Detalle en [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]]. Eliminadas `src/pages/servicios/index.astro` y `src/pages/tools/index.astro`; `tools/video-converter/index.astro` se movió a `src/pages/video-converters/index.astro` (importaciones ajustadas). El sidebar apunta ahora a `#services` y `#tools`; se quitaron los botones finales y los enlaces de las tarjetas de Servicios; el único enlace de Tools es el del conversor (`/video-converters/`, en ES y EN). Copias previas en `backups/` (`*.pre-rutas-2026-10-29` y `paginas-eliminadas-2026-10-29/`).
+- `npm run check`: 52 archivos, 0 errores y 0 avisos. `npm run build`: **dos páginas** (`/` y `/video-converters/`).
+- Comprobado con el servidor de vista previa: `/`, `/video-converters/` y `/video-converters` dan 200; `/servicios/`, `/tools/` y `/tools/video-converter/` dan 404; la portada no contiene enlaces a `/servicios` ni `/tools`; en `/video-converters/` carga la isla React (zona de arrastre presente, sin errores de consola) y su barra enlaza a las anclas de la portada.
+- Nota: los respaldos de páginas deben guardarse con extensión `.bak` (un `.astro` dentro de `backups/` lo revisa `astro check` y falla por sus importaciones relativas).
+
+## Pulido de Proyectos (29 de octubre de 2026)
+
+- Detalle en [[Otras-Secciones-y-Compartidos]]. Nuevos `ProjectArt.astro` y `ProjectMoreCard.astro`; reescritos `ProjectCard.astro`, `ProjectsSection.astro` y `SkillsStack.astro`; `ShowcaseSection` gana `center`, contador/progreso/foco; contenido con `art`, `metric`, `noteStrong`, `moreLabel`, `moreHref` (ES y EN).
+- `npm run check`: 54 archivos, 0 errores y 0 avisos. `npm run build`: dos páginas.
+- Comprobado en iframe: panel de 868px que cabe en 900; a los 380px de recorrido el contador marca 02, la barra 24 %, el foco está en la tarjeta 02; al final del recorrido marca 06 y se ve la tarjeta de GitHub (borde derecho a 1382px); el stack muestra 7 tarjetas y 42 logos cargados; a 390px no hay anclaje, contador oculto, tarjetas del stack a todo el ancho y sin desbordamiento horizontal.
+- Corregido sobre la marcha: el texto de las tarjetas heredaba el centrado de la cabecera (`text-align: left` en `.pj-card`).
+- Límites: no se vieron las animaciones en directo (entrada escalonada del stack, elevación al pasar el cursor, pulso del estado); las capturas son reducidas.
+
+## Cabecera de Proyectos fuera del anclaje (29 de octubre de 2026, tarde)
+
+- Petición del usuario: (a) al terminar el iris el título debía verse centrado con su texto, no cortado arriba; (b) con la fila anclada solo deben verse el contador/progreso y las tarjetas; (c) el stack se veía sin formato en su servidor de desarrollo.
+- Cambio en `ShowcaseSection.astro`: cabecera (`.sc-head`) separada del bloque anclado (`.sc-pin`), `PIN_TOP = 28`, punto del iris en el centro del título. Detalle en [[Otras-Secciones-y-Compartidos]]. `npm run check`: 54 archivos, 0 errores, 0 avisos; `npm run build`: dos páginas.
+- (c) no era un fallo del código: el servidor de Vite del usuario (puerto 4321) servía una hoja de estilos antigua de `SkillsStack`; el build y la vista previa salen formateados. Solución: parar `npm run dev`, borrar `node_modules/.vite-astro-dev` y volver a arrancar.
+- Límites: comprobado con cargas estáticas a distintos puntos del scroll, no con la rueda en directo.
+
+## Sidebar: cifras en oro y enlaces con flecha (29 de octubre de 2026, tarde)
+
+- Petición del usuario: las cifras «2+» y «10+» perdían el formato de la página (oro lavado sobre fondo claro), los enlaces del último bloque (GitHub, Redes Sociales) no parecían enlaces y la tipografía del sidebar se veía fina.
+- Cambios en `HeroExperience.astro` (copia previa: `backups/HeroExperience.astro.pre-nav-oro-2026-10-29.bak`): (1) `.hx-metric-value` y `.hx-compact-metric-value` con cara dorada degradada (`background-clip: text`) y borde de bronce extruido con `drop-shadow`, sin imágenes; se quitó el contorno negro fino del tema cálido; cifra del sidebar a 1.55rem. (2) Nav con Space Grotesk 700, 0.86rem, `letter-spacing: 0.07em`; etiquetas de cifras en 600; tagline en 500. (3) Bloque social en Space Grotesk 600 a 0.84rem (antes JetBrains Mono 400) con un disco dorado con flecha ↗ (`.hx-compact-social-arrow`) en GitHub y Redes Sociales; LinkedIn sigue atenuado y sin flecha por no tener URL.
+- Comprobado en iframe a 1440×900 sobre tema oscuro (Sobre mí) y cálido (Proyectos): el sidebar mide 873px y cabe en 900. `npm run check`: 0 errores, 0 avisos; build correcto.
+- Límites: no revisado a otras alturas de ventana ni en el menú móvil (no cambia).
+
+## Sidebar sin barra de desplazamiento (29 de octubre de 2026, noche)
+
+- Petición del usuario: con las cifras y la tipografía nuevas el sidebar no cabía en su ventana (zoom/ventana baja) y mostraba una barra lateral; pedía una auditoría para que cupiera como antes.
+- Primer intento descartado: pasar todo el interior a `em` con `font-size: clamp(10px, 1.65svh, 15px)`. Cabía, pero a ventanas altas (1887×882) todo quedaba un 7–15 % más pequeño que el resto de la página (el `em` anidado encogía además los botones) y el usuario lo vio feo. Copia: `backups/HeroExperience.astro.fit-v1-descartado-2026-10-29.bak`.
+- Solución adoptada (parte de la versión con cifras doradas y flechas; copia previa `backups/HeroExperience.astro.pre-nav-fit-2026-10-29.bak`): `.hx-compact-sidebar` define `--u: clamp(0.62rem, 1.82svh, 1rem)` y los `rem` de su interior pasan a `calc(N * var(--u))` (alto de botones: `2.75 * --u` = 44px a tamaño pleno). Con 1.82svh ≥ 1rem a partir de ~880px de alto: ahí el sidebar queda idéntico a antes; por debajo se encoge en proporción. Se mantienen los tramos de ≤950px y ≤850px. La barra queda oculta (`scrollbar-width: none`) solo como red de seguridad.
+- Medido (altura de contenido frente a altura útil): 1887×882 → 821/856; 1440×900 → 819/873; 1536×730 (equivale a 1920×1080 con zoom 125 %) → 625/706; 1366×768 → 637/744. En todos caben sin desbordar.
+- Límites: 1280×720 y 1920×1080 no medidos con esta versión; no probado con el zoom real del navegador; el menú móvil no cambia.
+
+## Sidebar rellena toda la altura (29 de octubre de 2026, noche)
+
+- Petición del usuario: en su ventana quedaba una franja vacía bajo el bloque de Contacto; el sidebar debía ocupar todo el alto expandiendo alguna celda.
+- Cambio en `HeroExperience.astro` (copia previa: `backups/HeroExperience.astro.pre-nav-relleno-2026-10-29.bak`): el espacio sobrante se reparte con `flex-grow`: el bloque de nav crece 3 partes (sus siete botones se estiran, `flex: 1`) y el bloque social 1 parte (filas y botón Contacto con `justify-content: space-evenly`); marca y cifras no crecen. `--u` sube su tope a 1.12rem para ventanas muy altas.
+- Medido (borde inferior del último bloque + padding = borde inferior del sidebar): 1887×882, 1920×1080 y 1536×730 → sin hueco ni desbordamiento; botones de nav de 48px, 52px y 45px de alto.
+- Límites: el reparto no se ha probado durante la animación de entrada del Hero (las posiciones del morph se miden en vivo, pero no lo vi en movimiento).
+
+## Sidebar con el aspecto original y «Mi stack» sin formato (29 de octubre de 2026, mediodía)
+
+- Sidebar (petición del usuario, con foto del estado anterior): se devuelven a los valores originales la frase de presentación, la etiqueta de las cifras, los botones del nav (Inter 600, 0.82rem, `letter-spacing: 0.02em`) y el bloque de redes (JetBrains Mono 0.72rem, sin huecos extra); se conservan las cifras doradas (1.3rem), las flechas junto a GitHub y Redes Sociales y el relleno de la altura. `--u` pasa a `clamp(0.62rem, 2.3svh, 1rem)`: vale 1rem a partir de ~700px de alto (sidebar idéntico al original en la ventana del usuario, ~1477×693 en CSS) y solo se encoge por debajo. Medido: 1477×693 y 1887×882 sin desbordamiento ni hueco inferior. Copia previa: `backups/HeroExperience.astro.pre-nav-original-2026-10-29.bak`.
+- «Mi stack de trabajo» seguía viéndose sin formato en el navegador del usuario. Auditoría: el servidor de desarrollo del usuario (`astro dev`, PID 29496, arrancado a las 9:36) devolvía el HTML nuevo (inline, con `sk-card`) pero el módulo de estilos `/src/components/SkillsStack.astro?astro&type=style&index=0&lang.css` seguía siendo el antiguo (`sk-group`/`sk-title`, sin `sk-card`). Un servidor nuevo (`astro dev --ignore-lock` en otro puerto) y el build servían el CSS correcto; los demás componentes del servidor del usuario también estaban al día. Es decir: el código y el build estaban bien; el servidor de desarrollo había dejado de invalidar ese único módulo CSS tras reescribirse el archivo entero (10:30), probablemente por el vigilante de archivos sobre OneDrive. Un `touch` del archivo bastó para refrescarlo y se comprobó en `localhost:4321`: siete tarjetas oscuras en mosaico, 42 logos cargados.
+- Cómo evitarlo: tras reescribir un archivo entero, reiniciar `astro dev` (o `astro dev --force`); si algo se ve «sin formato» en desarrollo, comprobar primero con `npm run build && npm run preview` y mirar el módulo `?astro&type=style` del componente.
+
+## Agua solo en el fondo (30 de octubre de 2026)
+
+- Petición del usuario: revertir el efecto de agua en los elementos sueltos del Hero (wordmark CHISU, titular, métricas, nota personal, chips y lema) y dejarlo únicamente en el fondo.
+- Cambio en `HeroExperience.astro`: fuera el `import`, el bloque `createHeroWater([...])` y la regla global `.hx-water-on`; se borró `src/lib/heroWater.ts`. El efecto del fondo (`createHeroFluid`) no se toca. Copias previas en `backups/*.pre-sin-agua-elementos-2026-10-30.bak`.
+- `npm run check`: 0 errores, 0 avisos; `npm run build`: correcto; sin referencias restantes a `heroWater` ni `hx-water` en `src/`.
+- Límites: no vi el movimiento con el puntero en vivo; el sidebar nunca tuvo el efecto.
+
+## Agua más visible en el fondo del Hero (30 de octubre de 2026)
+
+- Petición del usuario: el movimiento del ratón sobre el fondo se notaba poco y debía parecer agua.
+- Cambio en `src/lib/heroFluid.ts` (copia previa: `backups/heroFluid.ts.pre-agua-visible-2026-10-30.bak`): además del arrastre/desenfoque de antes, la textura de simulación guarda ahora un campo de alturas (`z` = altura, `w` = altura anterior) que avanza con la ecuación de onda (amortiguación 0.988 por paso). Cada movimiento deja una gota (`min(|velocidad| × 1.6, 0.8)`) que se propaga en anillos; el pase de dibujo desvía la imagen según la pendiente de la superficie (refracción, `g × 0.5`) y la ilumina desde arriba a la izquierda (brillo de hasta 5× en las pendientes que miran a la luz, oscurecimiento de hasta 0.4 en las contrarias). El efecto se mantiene 4.2 s tras el último movimiento (antes 2.6 s) para que se vean los anillos expandirse. La textura se limpia ahora a `(0,0,0,0)`.
+- Solo afecta al fondo (el canvas de `#hx-pin-fade`); título, wordmark y textos siguen sin efecto.
+- Comprobado en la página compilada a 1440×900: se crea el canvas, el shader compila y, con una trayectoria circular simulada, se capturan fotogramas con anillos concéntricos con refracción y brillo (composición del canvas sobre la imagen del fondo).
+- Límites: probado con eventos simulados, no con un ratón real (la sensación de intensidad hay que confirmarla a mano); los valores a ajustar son `1.6`/`0.8` (altura de la gota), `0.5` (refracción) y `5.0` (brillo) en `heroFluid.ts`; la velocidad de las ondas depende de la frecuencia de refresco del monitor.
+
+## Agua del fondo más pequeña y ligera (30 de octubre de 2026)
+
+- Petición del usuario: una sola pasada del ratón producía ondas enormes que ocupaban casi toda la pantalla y generaban mucho lag.
+- Causa: gotas demasiado fuertes y anchas (`min(|v| × 1.6, 0.8)`, radio ×1.5), amortiguación muy baja (0.988 por paso, las ondas rebotaban por toda la pantalla), refracción 0.5, 4.2 s de simulación tras cada movimiento y un pase de dibujo que muestreaba la imagen (hasta 9 lecturas) en todos los píxeles aunque el agua estuviera en calma.
+- Cambios en `src/lib/heroFluid.ts` (copias previas: `backups/heroFluid.ts.pre-agua-visible-2026-10-30.bak` y `...pre-agua-pequena-2026-10-30.bak`): gota `min(|v| × 1.3, 0.65)` con radio ×0.85; amortiguación 0.955 (los anillos mueren a ~70px del origen); refracción 0.38; brillo ×3 y sombra máx. 0.25; simulación activa 2.2 s tras el último movimiento. Rendimiento: el pase de dibujo sale pronto con alfa 0 donde no hay agua ni arrastre (sin lecturas de imagen) y el desenfoque de 8 muestras solo se calcula donde hay arrastre.
+- Medido con una pasada rápida simulada de lado a lado (900px en 0.84 s) a 1440×900, comparando el canvas con la imagen de fondo: ~7 % de la pantalla cambia de forma apreciable (antes ocupaba rangos mucho mayores) y se ven hoyuelos con borde brillante de ~70–120px.
+- Límites: el lag real depende de la GPU del usuario y no se pudo medir aquí (el panel de pruebas no da tiempos fiables de fotograma); si aún va justo, bajar la resolución del lienzo (`rect.width * 0.5` en `resize()`) o la simulación (`sw = 192`).
+
+## Agua del fondo: tercer ajuste, menos tamaño y menos coste (30 de octubre de 2026)
+
+- Petición del usuario: el efecto gusta pero hay que reducirlo uno o dos puntos y que la ola no se intensifique ni llegue hasta el final de la página; en un PC peor se atasca.
+- Cambios en `src/lib/heroFluid.ts` (copia previa: `backups/heroFluid.ts.pre-agua-mas-pequena-2026-10-30.bak`): amortiguación de las ondas 0.955 → 0.925; el rastro de arrastre se desvanece más rápido (0.982 → 0.95); gota `min(|v| × 0.9, 0.42)` con radio ×0.7 (y radio general de la gota ×0.7); la altura se limita a ±0.5 para que un movimiento continuo no acumule una ola cada vez mayor; refracción 0.28, arrastre 0.05, desenfoque 0.01, brillo ×2.4; simulación activa 1.5 s tras el último movimiento. Coste: lienzo al 35 % de la resolución (antes 50 %) y campo de simulación de 144 px de ancho (antes 192).
+- Medido con la misma pasada rápida simulada que la vez anterior: el área de pantalla que cambia de forma apreciable baja de ~6.9 % a ~2.6 %; se siguen viendo hoyuelos pequeños con borde brillante.
+- Límites: el rendimiento real en un PC modesto no se pudo medir aquí; si aún va justo, bajar `0.35` y `144` en `resize()`, acortar los 1500 ms de `activeUntil` o desactivar el efecto por debajo de cierta potencia.
+
 ## Cómo mantener este vault al día
 
 Actualizar junto al cambio de código: rutas, contratos, límites, estados, fuentes y hallazgos afectados. Volver a medir antes de copiar resultados de build o tamaños de archivo — no asumir que siguen igual. El contenido de [[Contenido-por-Seccion]] es una instantánea de `site.js`: al editar ese archivo, hay que regenerar o actualizar la nota — nunca debe convertirse en una segunda fuente de la aplicación. No dejar un hallazgo marcado como abierto en [[Hallazgos-y-Pendientes]] cuando el código y una prueba pertinente ya confirmen que está resuelto.
