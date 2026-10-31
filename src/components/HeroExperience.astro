@@ -1364,21 +1364,23 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     color: var(--hx-metal-ink);
     background: linear-gradient(180deg, var(--hx-metal-light), var(--hx-metal-face) 48%, var(--hx-metal-shade));
     box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), 0 1px 2px rgb(0 0 0 / 40%);
-    transition: transform 0.2s ease;
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
   }
 
+  /* Hovering a link only lights its arrow: no underline, no movement. */
   .hx-compact-socials a:hover .hx-compact-social-arrow,
   .hx-compact-socials a:focus-visible .hx-compact-social-arrow {
-    transform: translate(1px, -1px);
+    filter: brightness(1.18) saturate(1.1);
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 80%),
+      0 0 0 1px rgb(var(--hx-metal-glint) / 60%),
+      0 0 10px rgb(var(--hx-metal-glint) / 75%);
   }
 
   .hx-compact-socials a:hover,
   .hx-compact-socials a:focus-visible {
     color: var(--art-text, var(--color-ink));
-    text-decoration: underline;
-    text-decoration-color: var(--color-brand-gold);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
+    text-decoration: none;
   }
 
   .hx-compact-socials a:focus-visible {
