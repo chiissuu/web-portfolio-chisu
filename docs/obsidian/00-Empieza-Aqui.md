@@ -20,7 +20,7 @@ Estado comprobado el 10 de octubre en [[Auditoria-Web]]: formularios siguen simu
 | Área | Estado real |
 |---|---|
 | Inicio y secciones editoriales | Implementados |
-| Proyectos | Tres tarjetas provisionales, sin enlaces ni casos de estudio reales |
+| Proyectos | **Terminado** (31 de octubre de 2026): carrusel horizontal anclado con seis proyectos reales, cabecera con hilo de luz y contador, cierre luminoso hacia «Mi stack de trabajo». Para añadir, quitar o editar proyectos: [[Mantener-Proyectos]] |
 | Servicios | Contenido y formulario implementados; envío **simulado** |
 | Tools | Conversor de vídeo implementado; comprobador de Instagram sin lógica ni página |
 | Contacto | Enlaces externos + correo `mailto:`; formulario con envío simulado |
@@ -76,6 +76,7 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 
 **Operación**
 - [[Comandos-y-Pruebas]] — dev/check/build/preview, recorrido de prueba manual
+- [[Mantener-Proyectos]] — cómo añadir, quitar o modificar proyectos sin romper la sección
 - [[Hallazgos-y-Pendientes]] — tabla priorizada de pendientes, enlazada por componente
 - [[Skills-Desarrollo-Web]] — selección comprobada de skills e instalación manual
 - [[Prompt-Continuidad-Claude]] — toma de contexto inicial completa y metodología de trabajo con delegación y consumo controlados

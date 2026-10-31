@@ -55,6 +55,8 @@ En la portada, Proyectos, Servicios, Tools, Contacto y FAQ se presentan con un t
 
 ## Proyectos
 
+> Datos en `projects` de [site.js](../../src/content/site.js) (español e inglés). Guía de mantenimiento — añadir, quitar o modificar proyectos, campos y límites: [[Mantener-Proyectos]].
+
 Seis tarjetas **reales** (27 de octubre de 2026), elegidas entre los repositorios públicos de github.com/chiissuu y el proyecto en curso del usuario: 01 Clasificador de perros y gatos (notebook con Keras, exactitud de 0,99, «En desarrollo», sin enlace todavía), 02 MegatronixOS (simulador de caché en C, con Mario Viso Quito), 03 Plataforma de pedidos de restaurante (Java, siete patrones de diseño; fork de un proyecto universitario en equipo), 04 Tienda diaria de Fortnite (repo `M2-PWIC`, JavaScript/Vite, API pública), 05 Instagram Checker (Python/Playwright, todo en local) y 06 Aim Trainer (JavaScript puro). Cada una tiene categoría, título, `description`, `tags`, `status` (solo la 01 lo usa) y `href` opcional a su repositorio (se abre en pestaña nueva). Excluidos a propósito: `DDoS-Ripper` (herramienta ofensiva), `letterboxd-recomender` (en pausa, solo un inspector de ZIP), `github-checker` (parecido a Instagram Checker) y `web-portfolio-chisu` (esta web). Las imágenes siguen siendo el relleno de color por tarjeta. En el formato de Servicios/Tools, seguidas del stack de trabajo (que antes cerraba Sobre mí). Detalle estructural en [[Otras-Secciones-y-Compartidos]].
 
 ## Servicios y Tools en portada
