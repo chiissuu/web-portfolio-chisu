@@ -1,18 +1,18 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import SimpleNav from "../../components/SimpleNav.astro";
-import ServicesPageContent from "../../components/ServicesPageContent.astro";
+import VideoConverterPageContent from "../../components/VideoConverterPageContent.astro";
 import { content } from "../../content/site.js";
 
 const t = content.es;
 ---
 
 <Layout
-  title={`${t.services.page.title} | ${t.seo.title}`}
-  description={t.services.page.intro}
+  title={`${t.videoConverter.title} | ${t.seo.title}`}
+  description={t.videoConverter.seo.description}
   bodyClass="redesign"
   lang="es"
 >
   <SimpleNav t={t} />
-  <ServicesPageContent t={t} />
+  <VideoConverterPageContent t={t} />
 </Layout>

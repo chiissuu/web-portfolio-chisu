@@ -1,0 +1,34 @@
+---
+import { withBase } from "../lib/paths.js";
+import type { ToolsHomeSectionContent } from "../lib/content-types";
+import ShowcaseSection from "./ShowcaseSection.astro";
+import ShowcaseCard from "./ShowcaseCard.astro";
+
+interface Props {
+  t: ToolsHomeSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const copy = t.servicesTools.tools;
+const items = t.tools.page.items;
+---
+
+<ShowcaseSection
+  id="tools"
+  title={copy.title}
+  titleImage={copy.titleImage}
+  backdrop="brushed"
+>
+  <p slot="intro">{copy.description}</p>
+
+  {items.map((item, index) => (
+    <ShowcaseCard
+      number={String(index + 1).padStart(2, "0")}
+      eyebrow={item.status}
+      title={item.title}
+      text={item.text}
+      tags={item.tags}
+      href={item.href ? withBase(item.href) : undefined}
+    />
+  ))}
+</ShowcaseSection>

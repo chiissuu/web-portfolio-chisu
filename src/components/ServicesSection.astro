@@ -1,0 +1,35 @@
+---
+import type { ServicesHomeSectionContent } from "../lib/content-types";
+import ShowcaseSection from "./ShowcaseSection.astro";
+import ShowcaseCard from "./ShowcaseCard.astro";
+
+interface Props {
+  t: ServicesHomeSectionContent;
+}
+
+const { t } = Astro.props as Props;
+const copy = t.servicesTools.services;
+const articles = t.services.page.articles;
+---
+
+<ShowcaseSection
+  id="services"
+  title={copy.title}
+  titleImage={copy.titleImage}
+  backdrop="blueprint"
+>
+  <p slot="intro">
+    {copy.description.map((segment) =>
+      segment.strong ? <strong>{segment.text}</strong> : segment.text
+    )}
+  </p>
+
+  {articles.map((article, index) => (
+    <ShowcaseCard
+      number={String(index + 1).padStart(2, "0")}
+      title={article.title}
+      text={article.text}
+      tags={article.tags}
+    />
+  ))}
+</ShowcaseSection>

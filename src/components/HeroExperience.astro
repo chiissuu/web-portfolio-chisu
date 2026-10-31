@@ -42,17 +42,17 @@ const navRight = indexedNavItems.slice(3);
 // script (in the script block below) matches against. `morphIndex` links back
 // to the hero's own nav item by its ORIGINAL index in `navItems` above, so
 // the hero→sidebar crossfade still works for the 5 links that have a hero
-// equivalent — Servicios/Tools now point at their real subpages instead of
-// an anchor, but still morph in from the same hero nav item they always
-// did. FAQ has no hero-nav equivalent, so `morphIndex` is `null` and it
+// equivalent — all of them are anchors of the home page (the Servicios and
+// Tools sub-pages were removed), and each morphs in from its own hero nav
+// item. FAQ has no hero-nav equivalent, so `morphIndex` is `null` and it
 // simply appears static once the sidebar itself fades in (same as the
 // Contacto CTA, which also has no morph source).
 const sidebarNavItems = [
   { navId: "home", label: t.nav.home, icon: House, href: "#home", morphIndex: 0 },
   { navId: "about", label: t.nav.about, icon: UserRound, href: "#about", morphIndex: 1 },
   { navId: "projects", label: t.nav.projects, icon: FolderKanban, href: "#projects", morphIndex: 3 },
-  { navId: "services", label: t.nav.services, icon: BriefcaseBusiness, href: `${base}/servicios/`, morphIndex: 4 },
-  { navId: "tools", label: t.nav.tools, icon: Wrench, href: `${base}/tools/`, morphIndex: 5 },
+  { navId: "services", label: t.nav.services, icon: BriefcaseBusiness, href: "#services", morphIndex: 4 },
+  { navId: "tools", label: t.nav.tools, icon: Wrench, href: "#tools", morphIndex: 5 },
   { navId: "contact", label: t.nav.contact, icon: Mail, href: "#contact", morphIndex: 2 },
   { navId: "faq", label: t.nav.faq, icon: CircleHelp, href: "#faq", morphIndex: null as number | null },
 ];
@@ -187,8 +187,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           </div>
 
           <div class="hx-actions">
-            <a class="hx-btn hx-btn-primary" href="#projects">{t.hero.primaryCta}</a>
-            <a class="hx-btn hx-btn-ghost" href="#about">{t.hero.secondaryCta}</a>
+            <a class="hx-btn hx-metal-button" href="#projects"><span class="hx-metal-content">{t.hero.primaryCta}</span></a>
+            <a class="hx-btn hx-metal-button" href="#about"><span class="hx-metal-content">{t.hero.secondaryCta}</span></a>
           </div>
         </div>
       </div>
@@ -204,9 +204,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   `.hx-pin`) end. The `<aside>` itself is transparent (no background of its
   own) so the full-width section background behind it (warm/dark,
   alternating per section) shows through; each `<article>` inside carries
-  its own `.hx-glass` translucent surface — the SAME finish as the hero's
-  "Sobre mí" ghost button (`.hx-btn-ghost`), never a solid/near-opaque
-  panel — so a section boundary crossing behind the sidebar is genuinely
+  its own `.hx-glass` translucent surface, never a solid/near-opaque
+  panel, so a section boundary crossing behind the sidebar is genuinely
   visible through a card's own background, not just at its edges. There is
   intentionally NO single `data-bg-theme` on this `<aside>` anymore — each
   `<article>` below tracks and tweens its OWN `data-theme`
@@ -266,9 +265,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         const Icon = item.icon;
         const morphTarget = item.morphIndex !== null ? `nav-${item.morphIndex}` : undefined;
         return (
-          <a href={item.href} data-morph-target={morphTarget} data-nav-id={item.navId}>
-            <Icon class="hx-compact-nav-icon" aria-hidden="true" size={18} />
-            <span class="hx-compact-nav-label">{item.label}</span>
+          <a class="hx-metal-button" href={item.href} data-morph-target={morphTarget} data-nav-id={item.navId}>
+            <Icon class="hx-compact-nav-icon hx-metal-content" aria-hidden="true" size={18} />
+            <span class="hx-compact-nav-label hx-metal-content">{item.label}</span>
           </a>
         );
       })}
@@ -281,11 +280,22 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        instancia duplicada. -->
   <article class="hx-sidebar-article hx-glass hx-sidebar-socials" data-theme="warm">
     <div class="hx-compact-socials">
-      <span class="hx-compact-social-linkedin" aria-disabled="true">{t.contact.links.linkedinLabel}</span>
-      <a href={t.contact.links.github} target="_blank" rel="noopener noreferrer">{t.contact.links.githubLabel}</a>
-      <a href={t.contact.links.linktree} target="_blank" rel="noopener noreferrer">{t.contact.links.linktreeLabel}</a>
+      <span class="hx-compact-social-row hx-compact-social-linkedin" aria-disabled="true" title={t.contact.links.linkedinTooltip}>
+        <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+        <span>{t.contact.links.linkedinLabel}</span>
+      </span>
+      <a class="hx-compact-social-row" href={t.contact.links.github} target="_blank" rel="noopener noreferrer">
+        <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/github-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+        <span>{t.contact.links.githubLabel}</span>
+        <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+      <a class="hx-compact-social-row" href={t.contact.links.linktree} target="_blank" rel="noopener noreferrer">
+        <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linktree-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+        <span>{t.contact.links.linktreeLabel}</span>
+        <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+      </a>
     </div>
-    <a class="hx-btn hx-btn-primary hx-compact-cta" href="#contact">{t.nav.contact}</a>
+    <a class="hx-btn hx-metal-button hx-compact-cta" href="#contact"><span class="hx-metal-content">{t.nav.contact}</span></a>
   </article>
 </aside>
 
@@ -388,10 +398,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        hugging the sides. */
     --hx-aside-inset: clamp(1.5rem, 6vw, 4rem);
     --portrait-blur: 0px;
-    /* Drives the "|" nav separators' opacity (see `.hx-nav-item` below) —
-       tweened via a proxy object, same pattern as `--portrait-blur`, since
-       a `::after` pseudo-element can't be a direct GSAP tween target. */
-    --nav-sep-opacity: 1;
 
     /* Local black-gold palette for this first visual-harmonization pass.
        Scoped to `.hx-pin` only (not Layout.astro or any shared token) so
@@ -676,8 +682,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
   /* `.hx-glass` — SIDEBAR-ONLY now (see `.hx-sidebar-article` further
      down). Kept intentionally at this very low, near-invisible opacity
-     (a literal copy of the hero's "Sobre mí" ghost button finish) because
-     the sidebar's own boundary-bleed-through effect depends on it: the
+     because the sidebar's own boundary-bleed-through effect depends on it: the
      warm/dark section physically behind a `.hx-sidebar-article` needs to
      show through clearly while a section boundary crosses behind the
      fixed sidebar. The 3 hero cards below use the separate, more opaque
@@ -730,6 +735,23 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     font-weight: 800;
     font-size: 1.5rem;
     color: var(--hx-ui-gold);
+  }
+
+  /* The figures ("2+", "10+") share one finish with the nav buttons and the
+     wordmark: a polished gold face (light top, darker waist, bright base)
+     with a dark-bronze extruded edge underneath. */
+  .hx-metric-value,
+  .hx-compact-metric-value {
+    color: transparent;
+    background: linear-gradient(180deg, #fbeba0 0%, #e6c860 30%, #b08a32 52%, #c9a443 72%, #f3da8a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter:
+      drop-shadow(1px 0 0 #49361a)
+      drop-shadow(-1px 0 0 #49361a)
+      drop-shadow(0 1px 0 #49361a)
+      drop-shadow(0 2px 0 #49361a)
+      drop-shadow(0 3px 3px rgb(0 0 0 / 30%));
   }
 
   .hx-metric-label {
@@ -822,80 +844,13 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     justify-content: center;
     min-height: 46px;
     padding: 0.8rem 1.4rem;
-    border-radius: 999px;
     font-weight: 600;
     font-size: 0.92rem;
-    border: 1px solid transparent;
-    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   }
 
-  .hx-btn-primary {
-    background: var(--color-brand-gold);
-    color: var(--color-ink);
-  }
-
-  .hx-btn-ghost {
-    border-color: var(--color-line);
-    color: var(--color-ink);
-    background: rgb(213 207 190 / 12%);
-    backdrop-filter: blur(6px);
-  }
-
-  .hx-btn:hover {
-    transform: translateY(-2px);
-  }
-
-  /* Scoped to `.hx-actions` only — `.hx-btn`/`.hx-btn-primary`/
-     `.hx-btn-ghost` are shared with the compact sidebar's own CTA
-     (`.hx-compact-cta`), so unscoped edits here would leak into it. */
   .hx-actions .hx-btn {
-    border-radius: 12px;
+    border: 1px solid transparent;
     font-weight: 700;
-    transition:
-      transform 0.2s ease,
-      color 0.2s ease,
-      background 0.2s ease,
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-
-  .hx-actions .hx-btn-primary {
-    background: linear-gradient(
-      135deg,
-      var(--hx-ui-black),
-      var(--hx-ui-black-warm)
-    );
-    color: var(--hx-ui-gold);
-    border-color: rgb(249 211 119 / 55%);
-    box-shadow:
-      0 12px 30px rgb(35 20 0 / 28%),
-      inset 0 1px 0 rgb(255 242 207 / 10%);
-  }
-
-  .hx-actions .hx-btn-ghost {
-    background: var(--hx-ui-dark-glass-soft);
-    color: var(--hx-ui-ivory);
-    border-color: rgb(249 211 119 / 32%);
-    box-shadow: 0 10px 26px rgb(35 20 0 / 18%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .hx-actions .hx-btn-primary:hover {
-    background: var(--hx-ui-gold);
-    color: var(--hx-ui-black);
-    border-color: var(--hx-ui-gold);
-  }
-
-  .hx-actions .hx-btn-ghost:hover {
-    background: rgb(18 14 8 / 78%);
-    color: var(--hx-ui-gold);
-    border-color: rgb(249 211 119 / 58%);
-  }
-
-  .hx-actions .hx-btn:focus-visible {
-    outline: 2px solid var(--hx-ui-ivory);
-    outline-offset: 3px;
   }
 
   .hx-nav {
@@ -934,14 +889,14 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      hover animation. Color is `--color-ink` (real black), inherited from
      `.hx-nav` — previously dimmed to a fixed 40% opacity, which read as
      gray instead of black even at rest. Opacity now reads ONLY
-     `--nav-sep-opacity`, tweened by the scroll timeline (they have no
-     sidebar equivalent — see Section 4 of the scroll spec) — same
-     custom-property pattern as `--portrait-blur` — so alignment/fade-out
-     behavior on scroll is unchanged, just fully opaque (black) at rest. */
+     the scroll timeline, which tweens their own `opacity` (they have no
+     sidebar equivalent — see Section 4 of the scroll spec). They are tweened
+     directly, not through a proxy + `onUpdate`: a page loaded already
+     scrolled (hot reload, scroll restoration) renders the timeline without
+     firing callbacks, which used to leave the bars visible. */
   .hx-nav-sep {
     align-self: center;
     line-height: 1;
-    opacity: var(--nav-sep-opacity, 1);
     font-weight: 400;
     color: rgba(224, 197, 139, 0.62);
   }
@@ -980,7 +935,26 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      contained, scrollable overflow at the BOTTOM only, never an invisible
      one — never `transform: scale()`, which would shrink the sidebar as a
      unit instead of fixing the actual layout cause. */
+  /* Hero and sidebar share the same gold finish in every section. */
+  .hx-actions,
   .hx-compact-sidebar {
+    --hx-metal-light: #dfc357;
+    --hx-metal-face: #c19b3d;
+    --hx-metal-shade: #b08a32;
+    --hx-metal-base: #49361a;
+    --hx-metal-side: #b89036;
+    --hx-metal-rim: #efd683;
+    --hx-metal-glint: 244 216 126;
+    --hx-metal-pressed: #b38d36;
+    --hx-metal-ink: #211b0e;
+    --hx-metal-depth: 3px;
+  }
+
+  .hx-compact-sidebar {
+    /* 1 unit = 1rem on windows at least ~700px tall (so the column looks the
+       same as always) and shrinking in proportion on shorter ones (or with
+       the browser zoomed in a lot), so it always fits without a scrollbar. */
+    --u: clamp(0.62rem, 2.3svh, 1rem);
     position: fixed;
     top: clamp(0.75rem, 1.5vh, 1rem);
     bottom: clamp(0.75rem, 1.5vh, 1rem);
@@ -995,6 +969,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     gap: clamp(0.45rem, 0.9vh, 0.75rem);
     padding: clamp(1rem, 2vh, 1.5rem) var(--hx-sidebar-padding-inline, clamp(1.25rem, 2.5vw, 2rem));
     overflow-y: auto;
+    scrollbar-width: none;
     overscroll-behavior: contain;
     opacity: 0;
     visibility: hidden;
@@ -1004,21 +979,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   .hx-compact-sidebar.is-active {
     visibility: visible;
     pointer-events: auto;
-  }
-
-  /* About shares the existing active-section tracker. Override only the
-     sidebar's accent tokens; the Hero and other sections keep their gold. */
-  .hx-compact-sidebar[data-palette="mono"] {
-    --color-brand-gold: #c9c9c9;
-    --color-brand-gold-strong: #ededed;
-  }
-
-  .hx-compact-sidebar[data-palette="mono"] .hx-sidebar-article {
-    background: rgb(160 160 160 / 12%);
-  }
-
-  .hx-compact-sidebar[data-palette="mono"] .hx-compact-wordmark-image {
-    filter: grayscale(1) brightness(0.72);
   }
 
   /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
@@ -1035,8 +995,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      Layout.astro — keep in sync if those ever change. The article's own
      BACKGROUND (from `.hx-glass`) never switches with theme — it stays a
      constant translucent tan so whatever's physically behind it (warm or
-     dark section) always bleeds through proportionally; only text/border
-     need the discrete legibility swap. */
+     dark section) always bleeds through proportionally; text and dividers
+     need the discrete legibility swap, while the frame stays gold. */
   .hx-sidebar-article[data-theme="warm"] {
     --art-text: #000;
     --art-text-muted: #000;
@@ -1054,8 +1014,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   /* Four independent articles (brand+description, metrics, nav, socials —
      the last one also contains the Contacto CTA as its final child) — each
      its own `.hx-glass` (see above — the exact ghost-button finish), never
-     nested cards inside cards. Border/text color read the per-article
-     `--art-*` custom properties above; background stays the constant
+     nested cards inside cards. Text reads the per-article `--art-*`
+     properties; the metallic frame stays gold. Background stays the constant
      translucent `.hx-glass` tan regardless of theme. Vertical padding/gap
      kept deliberately tight (not the original 1.1rem/0.6rem) so all 4
      articles — the nav one now holding 7 links instead of 6 — fit inside
@@ -1063,13 +1023,51 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      see the `@media (max-height: 950px)` tier further down for an even
      tighter pass on short viewports. */
   .hx-sidebar-article {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.85rem 1.25rem;
-    border-color: var(--art-border, var(--color-line));
+    gap: calc(0.5 * var(--u));
+    padding: calc(0.85 * var(--u)) calc(1.25 * var(--u));
+    border-color: var(--hx-metal-side);
+    /* Besides the inner glint: a fine dark-brown outline just outside the gold
+       rim and a soft warm shadow. On light and gold sections (Tools, Proyectos)
+       they keep the card from dissolving into a gold background; on dark
+       sections they are practically invisible. */
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--hx-metal-glint) / 20%),
+      0 0 0 1px rgb(60 40 5 / 60%),
+      0 8px 24px rgb(60 40 5 / 35%);
     color: var(--art-text, var(--color-ink));
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Paint a 2px bevel without changing card bounds or morph targets.
+     Browsers without composite masks retain the solid gold border above. */
+  @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+    .hx-sidebar-article {
+      border-color: transparent;
+    }
+
+    .hx-sidebar-article::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(
+        135deg,
+        var(--hx-metal-rim) 8%,
+        var(--hx-metal-side) 30%,
+        var(--hx-metal-base) 48%,
+        var(--hx-metal-rim) 72%,
+        var(--hx-metal-side)
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
   }
 
   /* Brand mark — now the same gold wordmark image used in the hero
@@ -1092,7 +1090,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      exactly the visible wordmark — nothing wider to compensate for. */
   .hx-compact-wordmark-image {
     display: block;
-    width: min(8.25rem, 100%);
+    width: min(calc(8.25 * var(--u)), 100%);
     height: auto;
     object-fit: contain;
     transition: filter 0.3s ease;
@@ -1105,9 +1103,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      carries the full accessible name ("CHISU®") for the mark as a whole. */
   .hx-compact-mark-registered {
     position: absolute;
-    top: -0.05rem;
-    right: -0.7rem;
-    font-size: 0.62rem;
+    top: calc(-0.05 * var(--u));
+    right: calc(-0.7 * var(--u));
+    font-size: calc(0.62 * var(--u));
     font-weight: 700;
     line-height: 1;
     color: var(--color-brand-gold);
@@ -1116,7 +1114,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
   .hx-compact-tagline {
     text-align: center;
-    font-size: 0.86rem;
+    font-size: calc(0.86 * var(--u));
     line-height: 1.4;
     color: var(--art-text-muted, var(--color-ink));
   }
@@ -1127,7 +1125,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   .hx-compact-metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.4rem;
+    gap: calc(0.4 * var(--u));
   }
 
   .hx-compact-metric {
@@ -1135,22 +1133,20 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 0.3rem;
-    padding-inline: 0.4rem;
+    gap: calc(0.3 * var(--u));
+    padding-inline: calc(0.4 * var(--u));
   }
 
   .hx-compact-metric + .hx-compact-metric {
     border-left: 1px solid var(--art-divider, var(--color-line));
   }
 
-  /* Accent follows the section palette: gold normally, neutral in About. */
+  /* Metrics keep the brand gold, including over About's charcoal. */
   .hx-compact-metric-value {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: calc(1.3 * var(--u));
     line-height: 1.1;
-    color: var(--color-brand-gold);
-    transition: color 0.3s ease;
   }
 
   /* Contrast fix, warm theme only: an extremely thin black outline on the
@@ -1159,12 +1155,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      `-webkit-text-stroke` paints along the glyph outline, it doesn't add
      layout width. Dark theme is untouched (no reset needed — this selector
      simply doesn't match `[data-theme="dark"]`). */
-  .hx-sidebar-article[data-theme="warm"] .hx-compact-metric-value {
-    -webkit-text-stroke: 0.4px #000;
-  }
-
   .hx-compact-metric-label {
-    font-size: 0.72rem;
+    font-size: calc(0.72 * var(--u));
     line-height: 1.25;
     color: var(--art-text, var(--color-ink));
   }
@@ -1172,52 +1164,153 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   .hx-compact-vertical-nav {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: calc(0.4 * var(--u));
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: calc(0.82 * var(--u));
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
 
-  /* Each of the 7 links (Inicio/Sobre mí/Proyectos/Servicios/Tools/
-     Contacto/FAQ) is its own rectangular box — light-gray on a warm
-     section, dark-gray on a dark one, keyed off the SAME `data-theme`
-     attribute the rest of the article already reads (no new detection
-     logic, just a new selector on the existing mechanism). Colors here are
-     deliberately literal (not `--art-text`) since they're paired 1:1 with
-     the matching literal background per the spec. Consistent dimensions/
-     padding across all 6 — none of this varies by link. */
+  /* The hit areas stay fixed. Face and contents share a visual offset. */
+  /* The column fills the window's height: any spare space goes to the nav
+     (its buttons stretch) and, less, to the social block (its rows spread
+     out), so there is never an empty strip under the last card. */
+  .hx-sidebar-nav {
+    flex: 3 1 auto;
+  }
+
+  .hx-sidebar-socials {
+    flex: 1 1 auto;
+    justify-content: space-evenly;
+  }
+
+  .hx-compact-vertical-nav {
+    flex: 1 1 auto;
+  }
+
   .hx-compact-vertical-nav a {
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    min-height: 44px;
-    padding: 0.55rem 0.75rem;
-    border-radius: 7px;
-    background: #e7e3d9;
-    color: #000;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    gap: calc(0.55 * var(--u));
+    min-height: calc(2.75 * var(--u));
+    padding: calc(0.55 * var(--u)) calc(0.75 * var(--u));
   }
 
-  .hx-sidebar-article[data-theme="dark"] .hx-compact-vertical-nav a {
-    background: #242424;
-    color: #fff;
+  .hx-metal-button {
+    --hx-button-offset: 0px;
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--hx-metal-ink);
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgb(255 255 255 / 28%);
   }
 
-  .hx-compact-vertical-nav a:hover:not(.is-active) {
-    color: var(--color-brand-gold-strong);
+  .hx-metal-content {
+    transform: translateY(var(--hx-button-offset));
+    transition: transform 140ms ease;
   }
 
-  /* Active link: same brand gold as `.hx-compact-mark`/the Contacto CTA.
-     Both selectors are needed — the plain one for a warm article, the
-     `[data-theme="dark"]`-scoped one to win specificity over the dark box
-     rule above — so the active state reads the same (gold bg, black text)
-     no matter which theme the article is currently in. */
-  .hx-compact-vertical-nav a.is-active,
-  .hx-sidebar-article[data-theme="dark"] .hx-compact-vertical-nav a.is-active {
-    background: var(--color-brand-gold);
-    color: #000;
+  .hx-metal-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3.5%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--hx-metal-glint) / 38%) 23%, rgb(var(--hx-metal-glint) / 12%) 47%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--hx-metal-light), var(--hx-metal-face) 48%, var(--hx-metal-shade)) padding-box,
+      linear-gradient(135deg, var(--hx-metal-rim) 8%, var(--hx-metal-side) 30%, var(--hx-metal-base) 48%, var(--hx-metal-rim) 72%, var(--hx-metal-side)) border-box;
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 65%),
+      inset 0 -1px 2px rgb(0 0 0 / 22%);
+    transform: skewX(-4deg) translateY(var(--hx-button-offset));
+    transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  }
+
+  /* A separate, stationary metal edge stays visible beneath the face.
+     Its alternating reflections give the extrusion depth without
+     changing link dimensions or the Hero's measured morph targets. */
+  .hx-metal-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    border: 1px solid var(--hx-metal-base);
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      var(--hx-metal-base),
+      var(--hx-metal-side) 16%,
+      var(--hx-metal-rim) 28%,
+      var(--hx-metal-side) 34%,
+      var(--hx-metal-base) 62%,
+      var(--hx-metal-side) 84%,
+      var(--hx-metal-base)
+    );
+    box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+    transform: skewX(-4deg) translateY(var(--hx-metal-depth));
+  }
+
+  .hx-metal-button:hover {
+    --hx-button-offset: -1px;
+  }
+
+  .hx-metal-button:hover::before {
+    filter: brightness(1.06);
+  }
+
+  /* Selection stays raised, with a static side glint instead of a loop. */
+  .hx-metal-button.is-active {
+    --hx-button-offset: 0px;
+  }
+
+  .hx-metal-button.is-active::before {
+    filter: brightness(1.12);
+    box-shadow:
+      0 0 10px rgb(var(--hx-metal-glint) / 32%),
+      inset 3px 0 1px rgb(255 245 190 / 90%),
+      inset 7px 0 10px rgb(var(--hx-metal-glint) / 50%),
+      inset 0 1px 1px rgb(255 255 255 / 65%),
+      inset 0 -1px 2px rgb(0 0 0 / 22%);
+  }
+
+  /* Actual activation still depresses any button, including the selection. */
+  .hx-metal-button:active {
+    --hx-button-offset: 2px;
+  }
+
+  .hx-metal-button:active::before {
+    filter: none;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--hx-metal-glint) / 14%) 23%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--hx-metal-shade), var(--hx-metal-pressed)) padding-box,
+      linear-gradient(135deg, var(--hx-metal-base), var(--hx-metal-side) 45%, var(--hx-metal-rim) 72%, var(--hx-metal-base)) border-box;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 18%),
+      inset 0 2px 4px rgb(0 0 0 / 32%),
+      inset 0 -1px 0 rgb(255 255 255 / 28%);
+  }
+
+  .hx-metal-button:focus-visible {
+    outline: 2px solid var(--art-text, var(--hx-metal-rim));
+    outline-offset: 5px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hx-metal-button::before,
+    .hx-metal-content {
+      transition: none;
+    }
   }
 
   .hx-compact-nav-icon {
@@ -1229,44 +1322,87 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   .hx-compact-socials {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    align-self: center;
+    width: max-content;
+    max-width: 100%;
     align-items: center;
-    text-align: center;
-    gap: 0.4rem;
+    gap: 0;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: calc(0.72 * var(--u));
     color: var(--art-text-muted, var(--color-ink));
   }
 
-  .hx-compact-socials a:hover {
-    color: var(--color-brand-gold-strong);
-    opacity: 1;
+  .hx-compact-social-row {
+    display: grid;
+    grid-template-columns: calc(1.25 * var(--u)) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: calc(0.5 * var(--u));
+    min-height: calc(1.5 * var(--u));
+    color: inherit;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .hx-compact-social-icon {
+    display: block;
+    width: calc(1.25 * var(--u));
+    height: calc(1.25 * var(--u));
+    object-fit: contain;
+  }
+
+  /* Small gold metal disc with an arrow: says "this opens another site". */
+  .hx-compact-social-arrow {
+    display: grid;
+    place-items: center;
+    width: calc(1.15 * var(--u));
+    height: calc(1.15 * var(--u));
+    margin-left: calc(0.2 * var(--u));
+    border-radius: 50%;
+    font-size: calc(0.72 * var(--u));
+    line-height: 1;
+    color: var(--hx-metal-ink);
+    background: linear-gradient(180deg, var(--hx-metal-light), var(--hx-metal-face) 48%, var(--hx-metal-shade));
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), 0 1px 2px rgb(0 0 0 / 40%);
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Hovering a link only lights its arrow: no underline, no movement. */
+  .hx-compact-socials a:hover .hx-compact-social-arrow,
+  .hx-compact-socials a:focus-visible .hx-compact-social-arrow {
+    filter: brightness(1.18) saturate(1.1);
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 80%),
+      0 0 0 1px rgb(var(--hx-metal-glint) / 60%),
+      0 0 10px rgb(var(--hx-metal-glint) / 75%);
+  }
+
+  .hx-compact-socials a:hover,
+  .hx-compact-socials a:focus-visible {
+    color: var(--art-text, var(--color-ink));
+    text-decoration: none;
+  }
+
+  .hx-compact-socials a:focus-visible {
+    outline: 2px solid var(--art-text, var(--color-ink));
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   /* Not a link — `aria-disabled`, no `href`, no simulated clickability.
-     Only a cursor affordance is added on top of the shared
-     `.hx-compact-socials` text color. */
+     Muted opacity and cursor distinguish the unconfigured profile. */
   .hx-compact-social-linkedin {
     cursor: not-allowed;
+    opacity: 0.75;
   }
 
-  /* Overrides `.hx-btn`/`.hx-btn-primary` (shared with the hero's own
-     "Ver Proyectos"/"Sobre Mí" buttons, which stay untouched) for this
-     instance only — same-specificity single-class selectors, so source
-     order (this rule comes later in the stylesheet) is what makes these
-     win. Rectangular (not the shared 999px pill), text forced to solid
-     black regardless of theme, ≥44px clickable height. Background stays
-     inherited from `.hx-btn-primary` (`--color-brand-gold`) — already
-     correct, not overridden here. */
+  /* Sidebar-only dimensions; the shared metallic face is defined above. */
   .hx-compact-cta {
     align-self: center;
-    margin-top: 0.25rem;
-    border-radius: 8px;
-    font-size: clamp(1rem, 0.95vw, 1.1rem);
+    margin-top: calc(0.25 * var(--u));
+    font-size: clamp(calc(1 * var(--u)), 0.95vw, calc(1.1 * var(--u)));
     font-weight: 700;
-    color: #000;
-    min-height: 44px;
+    min-height: calc(2.75 * var(--u));
   }
 
   .hx-mobile-toggle,
@@ -1525,6 +1661,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      hide overflow. */
   @media (min-width: 900px) and (max-height: 850px) {
     .hx-compact-sidebar {
+      --hx-metal-depth: 2px;
       padding-block: 0.4rem;
       gap: 0.2rem;
     }
@@ -1541,10 +1678,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     .hx-compact-vertical-nav a {
       min-height: 36px;
       padding-block: 0.3rem;
-    }
-
-    .hx-compact-socials {
-      gap: 0.25rem;
     }
 
     .hx-compact-cta {
@@ -1926,6 +2059,21 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     overscroll-behavior: none;
   }
 
+  /* Scroll is locked only while the entrance animation plays. Same technique
+     as the mobile menu above, but a separate class so each lock releases
+     independently. `scrollbar-gutter` keeps the (already present) desktop
+     scrollbar's space reserved, so the layout doesn't shift when it locks or
+     unlocks. */
+  :global(html.hx-intro-locked),
+  :global(body.hx-intro-locked) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  :global(html.hx-intro-locked) {
+    scrollbar-gutter: stable;
+  }
+
   /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
      query -- does not touch HTML, script block, GSAP/ScrollTrigger, .hx-wrap,
      .hx-pin, the mobile nav/toggle, the 641-899px tier, or the >=900px
@@ -2052,6 +2200,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { createHeroFluid } from "../lib/heroFluid";
 
   // Bundled with the `gsap` package already installed via `npm install` —
   // not an additional dependency.
@@ -2543,6 +2692,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         tl.play();
       }
 
+      // ---- Scroll lock while the entrance plays -----------------------------
+      // Released by `entranceSettled`, which every outcome resolves (played
+      // out, skipped, interrupted, failed or disposed) -- so it follows the
+      // real animation instead of a fixed delay. The timer is only a safety
+      // net in case fonts/decoding never settle, so a visitor can never be
+      // left unable to scroll. Skipped entirely when the entrance won't play
+      // (reduced motion, or the page loads already scrolled). Registered
+      // before `bootScrollTimeline()` awaits the same promise, so the lock is
+      // gone before the scroll timeline measures the page.
+      const INTRO_LOCK_CLASS = "hx-intro-locked";
+      const INTRO_LOCK_MAX_MS = 8000;
+      let introLockTimer: ReturnType<typeof setTimeout> | undefined;
+      function releaseIntroScrollLock() {
+        window.clearTimeout(introLockTimer);
+        document.documentElement.classList.remove(INTRO_LOCK_CLASS);
+        document.body.classList.remove(INTRO_LOCK_CLASS);
+      }
+      if (!prefersReducedMotion && window.scrollY <= 0) {
+        document.documentElement.classList.add(INTRO_LOCK_CLASS);
+        document.body.classList.add(INTRO_LOCK_CLASS);
+        introLockTimer = window.setTimeout(releaseIntroScrollLock, INTRO_LOCK_MAX_MS);
+        void entranceSettled.then(releaseIntroScrollLock);
+      }
+      window.addEventListener("pagehide", releaseIntroScrollLock);
+
       playEntrance().catch((err) => {
         console.error("[HeroExperience] playEntrance failed:", err);
         detachAwaitSkipListener();
@@ -2703,7 +2877,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       }
 
       const blurProxy = { blur: 0 };
-      const navSepProxy = { opacity: 1 };
 
       function buildScrollTimeline() {
         const morphPairs = collectMorphPairs();
@@ -2765,16 +2938,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         // around them moved away, reading as orphaned floating bars.
         // Faded quickly and early (10%->28%) instead, so they're gone
         // before the nav items have travelled far.
-        tl.fromTo(
-          navSepProxy,
-          { opacity: 1 },
-          {
-            opacity: 0,
-            duration: 0.18,
-            onUpdate: () => pinEl.style.setProperty("--nav-sep-opacity", navSepProxy.opacity.toFixed(3)),
-          },
-          0.1
-        );
+        const navSeps = Array.from(pinEl.querySelectorAll<HTMLElement>(".hx-nav-sep"));
+        tl.fromTo(navSeps, { opacity: 1 }, { opacity: 0, duration: 0.18 }, 0.1);
 
         // Elements with NO sidebar equivalent (portrait, title, chip
         // card, actions, personal note): fade out early and quickly
@@ -2879,7 +3044,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
       function clearScrollDrivenState() {
         pinEl.style.removeProperty("--portrait-blur");
-        pinEl.style.removeProperty("--nav-sep-opacity");
+        gsap.set(Array.from(pinEl.querySelectorAll<HTMLElement>(".hx-nav-sep")), { clearProps: "opacity" });
         const morphSources = Array.from(introMotionEl.querySelectorAll<HTMLElement>("[data-morph-source]"));
         const noTargetGroup = collectNoTargetGroup();
         gsap.set([...morphSources, ...noTargetGroup], { clearProps: "all" });
@@ -3069,6 +3234,10 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         });
       }
 
+      // Other scenes (the Proyectos iris) change what is behind the sidebar
+      // without the scroll moving, so they can ask for a re-read.
+      window.addEventListener("hx-theme-check", checkArticleThemes);
+
       const articleThemeTrigger = ScrollTrigger.create({
         start: 0,
         end: "max",
@@ -3079,19 +3248,11 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       // ---- Sidebar active-link tracking (ScrollTrigger only, no new
       // deps) ---------------------------------------------------------
       //
-      // One ScrollTrigger per SECTION GROUP, not per link — Servicios and
-      // Tools are two nav entries but ONE shared visual section on the
-      // home page (`#services-tools`, containing `#services`/`#tools` as
-      // side-by-side columns), so they share a single trigger keyed to the
-      // combined wrapper and both light up together. Every other group
-      // has exactly one nav id. FAQ now gets its own group/trigger too
-      // (previously it had none, so Contacto stayed active by default —
-      // no longer the case: FAQ is now a real controlled link).
+      // One ScrollTrigger per home-page section. Servicios (`#services`) and
+      // Tools (`#tools`) are two separate consecutive sections, so each
+      // lights up only its own nav entry while it is on screen.
       // `data-nav-id` (set on each sidebar link's markup above) is the
-      // section's real `id` — for Servicios/Tools that id belongs to the
-      // HOME PAGE's in-page column, not the `/servicios/`/`/tools/`
-      // subpage the link's `href` actually points to; the two are
-      // deliberately decoupled (see `sidebarNavItems` in the frontmatter).
+      // section's real `id`, which is also the anchor its link points to.
       const navLinkEls = Array.from(
         compactSidebarEl.querySelectorAll<HTMLAnchorElement>("[data-nav-id]")
       );
@@ -3100,28 +3261,21 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         { sectionId: "home", navIds: ["home"] },
         { sectionId: "about", navIds: ["about"] },
         { sectionId: "projects", navIds: ["projects"] },
-        { sectionId: "services-tools", navIds: ["services", "tools"] },
+        { sectionId: "services", navIds: ["services"] },
+        { sectionId: "tools", navIds: ["tools"] },
         { sectionId: "contact", navIds: ["contact"] },
         { sectionId: "faq", navIds: ["faq"] },
       ];
 
-      // Sets one or more links active at once — the ONLY case with more
-      // than one is the Servicios+Tools group above. Always clears every
-      // non-matching link first, so outside that one group there is still
-      // never more than one active link at a time.
+      // Sets the matching link(s) active and clears every other one, so
+      // exactly one link is active at a time.
       function setActiveSections(ids: string[]) {
-        compactSidebarEl.dataset.palette = ids.includes("about") ? "mono" : "brand";
         navLinkEls.forEach((link) => {
           const navId = link.getAttribute("data-nav-id");
           const isMatch = !!navId && ids.includes(navId);
           link.classList.toggle("is-active", isMatch);
-          // Servicios/Tools `href` points at a REAL, SEPARATE page
-          // (`/servicios/`, `/tools/`) — even while their sidebar entry
-          // reads as active (still on the home page, scrolled through
-          // their combined block), `aria-current="location"` would
-          // falsely claim that link represents the page currently
-          // loaded. Only same-page anchor links (`href` starting with
-          // "#") are eligible for it.
+          // Only same-page anchor links (`href` starting with "#") are
+          // eligible for `aria-current="location"`.
           const isSamePageLink = (link.getAttribute("href") ?? "").startsWith("#");
           if (isMatch && isSamePageLink) {
             link.setAttribute("aria-current", "location");
@@ -3173,6 +3327,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
       return () => {
         entranceDisposed = true;
+        releaseIntroScrollLock();
+        window.removeEventListener("pagehide", releaseIntroScrollLock);
         detachAwaitSkipListener();
         detachPlayingInterruptListener();
         if (entranceTl) {
@@ -3191,11 +3347,26 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         window.clearTimeout(resizeTimer);
         window.removeEventListener("resize", onResize);
         prefersReducedMotionQuery.removeEventListener("change", onMotionPrefChange);
+        window.removeEventListener("hx-theme-check", checkArticleThemes);
         articleThemeTrigger.kill();
         navSectionTriggers.forEach((trigger) => trigger.kill());
       };
     }, wrapEl);
 
     document.addEventListener("astro:before-swap", () => ctx.revert());
+  }
+
+  // Pointer "liquid smear" over the background art only (the title, texts and
+  // wordmark are not distorted). A separate layer inside
+  // `.hx-pin-fade` (so it fades/desaturates with it on scroll); it does not
+  // touch the timeline, the morph or any animated element. No-op without a
+  // fine pointer, with reduced motion, or without WebGL2.
+  {
+    const pinFadeEl = document.getElementById("hx-pin-fade");
+    if (pinFadeEl) {
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const fluid = createHeroFluid(pinFadeEl, `${base}/assets/images/hero-background-gold-alternative.png`);
+      document.addEventListener("astro:before-swap", () => fluid?.destroy());
+    }
   }
 </script>

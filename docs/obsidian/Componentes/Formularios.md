@@ -11,6 +11,10 @@ Fuentes: [ContactForm.astro](../../../src/components/ContactForm.astro), [Servic
 > [!important]
 > **Ningún formulario de este sitio envía nada de verdad.** Esto hay que tenerlo presente antes de referenciarlos como un canal de contacto real en cualquier otro sitio (README, LinkedIn, etc.).
 
+## Aspecto
+
+El formulario de **Contacto** está estilado para la sección oscura (panel de tarjeta, Inter, campos con borde al 50 % para el contraste, foco dorado y botón de metal dorado); esos estilos viven en `ContactForm.astro` y no afectan al formulario de `/servicios/`, que conserva el estilo compartido de `Layout.astro`. La lógica, los campos, la validación y el envío simulado no cambiaron. Detalle y contrastes en [[Auditoria-Contacto]].
+
 ## Campos
 
 | Formulario | Campos obligatorios | Opcionales |

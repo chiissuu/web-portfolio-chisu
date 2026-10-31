@@ -1,147 +1,103 @@
 ---
-import type { ProjectsSectionContent } from "../lib/content-types";
-import SectionHeadingCard from "./SectionHeadingCard.astro";
+// Projects as a horizontal rail: on desktop the section pins and scrolling
+// slides the cards sideways (see ShowcaseSection), with a counter and a
+// progress line, and the card at the current position in focus. The stack of
+// tools used to build them follows. Light section (satin champagne) after the
+// dark Sobre mí.
+import type { AboutSectionContent, ProjectsSectionContent } from "../lib/content-types";
+import ShowcaseSection from "./ShowcaseSection.astro";
+import ProjectCard from "./ProjectCard.astro";
+import ProjectMoreCard from "./ProjectMoreCard.astro";
+import SkillsStack from "./SkillsStack.astro";
+import ProjectArt from "./ProjectArt.astro";
 
 interface Props {
-  t: ProjectsSectionContent;
+  t: ProjectsSectionContent & AboutSectionContent;
 }
 
 const { t } = Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// The introduction is authored plain; the key phrases listed in the content are
+// set in bold, like the accents of Sobre mí.
+const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const keys = t.projects.noteStrong ?? [];
+const noteParts = keys.length
+  ? t.projects.note.split(new RegExp(`(${keys.map(escape).join("|")})`, "g")).filter(Boolean)
+  : [t.projects.note];
+
+// Taken from the projects themselves so it follows the content: the
+// illustrations of the first two projects (the ones listed first are the ones
+// featured) at the sides of the head.
+const [left, right] = t.projects.items.filter((project) => project.art);
 ---
 
-<section class="section-theme-dark" id="projects">
-  <div class="section-inner">
-    <p class="rd-eyebrow">{t.projects.eyebrow}</p>
-    <SectionHeadingCard text={t.projects.title} as="h2" size="lg" />
-    <p class="rd-note editorial-text editorial-text-muted">{t.projects.note}</p>
+<ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} backdrop="champagne" rail iris center>
+  <Fragment slot="deco">
+    {left && (
+      <div class="pj-motif pj-motif--l" data-deco-l>
+        <ProjectArt kind={left.art ?? ""} />
+      </div>
+    )}
+    {right && (
+      <div class="pj-motif pj-motif--r" data-deco-r>
+        <ProjectArt kind={right.art ?? ""} />
+      </div>
+    )}
+  </Fragment>
 
-    <div class="rd-projects-grid">
-      {t.projects.items.map((project) => (
-        <article class="rd-project-card rd-reveal">
-          <div class="rd-project-visual" aria-hidden="true">
-            <span>{project.id}</span>
-          </div>
-          <p class="rd-project-category">{project.category}</p>
-          <h3>{project.title}</h3>
-          <div class="rd-tags">
-            {project.tags.map((tag) => <span>{tag}</span>)}
-          </div>
-          <p class="rd-project-status">{project.status}</p>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>
+  <p slot="intro">
+    {noteParts.map((part) => (keys.includes(part) ? <strong>{part}</strong> : part))}
+  </p>
+
+  {t.projects.items.map((project) => (
+    <ProjectCard
+      number={project.id}
+      eyebrow={project.status ? `${project.category} · ${project.status}` : project.category}
+      title={project.title}
+      text={project.description}
+      tags={project.tags}
+      href={project.href}
+      art={project.art}
+      metric={project.metric}
+      live={!!project.status}
+    />
+  ))}
+
+  <ProjectMoreCard label={t.projects.moreLabel} href={t.projects.moreHref} />
+
+  <SkillsStack slot="after" title={t.about.skillsTitle} groups={t.about.skillGroups} base={base} />
+</ShowcaseSection>
 
 <style>
-  .rd-note {
-    color: var(--theme-text-muted);
+  /* The illustrations of the first two projects, large and faint. */
+  .pj-motif {
+    position: absolute;
+    top: 4%;
+    width: clamp(7rem, 21%, 20rem);
+    color: rgb(150 112 34 / 62%);
+    will-change: transform;
   }
 
-  /* This section now carries `.section-theme-dark` (was `.section-theme-warm`
-     — see the corrective pass that swapped About/Proyectos so the sidebar's
-     own existing per-article `data-theme` overlap check, keyed generically
-     off the `.section-theme-dark` class name in HeroExperience.astro,
-     follows automatically with zero changes to that protected file).
-     Layout.astro's shared `.section-theme-dark` background is a 3-stop
-     vertical gradient computed against the section's own height — About
-     already overrides it with a flat color (its own scoped rule) for
-     exactly this reason, and the brief for this pass asks Proyectos to use
-     "el negro... que actualmente utiliza About", i.e. that same flat color,
-     not the raw gradient. Scoped the identical way (Astro's per-component
-     style attribute), so it only ever matches this section's own instance. */
-  .section-theme-dark {
-    background: var(--section-dark-start);
+  .pj-motif--l {
+    left: -5rem;
   }
 
-  /* Every color below that used to read a fixed, non-theme-aware `--color-*`
-     token (tuned for the warm/light background this section no longer has)
-     now reads the theme-agnostic `--theme-*` custom property instead, so it
-     resolves against whichever section theme is actually active — exactly
-     the mechanism `--theme-*` exists for. `--color-accent-2` (category
-     label) and the dashed-visual gradient wash are left as-is: both were
-     already legible against black (a medium gold and a subtle warm tint
-     respectively) and neither is theme-linked elsewhere in the codebase. */
-  .rd-projects-grid {
-    margin-top: 2rem;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
+  .pj-motif--r {
+    right: -3.5rem;
+    top: 10%;
   }
 
-  .rd-project-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    border: 1px solid var(--theme-border);
-    border-radius: 14px;
-    background: var(--theme-surface);
-    transition: transform 0.25s ease, border-color 0.25s ease;
+  /* The illustrations knock their lines out with a dark fill; here the
+     background is champagne. */
+  .pj-motif :global(circle[fill="#0f0e0a"]) {
+    fill: #e6dcc2;
   }
 
-  .rd-project-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--color-brand-gold);
-  }
-
-  .rd-project-visual {
-    display: grid;
-    place-content: center;
-    min-height: 160px;
-    margin-bottom: 1.25rem;
-    border: 1px dashed var(--theme-border);
-    border-radius: 10px;
-    background:
-      linear-gradient(135deg, rgba(138, 106, 31, 0.14), transparent 55%),
-      linear-gradient(315deg, rgba(184, 144, 44, 0.12), transparent 55%);
-  }
-
-  .rd-project-visual span {
-    font-family: var(--font-mono);
-    font-size: 2rem;
-    color: var(--theme-text-muted);
-  }
-
-  .rd-project-category {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    color: var(--color-accent-2);
-    margin-bottom: 0.4rem;
-  }
-
-  .rd-project-card h3 {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    margin-bottom: 0.9rem;
-    color: var(--theme-text);
-  }
-
-  .rd-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: auto;
-  }
-
-  .rd-tags span {
-    padding: 0.28rem 0.6rem;
-    border-radius: 999px;
-    border: 1px solid var(--theme-border);
-    font-size: 0.72rem;
-    color: var(--theme-text-muted);
-  }
-
-  .rd-project-status {
-    margin-top: 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--theme-text-muted);
-  }
-
-  @media (max-width: 900px) {
-    .rd-projects-grid {
-      grid-template-columns: 1fr;
-    }
+  .pj-motif :global(.pj-art-svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
   }
 </style>

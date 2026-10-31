@@ -1,7 +1,7 @@
 ---
 tags: [accesibilidad, movimiento, reveals]
 aliases: [Accesibilidad-y-Movimiento]
-actualizado: 2026-10-10
+actualizado: 2026-10-23
 fuente: [src/layouts/Layout.astro, src/components/RollLink.astro]
 ---
 
@@ -11,7 +11,11 @@ fuente: [src/layouts/Layout.astro, src/components/RollLink.astro]
 
 [Layout.astro](../../src/layouts/Layout.astro) observa `.rd-reveal` con `threshold: 0.15`, añade `.rd-in` al entrar y deja de observar ese elemento. El CSS pasa de opacidad 0 / `translateY(14px)` a visible en 0,55s.
 
-**Sin IntersectionObserver**, el script hace visibles todos los elementos. **Sin JavaScript**, ese fallback no se ejecuta en absoluto y los elementos se quedan con opacidad 0 — es una mejora progresiva incompleta, no total. Un bloque extremadamente alto también puede no alcanzar nunca el 15% de intersección necesario. Servicios/Tools no lleva la clase `.rd-reveal` en su bloque actual. Ver [[Hallazgos-y-Pendientes]].
+**Sin IntersectionObserver**, el script hace visibles todos los elementos. **Sin JavaScript**, ese fallback no se ejecuta en absoluto y los elementos se quedan con opacidad 0 — es una mejora progresiva incompleta, no total. Un bloque extremadamente alto también puede no alcanzar nunca el 15% de intersección necesario. Servicios, Tools y Contacto no llevan la clase `.rd-reveal` en su bloque actual. Ver [[Hallazgos-y-Pendientes]].
+
+Excepción desde 2026-10-23: la biografía y el stack de About ya no utilizan `.rd-reveal`; su lectura es inmediata sin scripts. El título PNG protegido conserva la clase y su limitación previa. Un fixture de la compilación sin scripts y con `html { font-size: 200% }` a 320px confirmó visibilidad y ausencia de overflow en los contenedores de texto/stack de About. La página completa sí desborda en ese escenario por elementos del Hero y encabezados de otras secciones, sin cambios en esta ronda. Es una prueba de ampliación de texto en un fixture, no una emulación del zoom nativo ni una auditoría de lector de pantalla. Ver [[Auditoria-Sobre-Mi]].
+
+Los títulos gráficos de Proyectos, Servicios, Tools, Contacto y FAQ no usan `.rd-reveal`: el `h2` conserva su texto como contenido accesible oculto visualmente y la imagen es decorativa (`alt=""`, `aria-hidden`). Se cargan con `loading="lazy"`; no dependen de JavaScript.
 
 ## `RollLink`
 
@@ -20,6 +24,8 @@ fuente: [src/layouts/Layout.astro, src/components/RollLink.astro]
 ## Movimiento reducido (global)
 
 Layout reduce las duraciones globales a 0,001ms y cambia el smooth scroll a `auto`. **Importante:** esto no hace visibles los reveals por sí mismo, ni resuelve la excepción `.hx-static` del Hero (ver [[Hero-y-Sidebar]], sección de resize/limpieza) — son tres mecanismos independientes que hay que verificar por separado.
+
+El Hero bloquea el scroll mientras reproduce su entrada (unos 2 s). No se aplica con `prefers-reduced-motion` ni en cargas ya desplazadas, tiene un límite de 8 s y no atrapa el foco (solo impide desplazar). Detalle en [[Hero-y-Sidebar]].
 
 ## Estado de accesibilidad conocido
 

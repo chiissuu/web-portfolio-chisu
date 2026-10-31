@@ -1,6 +1,7 @@
 ---
 import type { FaqSectionContent } from "../lib/content-types";
 import SectionHeadingCard from "./SectionHeadingCard.astro";
+import SectionBackdrop from "./SectionBackdrop.astro";
 
 interface Props {
   t: FaqSectionContent;
@@ -9,10 +10,11 @@ interface Props {
 const { t } = Astro.props as Props;
 ---
 
-<section class="section-theme-dark" id="faq">
+<section class="section-theme-warm bd-host bd-light faq-section" id="faq">
+  <SectionBackdrop kind="ivory" />
   <div class="section-inner">
     <p class="rd-eyebrow">{t.faq.eyebrow}</p>
-    <SectionHeadingCard text={t.faq.title} as="h2" size="lg" />
+    <SectionHeadingCard text={t.faq.title} image={t.faq.titleImage} as="h2" size="lg" />
 
     <div class="rd-faq-list">
       {t.faq.items.map((item) => (
@@ -26,6 +28,10 @@ const { t } = Astro.props as Props;
 </section>
 
 <style>
+  .faq-section {
+    background: #efe8d5;
+  }
+
   .rd-faq-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -41,6 +47,7 @@ const { t } = Astro.props as Props;
     border: 1px solid var(--theme-border);
     border-radius: 12px;
     background: var(--theme-surface);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 70%) inset, 0 8px 24px rgb(96 72 24 / 8%);
     color: var(--theme-text);
   }
 
@@ -57,7 +64,7 @@ const { t } = Astro.props as Props;
   .rd-faq-item summary::after {
     content: "+";
     float: right;
-    color: var(--color-brand-gold);
+    color: var(--theme-accent, var(--color-brand-gold));
   }
 
   .rd-faq-item[open] summary::after {

@@ -52,11 +52,18 @@ const es = {
   about: {
     aboutMe: {
       title: "SOBRE MÍ",
+      titleImage: {
+        src: "/assets/images/about-title-es.png",
+        width: 2446,
+        height: 1400,
+        crop: { x: 173, y: 454, width: 2084, height: 558 },
+      },
       groupLabels: {
-        intro: "Quién soy",
+        intro: "/whoami",
         difference: "Qué me diferencia de la competencia",
       },
       closingPhrase: "proyectos con más profundidad, más personalidad y una experiencia cuidada.",
+      projectsCta: { label: "Ver mis proyectos", href: "#projects" },
       accents: {
         strong: ["Jesús León Romero Atienza", "Ingeniería del Software", "Big Data", "desarrollo full-stack", "bases de datos", "arquitectura de software", "programación de sistemas", "diseño gráfico", "trabajar en equipo", "versión propia", "varias capas"],
         emojis: [
@@ -176,31 +183,85 @@ const es = {
     ],
   },
   projects: {
-    eyebrow: "Proyectos — en construcción",
+    eyebrow: "Proyectos",
     title: "Proyectos destacados",
+    titleImage: {
+      src: "/assets/images/section-title-proyectos-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 103, y: 389, width: 1817, height: 436 },
+    },
     note:
-      "Plantillas visuales: títulos provisionales, imágenes placeholder y sin enlaces definitivos. Se sustituirán por proyectos reales documentados.",
+      "Una selección de los proyectos más relevantes que he desarrollado en mi trayectoria como ingeniero tecnológico.",
+    noteStrong: ["proyectos más relevantes", "ingeniero tecnológico"],
+    moreLabel: "Ver más en GitHub",
+    moreHref: "https://github.com/chiissuu",
     items: [
       {
         id: "01",
-        category: "FULL-STACK",
-        tags: ["Full-stack", "UI"],
-        title: "Proyecto Full-stack (placeholder)",
-        status: "Próximamente",
+        art: "network",
+        category: "DEEP LEARNING",
+        tags: ["Keras", "Redes neuronales", "Python"],
+        title: "Clasificador de perros y gatos",
+        description:
+          "Notebook con Keras que distingue imágenes de perros y gatos mediante redes neuronales, con una exactitud de 0,99.",
+        status: "En desarrollo",
+        metric: { value: "0,99", label: "exactitud" },
       },
       {
         id: "02",
-        category: "DATA SCIENCE",
-        tags: ["Python", "Data"],
-        title: "Proyecto de Data Science (placeholder)",
-        status: "Próximamente",
+        art: "cache",
+        category: "SISTEMAS",
+        tags: ["C", "Linux", "Memoria caché"],
+        title: "MegatronixOS",
+        description:
+          "Simulador en C de una memoria caché de correspondencia directa: decodifica direcciones, detecta aciertos y fallos, carga bloques desde una RAM simulada y genera estadísticas.",
+        status: "",
+        href: "https://github.com/chiissuu/MegatronixOS",
       },
       {
         id: "03",
-        category: "VISUAL / UI",
-        tags: ["Design", "Branding"],
-        title: "Sistema Visual (placeholder)",
-        status: "Próximamente",
+        art: "order",
+        category: "BACKEND / POO",
+        tags: ["Java", "UML", "Patrones de diseño"],
+        title: "Plataforma de pedidos de restaurante",
+        description:
+          "Proyecto universitario en equipo inspirado en Uber Eats y Glovo: comidas personalizables, varios métodos de entrega, precios dinámicos y notificaciones, con siete patrones de diseño.",
+        status: "",
+        href: "https://github.com/chiissuu/Restaurant-Ordering-Platform",
+      },
+      {
+        id: "04",
+        art: "shop",
+        category: "WEB / API",
+        tags: ["JavaScript", "Vite", "API"],
+        title: "Tienda diaria de Fortnite",
+        description:
+          "Aplicación web que muestra la tienda diaria de Fortnite desde una API pública: secciones, tarjetas con precio, favoritos guardados y una caché de tres horas.",
+        status: "",
+        href: "https://github.com/chiissuu/M2-PWIC",
+      },
+      {
+        id: "05",
+        art: "graph",
+        category: "AUTOMATIZACIÓN",
+        tags: ["Python", "Playwright", "CLI"],
+        title: "Instagram Checker",
+        description:
+          "Script en Python que compara seguidores y seguidos desde el export oficial de Instagram para ver quién no te sigue. Todo en local; la verificación online es opcional.",
+        status: "",
+        href: "https://github.com/chiissuu/instagram-checker",
+      },
+      {
+        id: "06",
+        art: "target",
+        category: "WEB / JUEGO",
+        tags: ["JavaScript", "HTML", "CSS"],
+        title: "Aim Trainer",
+        description:
+          "Juego de puntería en el navegador: 15 segundos para acertar objetivos, con precisión, ranking local y modo oscuro, solo con HTML, CSS y JavaScript.",
+        status: "",
+        href: "https://github.com/chiissuu/aim-trainer",
       },
     ],
   },
@@ -280,7 +341,7 @@ const es = {
             "Extrae el audio de un vídeo como MP3 o conviértelo a un MP4 compatible. Todo se procesa en tu navegador — nada se sube a ningún servidor.",
           tags: ["Vídeo", "Audio", "Local"],
           cta: "Abrir conversor",
-          href: "/tools/video-converter/",
+          href: "/video-converters/",
         },
         {
           title: "Comprobador de quién no te sigue en Instagram",
@@ -294,8 +355,14 @@ const es = {
     },
   },
   servicesTools: {
-    title: "Servicios y Tools",
     services: {
+      title: "Servicios",
+      titleImage: {
+        src: "/assets/images/section-title-servicios-es.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 138, y: 391, width: 1743, height: 434 },
+      },
       description: [
         { text: "Combino " },
         { text: "desarrollo técnico", strong: true },
@@ -320,6 +387,13 @@ const es = {
       ctaLabel: "Ir a la página de servicios",
     },
     tools: {
+      title: "Tools",
+      titleImage: {
+        src: "/assets/images/section-title-tools-es.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 535, y: 407, width: 965, height: 414 },
+      },
       description:
         "Desarrollo pequeñas herramientas personales que parten de necesidades concretas y que voy construyendo y publicando progresivamente. El objetivo es crear utilidades sencillas, accesibles y transparentes que resuelvan tareas específicas sin añadir complejidad innecesaria. Esta colección crecerá poco a poco conforme las herramientas estén preparadas para utilizarse.",
       ctaLabel: "Ir a la página de herramientas",
@@ -328,6 +402,12 @@ const es = {
   contact: {
     eyebrow: "Contacto",
     title: "Hablemos de tu próxima idea",
+    titleImage: {
+      src: "/assets/images/section-title-contacto-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 234, y: 396, width: 1562, height: 423 },
+    },
     text: "Abierto a colaborar en proyectos, seguir aprendiendo y construir productos digitales con criterio técnico y visual.",
     emailIntro: "Si prefieres escribirme manualmente, puedes hacerlo mediante este correo:",
     links: {
@@ -359,6 +439,12 @@ const es = {
   faq: {
     eyebrow: "FAQ",
     title: "Preguntas frecuentes",
+    titleImage: {
+      src: "/assets/images/section-title-faq-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 692, y: 423, width: 621, height: 416 },
+    },
     items: [
       {
         q: "¿Tienes experiencia profesional?",
@@ -487,11 +573,18 @@ const en = {
   about: {
     aboutMe: {
       title: "ABOUT ME",
+      titleImage: {
+        src: "/assets/images/about-title-en.png",
+        width: 2446,
+        height: 1400,
+        crop: { x: 139, y: 475, width: 2157, height: 537 },
+      },
       groupLabels: {
-        intro: "Who I am",
+        intro: "/whoami",
         difference: "What sets me apart from the competition",
       },
       closingPhrase: "projects with more depth, more personality, and a thoughtfully designed experience.",
+      projectsCta: { label: "View my projects", href: "#projects" },
       accents: {
         strong: ["Jesús León Romero Atienza", "Software Engineering", "Big Data", "full-stack development", "databases", "software architecture", "systems programming", "graphic design", "work as part of a team", "a distinct identity", "several layers"],
         emojis: [
@@ -611,31 +704,79 @@ const en = {
     ],
   },
   projects: {
-    eyebrow: "Projects — under construction",
+    eyebrow: "Projects",
     title: "Featured Projects",
     note:
-      "Visual templates: placeholder titles, placeholder images, and no final links yet. These will be replaced with real, documented projects.",
+      "A selection of the most relevant projects I have developed throughout my career as a technology engineer.",
+    noteStrong: ["most relevant projects", "technology engineer"],
+    moreLabel: "See more on GitHub",
+    moreHref: "https://github.com/chiissuu",
     items: [
       {
         id: "01",
-        category: "FULL-STACK",
-        tags: ["Full-stack", "UI"],
-        title: "Full-stack Project (placeholder)",
-        status: "Coming soon",
+        art: "network",
+        category: "DEEP LEARNING",
+        tags: ["Keras", "Neural networks", "Python"],
+        title: "Dog and cat classifier",
+        description:
+          "A Keras notebook that tells dog and cat images apart with neural networks, with an accuracy of 0.99.",
+        status: "In progress",
+        metric: { value: "0.99", label: "accuracy" },
       },
       {
         id: "02",
-        category: "DATA SCIENCE",
-        tags: ["Python", "Data"],
-        title: "Data Science Project (placeholder)",
-        status: "Coming soon",
+        art: "cache",
+        category: "SYSTEMS",
+        tags: ["C", "Linux", "Cache memory"],
+        title: "MegatronixOS",
+        description:
+          "A C simulator of a direct-mapped cache memory: it decodes addresses, detects hits and misses, loads blocks from a simulated RAM and produces statistics.",
+        status: "",
+        href: "https://github.com/chiissuu/MegatronixOS",
       },
       {
         id: "03",
-        category: "VISUAL / UI",
-        tags: ["Design", "Branding"],
-        title: "Visual System (placeholder)",
-        status: "Coming soon",
+        art: "order",
+        category: "BACKEND / OOP",
+        tags: ["Java", "UML", "Design patterns"],
+        title: "Restaurant ordering platform",
+        description:
+          "A team university project inspired by Uber Eats and Glovo: custom meals, several delivery methods, dynamic pricing and notifications, built with seven design patterns.",
+        status: "",
+        href: "https://github.com/chiissuu/Restaurant-Ordering-Platform",
+      },
+      {
+        id: "04",
+        art: "shop",
+        category: "WEB / API",
+        tags: ["JavaScript", "Vite", "API"],
+        title: "Fortnite daily shop",
+        description:
+          "A web app that shows the Fortnite daily shop from a public API: sections, cards with prices, saved favorites and a three-hour cache.",
+        status: "",
+        href: "https://github.com/chiissuu/M2-PWIC",
+      },
+      {
+        id: "05",
+        art: "graph",
+        category: "AUTOMATION",
+        tags: ["Python", "Playwright", "CLI"],
+        title: "Instagram Checker",
+        description:
+          "A Python script that compares followers and following from Instagram's official export to show who does not follow you back. Everything runs locally; online verification is optional.",
+        status: "",
+        href: "https://github.com/chiissuu/instagram-checker",
+      },
+      {
+        id: "06",
+        art: "target",
+        category: "WEB / GAME",
+        tags: ["JavaScript", "HTML", "CSS"],
+        title: "Aim Trainer",
+        description:
+          "An aim game in the browser: 15 seconds to hit as many targets as you can, with accuracy, a local leaderboard and dark mode, using only HTML, CSS and JavaScript.",
+        status: "",
+        href: "https://github.com/chiissuu/aim-trainer",
       },
     ],
   },
@@ -715,7 +856,7 @@ const en = {
             "Extract a video's audio as MP3 or convert it to a compatible MP4. Everything runs in your browser — nothing is uploaded to any server.",
           tags: ["Video", "Audio", "Local"],
           cta: "Open converter",
-          href: "/tools/video-converter/",
+          href: "/video-converters/",
         },
         {
           title: "Instagram non-follower checker",
@@ -729,8 +870,8 @@ const en = {
     },
   },
   servicesTools: {
-    title: "Services & Tools",
     services: {
+      title: "Services",
       description: [
         { text: "I combine " },
         { text: "technical development", strong: true },
@@ -753,6 +894,7 @@ const en = {
       ctaLabel: "Go to the services page",
     },
     tools: {
+      title: "Tools",
       description:
         "I build small personal tools that start from concrete needs, and that I keep building and publishing gradually. The goal is to create simple, accessible, and transparent utilities that solve specific tasks without adding unnecessary complexity. This collection will grow little by little as each tool becomes ready to use.",
       ctaLabel: "Go to the tools page",

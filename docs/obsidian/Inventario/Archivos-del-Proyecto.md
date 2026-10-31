@@ -1,6 +1,6 @@
 ---
 tags: [inventario, archivos]
-actualizado: 2026-10-08
+actualizado: 2026-10-23
 fuente: [estructura del repositorio]
 ---
 
@@ -10,9 +10,16 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 
 | Archivo | Responsabilidad |
 |---|---|
+| [scripts/generate-about-veins.mjs](../../../scripts/generate-about-veins.mjs) | Genera `about-veins.webp` a partir de la textura del Hero (`sharp`), ver [[Sobre-Mi]] |
 | [scripts/copy-ffmpeg-core.mjs](../../../scripts/copy-ffmpeg-core.mjs) | Copia del motor instalado a `public/ffmpeg` |
-| [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Título Sobre mí, resumen inicial, formación, idiomas y skills — ver [[Sobre-Mi]] |
+| [src/pages/video-converters/index.astro](../../../src/pages/video-converters/index.astro) | Única ruta aparte de la portada (antes `/tools/video-converter/`); ver [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] |
+| [src/components/SectionBackdrop.astro](../../../src/components/SectionBackdrop.astro) | Capas de fondo de Proyectos, Servicios, Tools, Contacto y FAQ (`champagne`, `blueprint`, `brushed`, `dawn`, `ivory`) — ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
+| [src/components/ProjectCard.astro](../../../src/components/ProjectCard.astro) | Tarjeta alta del carrusel de Proyectos (arte a toda la tarjeta, tags, texto y flecha) — ver [[Otras-Secciones-y-Compartidos]] |
+| [src/components/SkillsStack.astro](../../../src/components/SkillsStack.astro) | «Mi stack de trabajo» (categorías y logos), bajo Proyectos; antes dentro de Sobre mí — ver [[Sobre-Mi]] |
+| [src/components/AboutSatellite.astro](../../../src/components/AboutSatellite.astro) | Ilustraciones de línea dorada al lado de cada tarjeta del hilo de Sobre mí (ocho variantes, decorativas) — ver [[Sobre-Mi]] |
+| [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Título PNG dorado, siete párrafos en dos grupos y stack de 42 herramientas; formación e idiomas van dentro de la biografía — ver [[Sobre-Mi]] |
 | Banderas [España](../../../public/assets/icons/flags/es.svg), [Reino Unido](../../../public/assets/icons/flags/gb.svg) y [Alemania](../../../public/assets/icons/flags/de.svg) | SVG locales simplificados para ubicación e idiomas de la biografía; no dependen de emojis de banderas |
+| [scripts/test-video-converter.mjs](../../../scripts/test-video-converter.mjs) | Prueba reproducible del conversor (6 casos con el motor real); ver [[Comandos-y-Pruebas]] |
 | [src/components/ClosingStatement.astro](../../../src/components/ClosingStatement.astro) | Cierre conservado; sin uso en rutas actuales — ver [[Otras-Secciones-y-Compartidos]] |
 | [src/components/ContactForm.astro](../../../src/components/ContactForm.astro) | Formulario de contacto y estados de validación/envío simulado — ver [[Formularios]] |
 | [src/components/ContactSection.astro](../../../src/components/ContactSection.astro) | Tarjetas sociales, formulario y correo manual |
@@ -20,11 +27,14 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/components/HeroExperience.astro](../../../src/components/HeroExperience.astro) | Hero, sidebar, menú móvil y sistema GSAP/ScrollTrigger — ver [[Hero-y-Sidebar]] |
 | [src/components/ProjectsSection.astro](../../../src/components/ProjectsSection.astro) | Tres tarjetas provisionales de proyectos |
 | [src/components/RollLink.astro](../../../src/components/RollLink.astro) | Enlace con duplicación visual y rollover accesible |
-| [src/components/SectionHeadingCard.astro](../../../src/components/SectionHeadingCard.astro) | Primitiva de título sobre cristal |
+| [src/components/SectionHeadingCard.astro](../../../src/components/SectionHeadingCard.astro) | Primitiva de título: tarjeta de cristal o, con `image`, título gráfico recortado por CSS |
 | [src/components/ServicesForm.astro](../../../src/components/ServicesForm.astro) | Solicitud de servicios con envío simulado — ver [[Formularios]] |
 | [src/components/ServicesPageContent.astro](../../../src/components/ServicesPageContent.astro) | Página de servicios, artículos y formulario |
 | [src/components/ServicesTeaser.astro](../../../src/components/ServicesTeaser.astro) | Teaser antiguo de servicios; sin uso actual |
-| [src/components/ServicesToolsSection.astro](../../../src/components/ServicesToolsSection.astro) | Sección combinada de portada y ejemplo de primera tool |
+| [src/components/ServicesSection.astro](../../../src/components/ServicesSection.astro) | Sección `#services` de la portada: tres tarjetas desde `services.page.articles` |
+| [src/components/ToolsSection.astro](../../../src/components/ToolsSection.astro) | Sección `#tools` de la portada: tarjetas desde `tools.page.items` |
+| [src/components/ShowcaseSection.astro](../../../src/components/ShowcaseSection.astro) | Sección compartida de Servicios/Tools: fondo grafito, título con halo, introducción, rejilla y CTA |
+| [src/components/ShowcaseCard.astro](../../../src/components/ShowcaseCard.astro) | Tarjeta compartida: número, estado, hueco de imagen, título, texto, etiquetas y flecha |
 | [src/components/SimpleNav.astro](../../../src/components/SimpleNav.astro) | Navegación sticky de las tres subpáginas |
 | [src/components/ToolsPageContent.astro](../../../src/components/ToolsPageContent.astro) | Catálogo con CTA condicional según `href` |
 | [src/components/ToolsTeaser.astro](../../../src/components/ToolsTeaser.astro) | Teaser antiguo de herramientas; sin uso actual |
@@ -42,15 +52,16 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/lib/forms/submit.ts](../../../src/lib/forms/submit.ts) | Simulación asíncrona de 500ms |
 | [src/lib/forms/types.ts](../../../src/lib/forms/types.ts) | Datos de ambos formularios y estado/resultado |
 | [src/lib/forms/validate.ts](../../../src/lib/forms/validate.ts) | Validadores de campos y email |
+| [src/lib/heroFluid.ts](../../../src/lib/heroFluid.ts) | Efecto del ratón sobre el fondo del Hero: WebGL2 sin dependencias, ver [[Hero-y-Sidebar]] |
 | [src/lib/paths.js](../../../src/lib/paths.js) | Prefijo de `BASE_URL` para enlaces internos |
 | [src/lib/videoConverter/constants.ts](../../../src/lib/videoConverter/constants.ts) | Límites, extensiones, bitrates y directorio FFmpeg |
 | [src/lib/videoConverter/ffmpegClient.ts](../../../src/lib/videoConverter/ffmpegClient.ts) | Carga de Worker, conversión, cancelación y FS virtual |
 | [src/lib/videoConverter/types.ts](../../../src/lib/videoConverter/types.ts) | Etapas, archivo seleccionado, resultado y errores de validación |
 | [src/lib/videoConverter/utils.ts](../../../src/lib/videoConverter/utils.ts) | Metadatos, validación, memoria y nombres de salida |
 | [src/pages/index.astro](../../../src/pages/index.astro) | Ruta: `/` |
-| [src/pages/servicios/index.astro](../../../src/pages/servicios/index.astro) | Ruta: `/servicios/` |
-| [src/pages/tools/index.astro](../../../src/pages/tools/index.astro) | Ruta: `/tools/` |
-| [src/pages/tools/video-converter/index.astro](../../../src/pages/tools/video-converter/index.astro) | Ruta: `/tools/video-converter/` |
+| `src/pages/servicios/index.astro` | **Eliminada el 29 de octubre de 2026** (respaldo en `backups/paginas-eliminadas-2026-10-29/`); era la ruta `/servicios/` |
+| `src/pages/tools/index.astro` | **Eliminada el 29 de octubre de 2026** (mismo respaldo); era la ruta `/tools/` |
+| `src/pages/tools/video-converter/index.astro` | **Movida** a `src/pages/video-converters/index.astro` (ruta `/video-converters/`) |
 
 ## Configuración revisada
 

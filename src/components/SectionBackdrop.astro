@@ -1,0 +1,522 @@
+---
+// Full-bleed decorative backdrops for the home sections after Sobre mí. The
+// page alternates light and dark (Hero light, Sobre mí dark, Proyectos light,
+// Servicios dark, Tools light, Contacto dark, FAQ light); every backdrop
+// shares the same gold palette and starts with a "liquid gold" edge: a wavy,
+// metallic-gold-rimmed border, filled with the section's own tone, that
+// overlaps the bottom of the section above and drifts sideways as you scroll.
+// (Sobre mí -> Proyectos has its own iris scene instead, see ShowcaseSection;
+// Proyectos only shows this edge where that scene is off.)
+//
+//   champagne  light  satin folds + gold veins that drift with the scroll
+//   blueprint  dark   a faint gold technical grid with pulses of light along it
+//   brushed    light  brushed pale-gold plate, engraved dials, a glare that follows the pointer
+//   dawn       dark   black with a gold sunrise at the bottom and rising dust
+//   ivory      light  warm paper with gold-foil question marks that drift
+//
+// Used as the first child of a section that has the `bd-host` class (and
+// `bd-light` plus `section-theme-warm` when the backdrop is light).
+interface Props {
+  kind: "champagne" | "blueprint" | "brushed" | "dawn" | "ivory";
+}
+
+const { kind } = Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Per-section tone at its top edge, and the shape of its wave (two sine terms
+// whose frequencies divide the 1440-unit period, so the drawing tiles
+// seamlessly and can drift by one period without a jump).
+const EDGE = {
+  champagne: { fill: "#ece3cb", amp: [14, 9], k: [1, 3], ph: [0.6, 2.1] },
+  blueprint: { fill: "#1b1a17", amp: [16, 7], k: [1, 2], ph: [2.4, 0.4] },
+  brushed: { fill: "#f0e5c2", amp: [12, 10], k: [2, 3], ph: [0.2, 1.5] },
+  dawn: { fill: "#0b0a09", amp: [18, 8], k: [1, 3], ph: [4.0, 2.7] },
+  ivory: { fill: "#eee7d3", amp: [13, 9], k: [1, 2], ph: [1.2, 3.3] },
+}[kind];
+const PERIOD = 1440;
+const WIDTH = PERIOD * 2;
+const HEIGHT = 96;
+const waveY = (x: number) =>
+  HEIGHT / 2 +
+  EDGE.amp[0] * Math.sin((2 * Math.PI * EDGE.k[0] * x) / PERIOD + EDGE.ph[0]) +
+  EDGE.amp[1] * Math.sin((2 * Math.PI * EDGE.k[1] * x) / PERIOD + EDGE.ph[1]);
+// Catmull-Rom through points every 60 units, written as cubic Beziers.
+const pts = Array.from({ length: WIDTH / 60 + 1 }, (_, i) => [i * 60, waveY(i * 60)]);
+let curve = `M ${pts[0][0]} ${pts[0][1].toFixed(1)}`;
+for (let i = 0; i < pts.length - 1; i++) {
+  const p0 = pts[Math.max(0, i - 1)];
+  const p1 = pts[i];
+  const p2 = pts[i + 1];
+  const p3 = pts[Math.min(pts.length - 1, i + 2)];
+  const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+  const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+  curve += ` C ${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1].toFixed(1)}`;
+}
+const fill = `${curve} L ${WIDTH} ${HEIGHT} L 0 ${HEIGHT} Z`;
+---
+
+<div class="bd-edge" data-bd-edge aria-hidden="true" style={`--edge-fill:${EDGE.fill}`}>
+  <svg class="bd-edge-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
+    <defs>
+      <linearGradient id={`bd-rim-${kind}`} x1="0" y1="0" x2={WIDTH} y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#b08a32" />
+        <stop offset="0.125" stop-color="#efd683" />
+        <stop offset="0.25" stop-color="#c19b3d" />
+        <stop offset="0.375" stop-color="#efd683" />
+        <stop offset="0.5" stop-color="#b08a32" />
+        <stop offset="0.625" stop-color="#efd683" />
+        <stop offset="0.75" stop-color="#c19b3d" />
+        <stop offset="0.875" stop-color="#efd683" />
+        <stop offset="1" stop-color="#b08a32" />
+      </linearGradient>
+    </defs>
+    <path d={fill} fill="var(--edge-fill)" />
+    <path d={curve} fill="none" stroke={`url(#bd-rim-${kind})`} stroke-width="3" vector-effect="non-scaling-stroke" />
+  </svg>
+</div>
+<div class={`bd bd--${kind}`} data-bd={kind} aria-hidden="true" style={`--bd-veins: url("${base}/assets/images/about-veins.webp");--edge-fill:${EDGE.fill}`}>
+  <div class="bd-bridge"></div>
+  {kind === "champagne" && <div class="bd-veins"></div>}
+  {kind === "blueprint" && (
+    <>
+      <div class="bd-grid"></div>
+      <span class="bd-pulse" style="--row:1;--delay:0s;--dur:11s"></span>
+      <span class="bd-pulse" style="--row:3;--delay:-4s;--dur:14s"></span>
+      <span class="bd-pulse" style="--row:5;--delay:-8s;--dur:12s"></span>
+      <span class="bd-pulse bd-pulse--late" style="--row:4;--delay:-2s;--dur:7s"></span>
+    </>
+  )}
+  {kind === "brushed" && (
+    <>
+      <div class="bd-brush"></div>
+      <div class="bd-dial bd-dial--a"></div>
+      <div class="bd-dial bd-dial--b"></div>
+      <div class="bd-sheen"></div>
+      <div class="bd-glare"></div>
+    </>
+  )}
+  {kind === "dawn" && (
+    <>
+      <div class="bd-veins bd-veins--faint"></div>
+      <div class="bd-dust bd-dust--a"></div>
+      <div class="bd-dust bd-dust--b"></div>
+    </>
+  )}
+  {kind === "ivory" && (
+    <>
+      <div class="bd-grain"></div>
+      <div class="bd-mark">?</div>
+      <span class="bd-float" style="--x:8%;--y:70%;--s:7rem;--d:46s;--o:0s">?</span>
+      <span class="bd-float" style="--x:52%;--y:16%;--s:4.5rem;--d:38s;--o:-12s">?</span>
+      <span class="bd-float" style="--x:90%;--y:82%;--s:9rem;--d:58s;--o:-24s">?</span>
+      <span class="bd-float" style="--x:34%;--y:88%;--s:3.5rem;--d:34s;--o:-6s">?</span>
+    </>
+  )}
+</div>
+
+<style is:global>
+  .bd-host {
+    position: relative;
+  }
+
+  /* Proyectos shows the wavy edge only where its iris scene is off (mobile,
+     reduced motion, no script). */
+  .bd-host[data-iris="on"] > .bd-edge {
+    display: none;
+  }
+
+  .bd-host > .section-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Light sections: the warm theme's tokens, retuned for the satin and paper
+     backdrops (dark ink, a darker gold for small gold text, light chips). */
+  .section-theme-warm.bd-light {
+    --theme-text: #1c1a17;
+    --theme-text-muted: rgb(28 26 23 / 70%);
+    --theme-border: rgb(96 72 24 / 24%);
+    --theme-surface: rgb(255 255 255 / 50%);
+    --theme-surface-strong: rgb(255 255 255 / 75%);
+    --theme-accent: #7a5a12;
+    --sc-chip-bg: rgb(255 255 255 / 65%);
+    color-scheme: light;
+  }
+</style>
+
+<style>
+  .bd {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* The wavy edge sits above the section's top (overlapping the section
+     before by 2px) and is as wide as two periods, so its drift can loop. */
+  .bd-edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(2px - var(--edge-h, clamp(4rem, 7vw, 6.5rem)));
+    height: var(--edge-h, clamp(4rem, 7vw, 6.5rem));
+    z-index: 2;
+    overflow-x: clip;
+    pointer-events: none;
+  }
+
+  .bd-edge-svg {
+    display: block;
+    width: 200%;
+    height: 100%;
+    filter: drop-shadow(0 -3px 8px rgb(239 214 131 / 45%));
+    will-change: transform;
+  }
+
+  /* The section's own first rems are flat in the edge's tone, so the edge and
+     whatever textures follow it meet without a step. */
+  .bd-bridge {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+    height: clamp(6rem, 12svh, 9rem);
+    background: linear-gradient(180deg, var(--edge-fill) 0, var(--edge-fill) 40%, transparent 100%);
+  }
+
+  /* ---------------- champagne (light) ---------------- */
+  .bd--champagne {
+    background:
+      radial-gradient(ellipse 55% 30% at 18% 14%, rgb(255 255 255 / 55%), transparent 70%),
+      radial-gradient(ellipse 50% 26% at 82% 38%, rgb(255 252 240 / 45%), transparent 70%),
+      radial-gradient(ellipse 60% 34% at 30% 78%, rgb(176 138 50 / 16%), transparent 70%),
+      linear-gradient(115deg, rgb(255 255 255 / 0%) 20%, rgb(255 255 255 / 28%) 34%, rgb(176 138 50 / 8%) 44%, rgb(255 255 255 / 0%) 60%),
+      linear-gradient(180deg, #ece3cb 0%, #ded3b4 52%, #e8dfc5 100%);
+  }
+
+  .bd-veins {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -12%;
+    right: -12%;
+    background: var(--bd-veins) center top / 100% auto repeat-y;
+    /* The gold veins of Sobre mí, deepened to a metallic gold that reads on champagne. */
+    filter: brightness(0.74) saturate(2.4) drop-shadow(0 0 2px rgb(176 138 50 / 45%));
+    opacity: 0.85;
+    mask-image: linear-gradient(180deg, transparent 0, #000 12rem, #000 calc(100% - 8rem), transparent 100%);
+    will-change: transform;
+  }
+
+  /* ---------------- blueprint (dark) ---------------- */
+  .bd--blueprint {
+    background:
+      radial-gradient(80% 50% at 50% 0%, rgb(224 197 139 / 6%), transparent 70%),
+      linear-gradient(180deg, #1b1a17, #12110f);
+  }
+
+  .bd-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgb(239 214 131 / 30%) 0 1.5px, transparent 2px),
+      linear-gradient(rgb(224 197 139 / 6%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(224 197 139 / 6%) 1px, transparent 1px),
+      linear-gradient(rgb(224 197 139 / 2.5%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(224 197 139 / 2.5%) 1px, transparent 1px);
+    background-size: 256px 256px, 256px 256px, 256px 256px, 64px 64px, 64px 64px;
+    background-position: 128px 128px, 0 0, 0 0, 0 0, 0 0;
+    mask-image: linear-gradient(180deg, transparent 0, #000 10rem, #000 calc(100% - 8rem), transparent 100%);
+  }
+
+  /* A pulse of light travelling along one of the grid's horizontal lines. */
+  .bd-pulse {
+    position: absolute;
+    top: calc(var(--row) * 256px - 1px);
+    left: 0;
+    width: 260px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgb(239 214 131 / 50%), transparent);
+    box-shadow: 0 0 10px 1px rgb(224 197 139 / 18%);
+    transform: translateX(-300px);
+    animation: bd-pulse var(--dur) linear var(--delay) infinite;
+    will-change: transform;
+  }
+
+  @keyframes bd-pulse {
+    to {
+      transform: translateX(calc(100vw + 300px));
+    }
+  }
+
+  /* ---------------- brushed (light) ---------------- */
+  .bd--brushed {
+    background:
+      radial-gradient(ellipse 70% 40% at 50% 0%, rgb(255 250 230 / 70%), transparent 70%),
+      linear-gradient(125deg, #f0e5c2 0%, #e4d29c 38%, #f2e8c8 62%, #dcc88f 100%);
+  }
+
+  /* Brushed metal: noise stretched along x (very low x frequency, high y). */
+  .bd-brush {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .34 0 0 0 0 .08 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
+  }
+
+  /* Engraved watch-dial rings in two corners. */
+  .bd-dial {
+    position: absolute;
+    width: 70rem;
+    height: 70rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, rgb(122 90 18 / 17%) 0 1px, transparent 1px 10px);
+    mask-image: radial-gradient(circle, #000 0, transparent 68%);
+  }
+
+  .bd-dial--a {
+    top: -22rem;
+    right: -22rem;
+  }
+
+  .bd-dial--b {
+    bottom: -26rem;
+    left: -24rem;
+  }
+
+  /* A slow diagonal highlight, and a glare under the pointer. */
+  .bd-sheen {
+    position: absolute;
+    inset: 0 -40%;
+    background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 38%) 48%, rgb(255 250 225 / 14%) 54%, transparent 64%);
+    animation: bd-sheen 22s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes bd-sheen {
+    from {
+      transform: translateX(-18%);
+    }
+    to {
+      transform: translateX(18%);
+    }
+  }
+
+  .bd-glare {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(420px circle at var(--bd-mx, -999px) var(--bd-my, -999px), rgb(255 255 255 / 55%), transparent 70%);
+    opacity: var(--bd-spot-o, 0);
+    transition: opacity 0.4s ease;
+  }
+
+  /* ---------------- dawn (dark) ---------------- */
+  .bd--dawn {
+    background:
+      radial-gradient(120% 55% at 50% 118%, rgb(239 214 131 / 55%), rgb(176 138 50 / 22%) 38%, transparent 70%),
+      radial-gradient(60% 30% at 50% 100%, rgb(255 236 180 / 35%), transparent 70%),
+      linear-gradient(180deg, #0b0a09 0%, #0d0c0a 60%, #14100a 100%);
+  }
+
+  .bd-veins--faint {
+    filter: none;
+    opacity: 0.1;
+    mask-image: linear-gradient(180deg, transparent 0, #000 6rem, transparent 60%);
+  }
+
+  .bd-dust {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100% + 520px);
+    background-repeat: repeat;
+    mask-image: linear-gradient(0deg, #000 0, transparent 75%);
+    will-change: transform;
+    animation: bd-rise 70s linear infinite;
+  }
+
+  .bd-dust--a {
+    background-image:
+      radial-gradient(circle at 12% 80%, rgb(239 214 131 / 85%) 0 1.4px, transparent 2.4px),
+      radial-gradient(circle at 37% 22%, rgb(239 214 131 / 60%) 0 1px, transparent 2px),
+      radial-gradient(circle at 63% 64%, rgb(255 236 180 / 80%) 0 1.5px, transparent 2.6px),
+      radial-gradient(circle at 86% 38%, rgb(239 214 131 / 55%) 0 1px, transparent 2px),
+      radial-gradient(circle at 74% 92%, rgb(239 214 131 / 70%) 0 1.2px, transparent 2.2px),
+      radial-gradient(circle at 25% 52%, rgb(255 236 180 / 50%) 0 1px, transparent 2px);
+    background-size: 520px 520px;
+    opacity: 0.7;
+  }
+
+  .bd-dust--b {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgb(239 214 131 / 55%) 0 1px, transparent 2px),
+      radial-gradient(circle at 55% 75%, rgb(255 236 180 / 70%) 0 1.2px, transparent 2.2px),
+      radial-gradient(circle at 82% 15%, rgb(239 214 131 / 45%) 0 1px, transparent 2px),
+      radial-gradient(circle at 45% 48%, rgb(239 214 131 / 50%) 0 0.9px, transparent 1.8px);
+    background-size: 340px 340px;
+    opacity: 0.55;
+    animation-duration: 110s;
+  }
+
+  @keyframes bd-rise {
+    to {
+      transform: translateY(-520px);
+    }
+  }
+
+  /* ---------------- ivory (light) ---------------- */
+  .bd--ivory {
+    background:
+      radial-gradient(60% 50% at 85% 8%, rgb(239 214 131 / 30%), transparent 70%),
+      radial-gradient(50% 40% at 8% 92%, rgb(224 197 139 / 24%), transparent 70%),
+      linear-gradient(180deg, #eee7d3 0%, #f3edde 55%, #efe8d5 100%);
+  }
+
+  .bd-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .bd-mark {
+    position: absolute;
+    top: 4%;
+    right: -3%;
+    font-family: var(--font-display);
+    font-size: min(52vw, 46rem);
+    font-weight: 700;
+    line-height: 1;
+    /* Gold foil: a metallic gradient clipped to the glyph, with a slow sheen. */
+    background: linear-gradient(115deg, #b08a32 0%, #efd683 30%, #c19b3d 50%, #efd683 70%, #b08a32 100%) 0 0 / 220% 220%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.2;
+    user-select: none;
+    animation: bd-foil 18s ease-in-out infinite alternate;
+  }
+
+  @keyframes bd-foil {
+    to {
+      background-position: 100% 100%;
+    }
+  }
+
+  /* Small outlined question marks drifting up, like the dust of Contacto. */
+  .bd-float {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    font-family: var(--font-display);
+    font-size: var(--s);
+    font-weight: 700;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(176 138 50 / 50%);
+    opacity: 0.7;
+    user-select: none;
+    animation: bd-drift var(--d) ease-in-out var(--o) infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes bd-drift {
+    from {
+      transform: translate(0, 0) rotate(-8deg);
+    }
+    to {
+      transform: translate(2.5rem, -7rem) rotate(10deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bd-pulse,
+    .bd-dust,
+    .bd-sheen,
+    .bd-float,
+    .bd-mark {
+      animation: none;
+    }
+
+    .bd-pulse {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Liquid-gold edges: each drifts one full period sideways while its section
+  // arrives (the drawing tiles, so the loop has no seam).
+  if (!reduced) {
+    document.querySelectorAll<HTMLElement>("[data-bd-edge]").forEach((edge) => {
+      const svg = edge.querySelector<SVGElement>(".bd-edge-svg");
+      const section = edge.closest("section");
+      if (!svg || !section) return;
+      gsap.fromTo(
+        svg,
+        { xPercent: 0 },
+        {
+          xPercent: -50,
+          ease: "none",
+          scrollTrigger: { trigger: section, start: "top bottom", end: "top 10%", scrub: true },
+        }
+      );
+    });
+  }
+
+  // champagne: the veins drift sideways a little more slowly than the page.
+  if (!reduced) {
+    document.querySelectorAll<HTMLElement>('[data-bd="champagne"]').forEach((bd) => {
+      const veins = bd.querySelector<HTMLElement>(".bd-veins");
+      const section = bd.closest("section");
+      if (!veins || !section) return;
+      gsap.fromTo(
+        veins,
+        { xPercent: -6 },
+        {
+          xPercent: 6,
+          ease: "none",
+          scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: true },
+        }
+      );
+    });
+  }
+
+  // brushed: a glare on the gold plate follows the pointer.
+  if (!reduced && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.querySelectorAll<HTMLElement>('[data-bd="brushed"]').forEach((bd) => {
+      const section = bd.closest("section");
+      if (!section) return;
+      let frame = 0;
+      let x = 0;
+      let y = 0;
+      const paint = () => {
+        frame = 0;
+        bd.style.setProperty("--bd-mx", `${x}px`);
+        bd.style.setProperty("--bd-my", `${y}px`);
+      };
+      section.addEventListener(
+        "pointermove",
+        (event) => {
+          const box = bd.getBoundingClientRect();
+          x = event.clientX - box.left;
+          y = event.clientY - box.top;
+          bd.style.setProperty("--bd-spot-o", "1");
+          if (!frame) frame = requestAnimationFrame(paint);
+        },
+        { passive: true }
+      );
+      section.addEventListener("pointerleave", () => bd.style.setProperty("--bd-spot-o", "0"));
+    });
+  }
+</script>
