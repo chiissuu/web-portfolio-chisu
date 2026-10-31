@@ -1,8 +1,10 @@
 ---
-// "Mi stack de trabajo": the tools grouped by area, as a mosaic of dark glass
-// cards (the bevel of the project cards) with large logo tiles that lift on
-// hover. It lives under the projects (what I build, then what I build it with)
-// on a light section, so the cards are dark on purpose.
+// "Mi stack de trabajo" as a periodic table of tools: one column per group
+// (like the groups of the chemical table), one tile per tool with its running
+// number, a two-letter symbol, its logo and its name. Hovering a group lights
+// that column and dims the others; a soft gold light follows the pointer over
+// the board; on first sight the tiles light up in a wave from the centre.
+// It lives under the projects, on a light section, so the board is dark.
 import type { SkillGroup } from "../lib/content-types";
 
 interface Props {
@@ -13,245 +15,675 @@ interface Props {
 
 const { title, groups, base } = Astro.props as Props;
 
-// Columns each card spans (of 12), so the bigger areas get more room:
-// Software, Bases de datos | Web, Data, Herramientas | Diseño, Documentación.
-const spans = [6, 6, 4, 4, 4, 6, 6];
-const columns = (count: number) => (count <= 4 ? count : Math.ceil(count / 2));
+// Symbols for the known tools. A tool that is not listed here gets its first
+// two letters, so adding one to the content never breaks the table.
+const symbols: Record<string, string> = {
+  Java: "Jv", Python: "Py", C: "C", "C++": "C++", JavaScript: "Js", PHP: "Ph", TypeScript: "Ts",
+  Astro: "As", React: "Re", "Node.js": "Nd", GSAP: "Gs",
+  MySQL: "My", PostgreSQL: "Pg", MariaDB: "Ma", MongoDB: "Mo", Qdrant: "Qd", Redis: "Rd", Neo4j: "N4",
+  Pandas: "Pa", NumPy: "Np", Matplotlib: "Mp", Seaborn: "Sb", "Scikit-learn": "Sk", Jupyter: "Jp",
+  Git: "Gt", GitHub: "Gh", Docker: "Dk", Linux: "Lx", Windows: "Wn", n8n: "n8",
+  Photoshop: "Ps", GIMP: "Gm", Photopea: "Pp", Canva: "Cv", "After Effects": "Ae", Illustrator: "Ai",
+  Obsidian: "Ob", "Google Drive": "Gd", Word: "Wd", Excel: "Xl", PowerPoint: "Pt", Teams: "Tm",
+};
+const symbolOf = (name: string) => {
+  if (symbols[name]) return symbols[name];
+  const letters = name.replace(/[^A-Za-z0-9]/g, "");
+  return letters.charAt(0).toUpperCase() + letters.slice(1, 2).toLowerCase();
+};
+
+// One tint per group (the same family as the project cards), dark to light.
+const tints = [
+  ["#6b4f1d", "#1b1408"],
+  ["#2a5457", "#0b1819"],
+  ["#4a3a6b", "#14101f"],
+  ["#5b5a1f", "#17170a"],
+  ["#6b3a22", "#1d0f08"],
+  ["#2f4d6b", "#0c141d"],
+  ["#5a2f4a", "#180c13"],
+];
+
+const pad = (value: number) => String(value).padStart(2, "0");
+const center = (groups.length - 1) / 2;
+let counter = 0;
+const columns = groups.map((group, gi) => {
+  const [a, b] = tints[gi % tints.length];
+  return {
+    id: group.id,
+    title: group.title,
+    style: `--a:${a};--b:${b}`,
+    tools: group.items.map(([rawName, icon], i) => {
+      const name = rawName ?? "";
+      return {
+        no: pad(++counter),
+        name,
+        icon,
+        symbol: symbolOf(name),
+        // The reveal spreads from the middle of the first row outwards.
+        delay: Math.round(Math.hypot((gi - center) * 1, i * 0.6) * 90),
+      };
+    }),
+  };
+});
 ---
 
-<section class="sk-skills" aria-labelledby="sk-skills-heading" data-sk>
-  <h3 id="sk-skills-heading" class="sk-plate">
-    <span class="sk-plate-text">{title}</span>
-    <span class="sk-cursor" aria-hidden="true"></span>
+<section class="pt" aria-labelledby="pt-heading" data-pt>
+  <h3 id="pt-heading" class="pt-title" data-pt-title>
+    <span class="pt-link pt-link--l" aria-hidden="true"><i class="pt-link-lit"></i><i class="pt-link-spark"></i></span>
+    <span class="pt-link pt-link--r" aria-hidden="true"><i class="pt-link-lit"></i><i class="pt-link-spark"></i></span>
+    <span class="pt-rule pt-rule--l" aria-hidden="true"></span>
+    <span class="pt-title-text">{title}</span>
+    <span class="pt-rule pt-rule--r" aria-hidden="true"></span>
   </h3>
 
-  <div class="sk-grid">
-    {groups.map((group, index) => (
-      <section class="sk-card" style={`--span:${spans[index] ?? 6};--cols:${columns(group.items.length)}`} aria-labelledby={`sk-${group.id}`}>
-        <header class="sk-head">
-          <h4 class="sk-category" id={`sk-${group.id}`}>{group.title}</h4>
-          <span class="sk-count" aria-hidden="true">{String(group.items.length).padStart(2, "0")}</span>
-        </header>
-        <ul class="sk-items">
-          {group.items.map(([name, icon], i) => (
-            <li class="sk-item" style={`--i:${i}`}>
-              <span class="sk-icon" aria-hidden="true">
-                {icon && <img src={`${base}/assets/skills/${icon}`} alt="" width="48" height="48" loading="lazy" decoding="async" />}
-              </span>
-              <span class="sk-name">{name}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ))}
+  <div class="pt-board" data-pt-board>
+    <div class="pt-grid">
+      {columns.map((column) => (
+        <section class="pt-col" style={column.style} aria-labelledby={`pt-${column.id}`}>
+          <header class="pt-head">
+            <h4 class="pt-cat" id={`pt-${column.id}`}>{column.title}</h4>
+          </header>
+          <ul class="pt-list">
+            {column.tools.map((tool) => (
+              <li class="pt-cell" style={`--d:${tool.delay}ms`}>
+                <span class="pt-no" aria-hidden="true">{tool.no}</span>
+                <span class="pt-ic" aria-hidden="true">
+                  {tool.icon && <img src={`${base}/assets/skills/${tool.icon}`} alt="" width="40" height="40" loading="lazy" decoding="async" />}
+                </span>
+                <b class="pt-sym" aria-hidden="true">{tool.symbol}</b>
+                <span class="pt-name">{tool.name}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
   </div>
 </section>
 
 <style>
-  .sk-skills {
-    width: min(100%, 66rem);
+  .pt {
+    width: min(100%, 68rem);
     margin: clamp(3rem, 6vw, 5rem) auto 0;
   }
 
-  /* Heading plate: dark, with the metallic bevel, like /whoami in Sobre mí
-     (which is gold on black); here it is black so it stands out on champagne. */
-  .sk-plate {
+  /* Title: no box, just letters between two gold rules that run towards the
+     corners of the board, each ending in a small diamond. */
+  .pt-title {
     position: relative;
-    isolation: isolate;
     display: flex;
-    align-items: baseline;
-    width: fit-content;
-    margin: 0 auto clamp(1.5rem, 3vw, 2.25rem);
-    padding: 0.65rem 1.2rem 0.7rem;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: linear-gradient(145deg, #1d1a12, #0f0e0a);
-    box-shadow: 0 8px 22px rgb(60 40 5 / 25%);
-    color: #f6e7b8;
-    font-family: var(--font-mono);
-    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
-    font-weight: 600;
-    letter-spacing: 0;
-    line-height: 1.35;
+    align-items: center;
+    gap: clamp(0.7rem, 1.6vw, 1.2rem);
+    width: 100%;
+    margin: 0 0 clamp(1.1rem, 2.4vw, 1.7rem);
+    font-family: var(--font-display);
+    font-size: clamp(0.98rem, 1.45vw, 1.28rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: #2a1f0a;
   }
 
-  .sk-plate::before,
-  .sk-card::before {
+  .pt-title-text {
+    white-space: nowrap;
+    /* cancels the letter-spacing after the last letter so it is truly centred */
+    margin-right: -0.2em;
+  }
+
+  .pt-rule {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 1.5rem;
+    height: 3px;
+  }
+
+  .pt-rule--l {
+    background: linear-gradient(90deg, transparent, #a07a26 35%, #c19b3d 75%, #8f6c24);
+  }
+
+  .pt-rule--r {
+    background: linear-gradient(270deg, transparent, #a07a26 35%, #c19b3d 75%, #8f6c24);
+  }
+
+  .pt-rule::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #c19b3d;
+    box-shadow: 0 0 0 1px #6b4f1d;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .pt-rule--l::after {
+    right: 0;
+  }
+
+  .pt-rule--r::after {
+    left: 0;
+  }
+
+  /* --- Light path from the closing rule of the projects ----------------------
+     With the script on (desktop, with motion) the title is "wired" (pt-wired):
+     two dim threads come down from the diamonds of the rule under the projects
+     to the rules of this title, which are dim too; as the page scrolls, the
+     light runs down the threads (--c), along the rules towards the text (--t)
+     and, at the end, the diamonds of the title light up (is-lit). Without it
+     the title is simply gold. */
+  .pt-link {
+    display: none;
+  }
+
+  .pt-wired {
+    --up: calc(clamp(3rem, 6vw, 5rem) + 0.6em);
+  }
+
+  .pt-wired .pt-link {
+    position: absolute;
+    top: calc(50% - var(--up));
+    left: var(--lx, 0);
+    display: block;
+    width: 3px;
+    height: var(--up);
+    background: linear-gradient(180deg, transparent, rgb(176 138 50 / 55%) 25%, rgb(176 138 50 / 70%));
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .pt-wired .pt-link--r {
+    left: var(--rx, 0);
+  }
+
+  .pt-link-lit {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, #b08a32 25%, #c19b3d);
+    transform: scaleY(var(--c, 1));
+    transform-origin: top;
+  }
+
+  .pt-link-spark {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--c, 1) * (100% - 11px));
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff3c4;
+    box-shadow: 0 0 16px 6px rgb(239 214 131 / 90%);
+    opacity: min(1, calc(var(--c, 1) * 30), calc((1 - var(--c, 1)) * 30));
+    transform: translateX(-50%);
+  }
+
+  .pt-wired .pt-rule--l {
+    background: linear-gradient(90deg, transparent, rgb(176 138 50 / 45%) 35%, rgb(176 138 50 / 55%));
+  }
+
+  .pt-wired .pt-rule--r {
+    background: linear-gradient(270deg, transparent, rgb(176 138 50 / 45%) 35%, rgb(176 138 50 / 55%));
+  }
+
+  /* The lit part of each rule: from where its thread lands (--j, set by the
+     script) towards the text, as far as --t. */
+  .pt-wired .pt-rule::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .pt-wired .pt-rule--l::before {
+    background: linear-gradient(90deg, transparent, #a07a26 35%, #c19b3d 75%, #8f6c24);
+    clip-path: inset(0 calc(100% - var(--j, 0px) - var(--t, 1) * (100% - var(--j, 0px))) 0 var(--j, 0px));
+  }
+
+  .pt-wired .pt-rule--r::before {
+    background: linear-gradient(270deg, transparent, #a07a26 35%, #c19b3d 75%, #8f6c24);
+    clip-path: inset(0 calc(100% - var(--j, 0px)) 0 calc(var(--j, 0px) * (1 - var(--t, 1))));
+  }
+
+  .pt-wired .pt-rule::after {
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    box-shadow: 0 0 0 1px #8f6c24;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .pt-wired.is-lit .pt-rule::after {
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1px #8f6c24,
+      0 0 12px rgb(239 214 131 / 95%),
+      0 0 26px rgb(239 214 131 / 55%);
+    animation: pt-diamond-flash 0.8s ease-out;
+  }
+
+  @keyframes pt-diamond-flash {
+    0% {
+      filter: brightness(2.2);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
+  /* Thick gold bevel, like a plate set into the background. */
+  .pt-board::before {
     content: "";
     position: absolute;
     inset: -1px;
     z-index: 1;
-    padding: 2px;
+    padding: 6px;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    background: linear-gradient(135deg, #efd683 6%, #b08a32 26%, #6b4f1d 40%, #c19b3d 52%, #efd683 72%, #8f6c24 90%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
 
-  .sk-cursor {
-    align-self: center;
-    width: 0.5em;
-    height: 1.1em;
-    margin-left: 0.3rem;
-    border-radius: 1px;
-    background: currentColor;
-    animation: sk-caret 1.1s steps(1) infinite;
+  /* --- Board ----------------------------------------------------------- */
+
+  .pt-board {
+    --mx: 50%;
+    --my: 30%;
+    position: relative;
+    isolation: isolate;
+    padding: clamp(1.3rem, 2.4vw, 1.9rem);
+    border: 1px solid transparent;
+    border-radius: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 70% at 85% 0%, rgb(224 197 139 / 10%), transparent 60%),
+      linear-gradient(145deg, #1d1a13, #0e0d0a);
+    box-shadow:
+      0 0 0 1px #4a3612,
+      0 18px 44px rgb(60 40 5 / 32%),
+      inset 0 0 0 8px rgb(0 0 0 / 45%),
+      inset 0 0 22px rgb(0 0 0 / 55%);
   }
 
-  @keyframes sk-caret {
-    50% {
-      opacity: 0;
+  /* Soft gold light under the pointer. */
+  .pt-board::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(18rem circle at var(--mx) var(--my), rgb(239 214 131 / 14%), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .pt-board:hover::after {
+    opacity: 1;
+  }
+
+  .pt-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: clamp(0.35rem, 0.8vw, 0.6rem);
+  }
+
+  .pt-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.35rem, 0.8vw, 0.6rem);
+    min-width: 0;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  /* Hovering (or focusing) a group lights it and steps the rest back. */
+  @media (hover: hover) and (pointer: fine) {
+    .pt-grid:has(.pt-col:hover) .pt-col:not(:hover),
+    .pt-grid:has(.pt-col:focus-within) .pt-col:not(:focus-within) {
+      opacity: 0.28;
+      filter: grayscale(0.6);
     }
   }
 
-  .sk-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1.1rem;
-  }
-
-  .sk-card {
-    position: relative;
-    isolation: isolate;
-    grid-column: span var(--span);
-    padding: 1.1rem 1.25rem 1.3rem;
-    border: 1px solid transparent;
-    border-radius: 14px;
-    background:
-      radial-gradient(120% 90% at 85% 0%, rgb(224 197 139 / 10%), transparent 60%),
-      linear-gradient(145deg, #1d1a13, #100f0b);
-    box-shadow: 0 14px 34px rgb(60 40 5 / 22%), inset 0 1px 0 rgb(255 240 190 / 12%);
-  }
-
-  .sk-head {
+  .pt-head {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    min-height: 3.4rem;
+    padding: 0 0.15rem 0.45rem;
+    border-bottom: 1px solid rgb(224 197 139 / 28%);
   }
 
-  .sk-category {
+
+  .pt-cat {
     margin: 0;
     font-family: var(--font-display);
-    font-size: 1.02rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.3;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.2;
     color: #f3e6bf;
     overflow-wrap: anywhere;
   }
 
-  .sk-count {
-    padding: 0.15rem 0.55rem;
-    border: 1px solid rgb(224 197 139 / 35%);
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: #d8c58b;
-  }
-
-  .sk-items {
-    display: grid;
-    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-    gap: 1rem 0.6rem;
+  .pt-list {
+    display: flex;
+    flex-direction: column;
+    gap: inherit;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .sk-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.45rem;
-    min-width: 0;
-    text-align: center;
+  /* --- Tile ------------------------------------------------------------ */
+
+  .pt-cell {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr auto;
+    align-items: start;
+    height: 5.5rem;
+    padding: 0.4rem 0.45rem 0.4rem 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--a) 40%, rgb(224 197 139 / 40%));
+    border-radius: 9px;
+    background:
+      radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--a) 70%, transparent), transparent 65%),
+      linear-gradient(160deg, var(--a), var(--b));
+    box-shadow: inset 0 1px 0 rgb(255 240 190 / 18%), 0 4px 10px rgb(0 0 0 / 28%);
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease, border-color 0.25s ease;
   }
 
-  .sk-icon {
+  .pt-no {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    color: rgb(243 230 191 / 70%);
+  }
+
+  .pt-ic {
     display: grid;
     place-items: center;
-    width: 3.2rem;
-    height: 3.2rem;
-    padding: 0.6rem;
-    border-radius: 0.85rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    padding: 0.28rem;
+    border-radius: 0.5rem;
     background: #efede7;
-    box-shadow: 0 6px 14px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 70%);
-    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 35%), inset 0 1px 0 rgb(255 255 255 / 70%);
   }
 
-  .sk-icon img {
+  .pt-ic img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  .sk-name {
-    font-size: 0.7rem;
-    line-height: 1.25;
-    color: #b9bdc0;
-    overflow-wrap: anywhere;
-    transition: color 0.25s ease;
+  .pt-sym {
+    grid-column: 1 / -1;
+    align-self: end;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #efd683;
+    text-shadow: 0 1px 0 #3a2a10, 0 0 14px rgb(239 214 131 / 25%);
+  }
+
+  .pt-name {
+    grid-column: 1 / -1;
+    margin-top: 0.15rem;
+    font-size: 0.66rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #d9cba0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .sk-item:hover .sk-icon {
-      transform: translateY(-5px) scale(1.07);
-      box-shadow: 0 12px 22px rgb(0 0 0 / 45%), 0 0 0 1px rgb(239 214 131 / 70%), 0 0 20px rgb(239 214 131 / 40%);
-    }
-
-    .sk-item:hover .sk-name {
-      color: #f3e6bf;
+    .pt-cell:hover {
+      z-index: 3;
+      transform: translateY(-4px) scale(1.07);
+      border-color: #efd683;
+      box-shadow: inset 0 1px 0 rgb(255 240 190 / 30%), 0 14px 24px rgb(0 0 0 / 45%), 0 0 22px rgb(239 214 131 / 38%);
     }
   }
 
-  /* Entrance (only with script and motion): the cards' items rise in turn as
-     each card comes into view. Without it, everything is simply visible. */
-  .sk-skills.sk-js .sk-item,
-  .sk-skills.sk-js .sk-head {
-    transition: opacity 0.5s ease calc(var(--i, 0) * 45ms), transform 0.5s cubic-bezier(0.23, 1, 0.32, 1) calc(var(--i, 0) * 45ms);
-  }
+  /* --- Foot ------------------------------------------------------------ */
 
-  .sk-skills.sk-js .sk-card:not(.is-in) .sk-item,
-  .sk-skills.sk-js .sk-card:not(.is-in) .sk-head {
+
+
+  /* --- Entrance (only with script and motion): the tiles light up in a wave
+     from the middle. Without it everything is simply visible. -------------- */
+
+  .pt.pt-js .pt-board:not(.is-in) .pt-cell {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px) scale(0.9);
   }
+
+  .pt.pt-js .pt-board.is-in .pt-cell {
+    animation: pt-in 0.7s cubic-bezier(0.23, 1, 0.32, 1) var(--d, 0ms) backwards;
+  }
+
+  @keyframes pt-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.9);
+      filter: brightness(1.8);
+    }
+    55% {
+      opacity: 1;
+      filter: brightness(1.5);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  /* --- Narrow screens: each group becomes a block of tiles -------------- */
 
   @media (max-width: 899px) {
-    .sk-card {
-      grid-column: 1 / -1;
+    .pt-grid {
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
     }
 
-    .sk-items {
-      grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
+    .pt-head {
+      min-height: 0;
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: flex-start;
+      gap: 0.6rem;
     }
+
+    .pt-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr));
+    }
+
+    .pt-cell {
+      height: 4.8rem;
+      padding: 0.35rem 0.4rem 0.35rem 0.45rem;
+    }
+
+    .pt-ic {
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0.22rem;
+    }
+
+    .pt-sym {
+      font-size: 1.3rem;
+    }
+
+    .pt-name {
+      font-size: 0.62rem;
+    }
+
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sk-cursor {
-      animation: none;
+    .pt-cell,
+    .pt-col {
+      transition: none;
     }
   }
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>("[data-sk]").forEach((root) => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
-    root.classList.add("sk-js");
+  document.querySelectorAll<HTMLElement>("[data-pt]").forEach((root) => {
+    const board = root.querySelector<HTMLElement>("[data-pt-board]");
+    if (!board) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // The light that follows the pointer (fine pointers only).
+    if (!reduced && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      let frame = 0;
+      let x = 0;
+      let y = 0;
+      board.addEventListener(
+        "pointermove",
+        (event) => {
+          const rect = board.getBoundingClientRect();
+          x = event.clientX - rect.left;
+          y = event.clientY - rect.top;
+          if (frame) return;
+          frame = requestAnimationFrame(() => {
+            frame = 0;
+            board.style.setProperty("--mx", `${x}px`);
+            board.style.setProperty("--my", `${y}px`);
+          });
+        },
+        { passive: true }
+      );
+    }
+
+    // The wave on first sight.
+    if (reduced || !("IntersectionObserver" in window)) return;
+    root.classList.add("pt-js");
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          observer.unobserve(entry.target);
+          board.classList.add("is-in");
+          observer.disconnect();
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.12 }
     );
-    root.querySelectorAll(".sk-card").forEach((card) => observer.observe(card));
+    observer.observe(board);
   });
+</script>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // The light path from the closing rule of the projects (its two diamonds
+  // light up when the row has been seen to its end, see ShowcaseSection) down
+  // to the rules and diamonds of this title, driven by the scroll.
+  const title = document.querySelector<HTMLElement>("[data-pt-title]");
+  const foot = document.querySelector<HTMLElement>(".sc-foot");
+  if (title && foot) {
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+      const ruleL = title.querySelector<HTMLElement>(".pt-rule--l");
+      const ruleR = title.querySelector<HTMLElement>(".pt-rule--r");
+      if (!ruleL || !ruleR) return;
+      title.classList.add("pt-wired");
+
+      // Where the threads land: straight under the diamonds of the closing rule.
+      const layout = () => {
+        const t = title.getBoundingClientRect();
+        const f = foot.getBoundingClientRect();
+        // The diamonds are 0.4rem wide: the left one starts at 8 %, the right
+        // one ends at 92 %.
+        const lx = f.left + f.width * 0.08 + 3.2 - t.left;
+        const rx = f.left + f.width * 0.92 - 3.2 - t.left;
+        title.style.setProperty("--lx", `${lx}px`);
+        title.style.setProperty("--rx", `${rx}px`);
+        ruleL.style.setProperty("--j", `${lx - (ruleL.getBoundingClientRect().left - t.left)}px`);
+        ruleR.style.setProperty("--j", `${rx - (ruleR.getBoundingClientRect().left - t.left)}px`);
+      };
+      layout();
+      ScrollTrigger.addEventListener("refresh", layout);
+      window.addEventListener("resize", layout);
+
+      // The path runs by TIME, like the thread of the projects' head: once
+      // the diamonds of the closing rule are lit (the row has been seen to its
+      // end) and the title has come up a little, the light runs down the two
+      // threads (RUN_THREADS s), along the rules to the text (RUN_RULES s) and
+      // the diamonds of the title light up with a flash. It never starts
+      // before the closing rule is lit, however fast the user scrolls.
+      const START_AT = 665; // px from the top of the screen to the top of the title
+      const RUN_THREADS = 1.2;
+      const RUN_RULES = 0.9;
+      gsap.set(title, { "--c": 0, "--t": 0 });
+      const run = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power1.inOut" },
+        onComplete: () => title.classList.add("is-lit"),
+      });
+      run.to(title, { "--c": 1, duration: RUN_THREADS }).to(title, { "--t": 1, duration: RUN_RULES });
+
+      let done = foot.classList.contains("is-done");
+      let inRange = false;
+      let want = false;
+      const sync = (instant = false) => {
+        const next = done && inRange;
+        if (next === want && !instant) return;
+        want = next;
+        if (want) {
+          if (instant) {
+            run.progress(1);
+            title.classList.add("is-lit");
+          } else run.timeScale(1).play();
+        } else {
+          title.classList.remove("is-lit");
+          if (instant) run.progress(0);
+          else run.timeScale(2.5).reverse();
+        }
+      };
+      const onDone = (event: Event) => {
+        done = (event as CustomEvent<{ done: boolean }>).detail.done;
+        sync();
+      };
+      window.addEventListener("sc-rail-done", onDone);
+      const trigger = ScrollTrigger.create({
+        trigger: title,
+        start: `top ${START_AT}px`,
+        end: "max",
+        // Measured after the row's pin (refreshPriority -2) is in place.
+        refreshPriority: -3,
+        onEnter: () => {
+          inRange = true;
+          sync();
+        },
+        onLeaveBack: () => {
+          inRange = false;
+          sync();
+        },
+        onRefresh: (self) => {
+          inRange = self.isActive;
+          done = foot.classList.contains("is-done");
+          sync(true);
+        },
+      });
+
+      return () => {
+        trigger.kill();
+        window.removeEventListener("sc-rail-done", onDone);
+        ScrollTrigger.removeEventListener("refresh", layout);
+        window.removeEventListener("resize", layout);
+        title.classList.remove("pt-wired", "is-lit");
+      };
+    });
+  }
 </script>

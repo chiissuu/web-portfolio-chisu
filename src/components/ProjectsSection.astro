@@ -9,6 +9,7 @@ import ShowcaseSection from "./ShowcaseSection.astro";
 import ProjectCard from "./ProjectCard.astro";
 import ProjectMoreCard from "./ProjectMoreCard.astro";
 import SkillsStack from "./SkillsStack.astro";
+import ProjectArt from "./ProjectArt.astro";
 
 interface Props {
   t: ProjectsSectionContent & AboutSectionContent;
@@ -24,9 +25,27 @@ const keys = t.projects.noteStrong ?? [];
 const noteParts = keys.length
   ? t.projects.note.split(new RegExp(`(${keys.map(escape).join("|")})`, "g")).filter(Boolean)
   : [t.projects.note];
+
+// Taken from the projects themselves so it follows the content: the
+// illustrations of the first two projects (the ones listed first are the ones
+// featured) at the sides of the head.
+const [left, right] = t.projects.items.filter((project) => project.art);
 ---
 
 <ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} backdrop="champagne" rail iris center>
+  <Fragment slot="deco">
+    {left && (
+      <div class="pj-motif pj-motif--l" data-deco-l>
+        <ProjectArt kind={left.art ?? ""} />
+      </div>
+    )}
+    {right && (
+      <div class="pj-motif pj-motif--r" data-deco-r>
+        <ProjectArt kind={right.art ?? ""} />
+      </div>
+    )}
+  </Fragment>
+
   <p slot="intro">
     {noteParts.map((part) => (keys.includes(part) ? <strong>{part}</strong> : part))}
   </p>
@@ -49,3 +68,36 @@ const noteParts = keys.length
 
   <SkillsStack slot="after" title={t.about.skillsTitle} groups={t.about.skillGroups} base={base} />
 </ShowcaseSection>
+
+<style>
+  /* The illustrations of the first two projects, large and faint. */
+  .pj-motif {
+    position: absolute;
+    top: 4%;
+    width: clamp(7rem, 21%, 20rem);
+    color: rgb(150 112 34 / 62%);
+    will-change: transform;
+  }
+
+  .pj-motif--l {
+    left: -5rem;
+  }
+
+  .pj-motif--r {
+    right: -3.5rem;
+    top: 10%;
+  }
+
+  /* The illustrations knock their lines out with a dark fill; here the
+     background is champagne. */
+  .pj-motif :global(circle[fill="#0f0e0a"]) {
+    fill: #e6dcc2;
+  }
+
+  .pj-motif :global(.pj-art-svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+</style>
