@@ -66,15 +66,27 @@ const light = backdrop !== "blueprint";
     {rail ? (
       <>
         <div class:list={["sc-head", { "sc-head--center": center }]}>
+          <div class="sc-deco" aria-hidden="true">
+            <slot name="deco" />
+          </div>
           <SectionHeadingCard text={title} image={titleImage} halo={!light} as="h2" size="lg" />
 
           <div class="sc-intro editorial-text">
             <slot name="intro" />
           </div>
+
+          {center && (
+            <div class="sc-thread" data-sc-thread aria-hidden="true">
+              <i class="sc-thread-line"></i>
+              <i class="sc-thread-spark"></i>
+              <i class="sc-thread-node"></i>
+            </div>
+          )}
         </div>
 
         <div class="sc-pin" data-sc-pin>
         <div class="sc-progress" data-sc-progress aria-hidden="true">
+          <span class="sc-rule"><i data-sc-bar-l></i></span>
           <span class="sc-count"><b data-sc-count>01</b> / <span data-sc-total>06</span></span>
           <span class="sc-bar"><i data-sc-bar></i></span>
         </div>
@@ -84,6 +96,8 @@ const light = backdrop !== "blueprint";
             <slot />
           </div>
         </div>
+
+        <div class="sc-foot" aria-hidden="true"></div>
         </div>
       </>
     ) : (
@@ -126,6 +140,11 @@ const light = backdrop !== "blueprint";
 
   .sc-section.section-theme-warm {
     background: #e6dcc2;
+  }
+
+  /* While the iris plays by itself (see initIris) the page does not bounce. */
+  :global(html.sc-iris-lock) {
+    overscroll-behavior: none;
   }
 
   .sc-intro {
@@ -296,8 +315,32 @@ const light = backdrop !== "blueprint";
 
   /* --- Centred head (Proyectos) ---------------------------------------- */
 
+  .sc-head {
+    position: relative;
+  }
+
   .sc-head--center {
     text-align: center;
+  }
+
+  /* Decoration behind the head (slot "deco"): above the backdrop, below the
+     title and the introduction; only on desktop, where the sides are empty. */
+  .sc-deco {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .sc-head > :global(:not(.sc-deco)) {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 899px) {
+    .sc-deco {
+      display: none;
+    }
   }
 
   .sc-head--center :global(.shc-art) {
@@ -312,17 +355,28 @@ const light = backdrop !== "blueprint";
     isolation: isolate;
     max-width: 44rem;
     margin-inline: auto;
-    font-family: var(--font-body);
-    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
     font-weight: 500;
-    line-height: 1.55;
+    letter-spacing: -0.012em;
+    line-height: 1.5;
     color: color-mix(in srgb, var(--theme-text) 92%, transparent);
     text-wrap: balance;
   }
 
+  /* The key phrases: bold, with a gold marker stroke behind them. */
   .sc-section--center .sc-intro :global(strong) {
+    padding-inline: 0.12em;
     font-weight: 700;
     color: var(--theme-text);
+    background: linear-gradient(
+      transparent 56%,
+      rgb(224 188 96 / 62%) 56%,
+      rgb(224 188 96 / 62%) 90%,
+      transparent 90%
+    );
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .sc-section--center .sc-intro::before {
@@ -335,13 +389,214 @@ const light = backdrop !== "blueprint";
     pointer-events: none;
   }
 
+  /* Gold thread from the introduction down to the counter: the head leads
+     into the row. It is always there, dim, and a light runs down it as the
+     head scrolls (see --p); the diamond at its end sits where the counter
+     will be born. Only where the row is pinned (desktop, with motion). */
+  .sc-thread {
+    display: none;
+  }
+
+  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+    .sc-section--center .sc-intro {
+      margin-bottom: 1.1rem;
+    }
+
+    .sc-thread {
+      position: relative;
+      display: block;
+      width: 3px;
+      height: clamp(3.4rem, 5.2vw, 4.4rem);
+      margin: 0 auto;
+    }
+
+    .sc-progress {
+      height: 1.75rem;
+    }
+  }
+
+  /* The dim thread, always present; it runs on to the middle of the row. */
+  .sc-thread::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, rgb(176 138 50 / 58%) 38%, rgb(176 138 50 / 72%));
+  }
+
+  /* The lit part: grows with --p. */
+  .sc-thread-line {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, #b08a32 38%, #c19b3d);
+    transform: scaleY(var(--p, 1));
+    transform-origin: top;
+  }
+
+  /* The light at the tip of the thread while it is drawn (see --p). */
+  .sc-thread-spark {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--p, 1) * (100% - 11px));
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff3c4;
+    box-shadow: 0 0 16px 6px rgb(239 214 131 / 90%);
+    opacity: min(1, calc(var(--p, 1) * 30), calc((1 - var(--p, 1)) * 30));
+    transform: translateX(-50%);
+  }
+
+  /* The diamond where the counter will be, at the end of the thread (it covers
+     the rule behind it). Brown until the light of the thread reaches it, then
+     it turns gold; the counter is born from it one scroll later. */
+  .sc-thread-node {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 0.875rem);
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid #8f6c24;
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    box-shadow: 0 2px 6px rgb(60 40 5 / 40%);
+    transform: translate(-50%, -50%) rotate(45deg) scale(var(--ns, 1));
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .sc-thread-node.is-lit {
+    border-color: #fff0b0;
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1.5px #8f6c24,
+      0 0 18px rgb(239 214 131 / 95%),
+      0 0 40px rgb(239 214 131 / 55%);
+    animation: sc-slot-flash 0.7s ease-out;
+  }
+
+  @keyframes sc-slot-flash {
+    0% {
+      filter: brightness(2);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
+  /* Closing rule under the row: thin, so it reads as the end of the row and
+     not as a new title. */
+  .sc-foot {
+    position: relative;
+    height: 1px;
+    margin-top: clamp(1rem, 2vh, 1.4rem);
+    background: linear-gradient(90deg, transparent, rgb(176 138 50 / 75%) 10%, rgb(176 138 50 / 75%) 90%, transparent);
+  }
+
+  .sc-foot::before,
+  .sc-foot::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: #c19b3d;
+    box-shadow: 0 0 0 1px #6b4f1d;
+    transform: translateY(-50%) rotate(45deg);
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  /* Where the row is pinned the two diamonds start dim (brown) and light up
+     gold when the row has been seen to its end (class is-done, see initRail):
+     the light then goes on down to the title of the stack. */
+  .sc-section[data-rail-on] .sc-foot::before,
+  .sc-section[data-rail-on] .sc-foot::after {
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    box-shadow: 0 0 0 1px #8f6c24;
+  }
+
+  .sc-section[data-rail-on] .sc-foot.is-done::before,
+  .sc-section[data-rail-on] .sc-foot.is-done::after {
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1px #8f6c24,
+      0 0 12px rgb(239 214 131 / 95%),
+      0 0 26px rgb(239 214 131 / 55%);
+    animation: sc-foot-flash 0.8s ease-out;
+  }
+
+  @keyframes sc-foot-flash {
+    0% {
+      filter: brightness(2.2);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
+  .sc-foot::before {
+    left: 8%;
+  }
+
+  .sc-foot::after {
+    right: 8%;
+  }
+
   /* Counter and progress line of the row (shown while it slides). */
   .sc-progress {
+    position: relative;
     display: none;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.1rem;
+    width: 100%;
     margin: 0 auto 1rem;
+    --w: 3.4rem;
+  }
+
+  /* The dim rule across the whole row; the counter's slot opens in the middle
+     of it (--m, 0 to 1) when the counter is born. */
+  .sc-progress::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgb(176 138 50 / 55%) 14%, rgb(176 138 50 / 55%) 86%, transparent);
+    transform: translateY(-50%);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 calc(50% - var(--m, 1) * var(--w)),
+      transparent calc(50% - var(--m, 1) * var(--w)),
+      transparent calc(50% + var(--m, 1) * var(--w)),
+      #000 calc(50% + var(--m, 1) * var(--w))
+    );
+    mask-image: linear-gradient(
+      90deg,
+      #000 calc(50% - var(--m, 1) * var(--w)),
+      transparent calc(50% - var(--m, 1) * var(--w)),
+      transparent calc(50% + var(--m, 1) * var(--w)),
+      #000 calc(50% + var(--m, 1) * var(--w))
+    );
+  }
+
+  /* The left half of the progress: it fills away from the counter, as the
+     right half does (the dim rule under both is the row's own). */
+  .sc-rule {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 4rem;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 2px;
+    -webkit-mask-image: linear-gradient(270deg, #000 78%, transparent);
+    mask-image: linear-gradient(270deg, #000 78%, transparent);
+  }
+
+  .sc-rule i {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(270deg, #b08a32, #efd683);
+    transform: scaleX(0);
+    transform-origin: right;
   }
 
   .sc-section[data-rail-on] .sc-progress {
@@ -363,11 +618,13 @@ const light = backdrop !== "blueprint";
 
   .sc-bar {
     position: relative;
-    width: min(18rem, 40%);
-    height: 2px;
+    flex: 1 1 0;
+    min-width: 4rem;
+    height: 3px;
     overflow: hidden;
     border-radius: 2px;
-    background: color-mix(in srgb, var(--theme-text) 18%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent);
+    mask-image: linear-gradient(90deg, #000 78%, transparent);
   }
 
   .sc-bar i {
@@ -492,15 +749,25 @@ const light = backdrop !== "blueprint";
     const track = root.querySelector<HTMLElement>("[data-sc-track]");
     if (!pin || !rail || !track) return;
 
+    const foot = root.querySelector<HTMLElement>(".sc-foot");
+    // Lights (or dims) the diamonds of the closing rule and tells the title of
+    // the stack, which continues the path of light from there.
+    const setDone = (done: boolean) => {
+      if (foot?.classList.contains("is-done") === done) return;
+      foot?.classList.toggle("is-done", done);
+      window.dispatchEvent(new CustomEvent("sc-rail-done", { detail: { done } }));
+    };
     const cards = Array.from(track.querySelectorAll<HTMLElement>("[data-sc-card]"));
     const countEl = root.querySelector<HTMLElement>("[data-sc-count]");
     const totalEl = root.querySelector<HTMLElement>("[data-sc-total]");
     const barEl = root.querySelector<HTMLElement>("[data-sc-bar]");
+    const barLEl = root.querySelector<HTMLElement>("[data-sc-bar-l]");
     const pad = (value: number) => String(value).padStart(2, "0");
     let focused = -1;
     // The progress line, the counter and the card in focus follow the slide.
     const follow = (progress: number) => {
       barEl?.style.setProperty("transform", `scaleX(${progress})`);
+      barLEl?.style.setProperty("transform", `scaleX(${progress})`);
       if (!cards.length) return;
       const index = Math.min(cards.length - 1, Math.round(progress * (cards.length - 1)));
       if (index === focused) return;
@@ -536,6 +803,10 @@ const light = backdrop !== "blueprint";
           invalidateOnRefresh: true,
           refreshPriority: -2,
           onUpdate: (self) => follow(self.progress),
+          // The row has been seen to its end: the diamonds of its closing rule light up.
+          onLeave: () => setDone(true),
+          onEnterBack: () => setDone(false),
+          onRefresh: (self) => setDone(self.progress >= 1),
         },
       });
 
@@ -546,6 +817,115 @@ const light = backdrop !== "blueprint";
         focused = -1;
       };
     });
+
+    // The decoration behind the head drifts slowly while the head passes.
+    const deco = root.querySelector<HTMLElement>(".sc-deco");
+    const head = root.querySelector<HTMLElement>(".sc-head");
+    if (deco && head) {
+      const drift = (selector: string, from: gsap.TweenVars, to: gsap.TweenVars) => {
+        const el = deco.querySelector<HTMLElement>(selector);
+        if (!el) return;
+        gsap.fromTo(el, from, {
+          ...to,
+          ease: "none",
+          scrollTrigger: { trigger: head, start: "top bottom", end: "bottom top", scrub: true },
+        });
+      };
+      mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+        drift("[data-deco-l]", { y: 12 }, { y: -12 });
+        drift("[data-deco-r]", { y: -12 }, { y: 12 });
+      });
+    }
+
+    // The thread and the rule of the row are always there, dim, and a brown
+    // diamond sits at the end of the thread, where the counter will be. The
+    // light runs down the thread by TIME (it starts when the head has scrolled
+    // a little, LIGHT_AT, and takes RUN_TIME s, however fast the user scrolls),
+    // reaches the diamond and turns it gold; the counter is born later, by
+    // scroll (BORN_AT, a little before the row pins), and never before the light has
+    // arrived: the diamond turns into the counter, the rule opens a space for
+    // it and the two halves of the rule light up outwards. Thread-top offsets
+    // below are in px from the top of the screen (the thread is at ~350px when
+    // the iris ends; one wheel notch is about 100px).
+    const LIGHT_AT = 270;
+    const RUN_TIME = 0.9;
+    const BORN_AT = 0;
+    const thread = root.querySelector<HTMLElement>("[data-sc-thread]");
+    if (thread) {
+      mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+        const diamond = thread.querySelector<HTMLElement>(".sc-thread-node");
+        const row = root.querySelector<HTMLElement>(".sc-progress");
+        const count = root.querySelector<HTMLElement>(".sc-progress .sc-count");
+        if (!row || !count || !diamond) return;
+
+        gsap.set(thread, { "--p": 0 });
+        gsap.set(row, { "--m": 0 });
+        gsap.set(count, { autoAlpha: 0, y: -10, scale: 0.7 });
+        // GSAP reads an unset custom property as 0: give it its real start value.
+        gsap.set(diamond, { "--ns": 1 });
+
+        const born = gsap.timeline({ paused: true });
+        born
+          .to(diamond, { "--ns": 0.85, autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 0)
+          .to(row, { "--m": 1, duration: 0.45, ease: "power2.out" }, 0.1)
+          .to(count, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(2.2)" }, 0.15);
+
+        let arrived = false;
+        let wantBorn = false;
+        const tryBorn = () => {
+          if (arrived && wantBorn) born.play();
+        };
+        const run = gsap.to(thread, {
+          "--p": 1,
+          duration: RUN_TIME,
+          ease: "power1.inOut",
+          paused: true,
+          onComplete: () => {
+            arrived = true;
+            diamond.classList.add("is-lit");
+            tryBorn();
+          },
+        });
+
+        ScrollTrigger.create({
+          trigger: thread,
+          start: `top ${LIGHT_AT}px`,
+          end: "max",
+          onEnter: () => run.play(),
+          onLeaveBack: () => {
+            arrived = false;
+            diamond.classList.remove("is-lit");
+            run.reverse();
+          },
+          // Loaded already past it (restored scroll, resize): show it done.
+          onRefresh: (self) => {
+            if (!self.isActive) return;
+            run.progress(1);
+            arrived = true;
+            diamond.classList.add("is-lit");
+          },
+        });
+        ScrollTrigger.create({
+          trigger: thread,
+          start: `top ${BORN_AT}px`,
+          end: "max",
+          onEnter: () => {
+            wantBorn = true;
+            tryBorn();
+          },
+          onLeaveBack: () => {
+            wantBorn = false;
+            born.reverse();
+          },
+          onRefresh: (self) => {
+            if (self.isActive) {
+              wantBorn = true;
+              born.progress(1);
+            }
+          },
+        });
+      });
+    }
 
     // Images and fonts change the widths the travel is measured from.
     window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
@@ -623,8 +1003,19 @@ const light = backdrop !== "blueprint";
       // shows the smaller of the scroll's value and the gate's.
       const gate = { line: 0, ignite: 0, open: 0 };
       let sequence: gsap.core.Timeline | null = null;
+      // True while the autoplay (below) has started the beats itself.
+      let forced = false;
+      const playSequence = (delay: number) => {
+        sequence?.kill();
+        sequence = gsap.timeline({ delay, onUpdate: render });
+        sequence.to(gate, { line: 1, duration: 0.5, ease: "power1.out" });
+        sequence.to(gate, { ignite: 1, duration: 0.25, ease: "none" });
+        sequence.to(gate, { open: 1, duration: 0.7, ease: "none" }, ">-0.05");
+      };
       const onExitLit = (event: Event) => {
         const lit = (event as CustomEvent<{ lit: boolean }>).detail.lit;
+        // The autoplay is already running the beats: do not restart them.
+        if (lit && forced) return;
         sequence?.kill();
         sequence = null;
         if (!lit) {
@@ -632,10 +1023,7 @@ const light = backdrop !== "blueprint";
           render();
           return;
         }
-        sequence = gsap.timeline({ delay: 0.7, onUpdate: render });
-        sequence.to(gate, { line: 1, duration: 0.5, ease: "power1.out" });
-        sequence.to(gate, { ignite: 1, duration: 0.25, ease: "none" });
-        sequence.to(gate, { open: 1, duration: 0.7, ease: "none" }, ">-0.05");
+        playSequence(0.7);
       };
       window.addEventListener("ab-exit-lit", onExitLit);
 
@@ -734,7 +1122,129 @@ const light = backdrop !== "blueprint";
       }
       render();
 
+      // --- Autoplay ------------------------------------------------------
+      // Scrolling down past S0 (the thread's last node at the middle of the
+      // screen) plays the whole scene by itself: the scroll is taken over
+      // and moved to the end of the iris, so a fast scroll cannot skip it.
+      // Scrolling back up past the end of the iris does the same in reverse,
+      // up to just above S0. A scroll speed below MIN_SPEED leaves
+      // the scene to the user's own scroll (0 = always autoplay); anchor
+      // links, keyboard jumps and the scrollbar jump straight through.
+      const MIN_SPEED = 0; // px/s
+      const MAX_SPEED = 15000; // px/s, above this it is a jump, not a scroll
+      const DURATION = 2.5; // s
+      let locked = false;
+      let skipUntil = 0;
+      let sawBelow = window.scrollY < geo.s0;
+      let drive: gsap.core.Timeline | null = null;
+      let failsafe = 0;
+      const pos = { y: 0 };
+      const move = () => window.scrollTo({ top: pos.y, behavior: "instant" as ScrollBehavior });
+      const swallow = (event: Event) => event.preventDefault();
+      const swallowKey = (event: KeyboardEvent) => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) event.preventDefault();
+      };
+      const unlock = () => {
+        if (!locked) return;
+        locked = false;
+        forced = false;
+        window.clearTimeout(failsafe);
+        drive?.kill();
+        drive = null;
+        window.removeEventListener("wheel", swallow);
+        window.removeEventListener("touchmove", swallow);
+        window.removeEventListener("keydown", swallowKey);
+        document.documentElement.classList.remove("sc-iris-lock");
+      };
+      // Safety net: if the scene is still running long after it should be done
+      // (a very slow or throttled page), jump to its end instead of leaving the
+      // user in the middle of it.
+      const finish = () => {
+        if (drive) drive.progress(1);
+        else unlock();
+      };
+      const lockInput = () => {
+        locked = true;
+        window.addEventListener("wheel", swallow, { passive: false });
+        window.addEventListener("touchmove", swallow, { passive: false });
+        window.addEventListener("keydown", swallowKey);
+        document.documentElement.classList.add("sc-iris-lock");
+      };
+      const autoplay = () => {
+        measure();
+        lockInput();
+        // The beats take time after the node lights; if it has not lit yet
+        // (a very fast scroll), start them now.
+        if (!sequence && gate.line < 1) {
+          forced = true;
+          playSequence(0.3);
+        }
+        pos.y = window.scrollY;
+        const back = Math.max(0, pos.y - (geo.s0 + 12));
+        drive = gsap.timeline({ onComplete: unlock });
+        // Overshot by the flick: bring the scroll back to the start first.
+        if (back > 40) {
+          drive.to(pos, { y: geo.s0 + 12, duration: Math.min(0.6, 0.2 + back / 4000), ease: "power2.out", onUpdate: move });
+        }
+        drive.to(pos, { y: geo.s0 + geo.dist, duration: DURATION, ease: "sine.inOut", onUpdate: move });
+        // Never leave the page locked.
+        failsafe = window.setTimeout(finish, (DURATION + 3) * 1000);
+      };
+      // The same, upwards: from the end of the iris back to just above S0.
+      const autoplayUp = () => {
+        measure();
+        lockInput();
+        const top = geo.s0 + geo.dist - 6;
+        pos.y = window.scrollY;
+        const over = Math.max(0, top - 80 - pos.y);
+        drive = gsap.timeline({ onComplete: unlock });
+        // Overshot upwards by the flick: bring the scroll back to the end first.
+        if (over > 0) {
+          drive.to(pos, { y: top, duration: Math.min(0.6, 0.2 + over / 4000), ease: "power2.out", onUpdate: move });
+        }
+        drive.to(pos, { y: geo.s0 - 24, duration: DURATION, ease: "sine.inOut", onUpdate: move });
+        failsafe = window.setTimeout(finish, (DURATION + 3) * 1000);
+      };
+      const onAnchor = (event: MouseEvent) => {
+        const link = (event.target as Element | null)?.closest?.('a[href^="#"], a[href*="/#"]');
+        if (!link) return;
+        skipUntil = performance.now() + 3000;
+        unlock();
+      };
+      document.addEventListener("click", onAnchor, true);
+      const autoplayTrigger = ScrollTrigger.create({
+        start: () => geo.s0 + 6,
+        end: "max",
+        invalidateOnRefresh: true,
+        refreshPriority: -1,
+        onEnter: (self) => {
+          if (locked || performance.now() < skipUntil || !sawBelow) return;
+          const speed = Math.abs(self.getVelocity());
+          if (speed < MIN_SPEED || speed > MAX_SPEED) return;
+          autoplay();
+        },
+        onLeaveBack: () => {
+          sawBelow = true;
+        },
+      });
+      const autoplayUpTrigger = ScrollTrigger.create({
+        start: () => geo.s0 + geo.dist - 6,
+        end: "max",
+        invalidateOnRefresh: true,
+        refreshPriority: -1,
+        onLeaveBack: (self) => {
+          if (locked || performance.now() < skipUntil) return;
+          const speed = Math.abs(self.getVelocity());
+          if (speed < MIN_SPEED || speed > MAX_SPEED) return;
+          autoplayUp();
+        },
+      });
+
       return () => {
+        unlock();
+        autoplayTrigger.kill();
+        autoplayUpTrigger.kill();
+        document.removeEventListener("click", onAnchor, true);
         window.removeEventListener("ab-exit-lit", onExitLit);
         about?.classList.add("section-theme-dark");
         sequence?.kill();
