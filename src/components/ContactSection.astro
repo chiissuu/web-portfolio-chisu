@@ -1,6 +1,7 @@
 ---
-import { Mail } from "lucide-astro";
+import { Mail, Copy } from "lucide-astro";
 import ContactForm from "./ContactForm.astro";
+import ContactBridge from "./ContactBridge.astro";
 import type { ContactSectionContent } from "../lib/content-types";
 import SectionHeadingCard from "./SectionHeadingCard.astro";
 import SectionBackdrop from "./SectionBackdrop.astro";
@@ -10,66 +11,211 @@ interface Props {
 }
 
 const { t } = Astro.props as Props;
-const links = t.contact.links;
+const c = t.contact;
+const links = c.links;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// The channels under the email button. A channel without `href` is shown
+// disabled, like LinkedIn in the sidebar, with its tooltip; it becomes a link
+// as soon as the URL exists (LinkedIn: `links.linkedin`).
+const channels = [
+  { id: "linkedin", label: links.linkedinLabel, href: links.linkedin, tooltip: links.linkedinTooltip },
+  { id: "github", label: links.githubLabel, href: links.github },
+  { id: "linktree", label: links.linktreeLabel, href: links.linktree },
+];
 ---
 
 <section class="section-theme-dark ct-section bd-host" id="contact">
-  <SectionBackdrop kind="dawn" />
+  <SectionBackdrop kind="dawn" edge={false} />
+  <ContactBridge />
   <div class="section-inner">
-    <SectionHeadingCard text={t.contact.title} image={t.contact.titleImage} halo as="h2" size="lg" />
+    <SectionHeadingCard text={c.title} image={c.titleImage} halo as="h2" size="lg" />
 
-    <p class="ct-lead">{t.contact.text}</p>
+    <p class="ct-lead">{c.text}</p>
 
     <div class="ct-layout">
-      <div class="ct-form-card">
-        <ContactForm t={t} />
-      </div>
+      <aside class="ct-card ct-direct" aria-labelledby="ct-direct-title">
+        <h3 class="ct-card-title" id="ct-direct-title">{c.directTitle}</h3>
+        <p class="ct-aside-text">{c.emailIntro}</p>
 
-      <aside class="ct-aside">
-        <p class="ct-aside-text">{t.contact.emailIntro}</p>
-
-        <a class="ct-channel ct-channel-email" href={`mailto:${links.email}`}>
-          <Mail class="ct-channel-icon" size={20} aria-hidden="true" />
-          <span class="ct-channel-label">{links.email}</span>
-          <span class="ct-channel-arrow" aria-hidden="true">&#8599;</span>
+        <a class="ct-metal ct-metal--wide" href={`mailto:${links.email}`}>
+          <Mail class="ct-metal-icon" size={20} aria-hidden="true" />
+          <span>{c.emailButton}</span>
         </a>
 
+        <div class="ct-email-row">
+          <span class="ct-email-addr">{links.email}</span>
+          <button
+            type="button"
+            class="ct-copy"
+            data-copy={links.email}
+            data-copied={c.copiedLabel}
+            data-idle={c.copyLabel}
+          >
+            <Copy size={14} aria-hidden="true" />
+            <span class="ct-copy-label" aria-live="polite">{c.copyLabel}</span>
+          </button>
+        </div>
+
+        <p class="ct-channels-label">{c.channelsLabel}</p>
         <ul class="ct-channels">
-          <li>
-            <!-- LinkedIn: no real URL exists anywhere in the content system, so
-                 this is intentionally not a link — `aria-disabled`, focusable,
-                 with an accessible tooltip (not a permanent "Próximamente"). -->
-            <span
-              class="ct-channel ct-channel-disabled"
-              aria-disabled="true"
-              tabindex="0"
-              aria-describedby="ct-linkedin-tooltip"
-            >
-              <img class="ct-channel-logo" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
-              <span class="ct-channel-label">{links.linkedinLabel}</span>
-              <span class="ct-tooltip" role="tooltip" id="ct-linkedin-tooltip">{links.linkedinTooltip}</span>
-            </span>
-          </li>
-          <li>
-            <a class="ct-channel" href={links.github} target="_blank" rel="noopener noreferrer">
-              <img class="ct-channel-logo" src={`${base}/assets/icons/social/github-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
-              <span class="ct-channel-label">{links.githubLabel}</span>
-              <span class="ct-channel-arrow" aria-hidden="true">&#8599;</span>
-            </a>
-          </li>
-          <li>
-            <a class="ct-channel" href={links.linktree} target="_blank" rel="noopener noreferrer">
-              <img class="ct-channel-logo" src={`${base}/assets/icons/social/linktree-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
-              <span class="ct-channel-label">{links.linktreeLabel}</span>
-              <span class="ct-channel-arrow" aria-hidden="true">&#8599;</span>
-            </a>
-          </li>
+          {channels.map((channel) => (
+            <li>
+              {channel.href ? (
+                <a class="ct-channel" href={channel.href} target="_blank" rel="noopener noreferrer">
+                  <img class="ct-channel-logo" src={`${base}/assets/icons/social/${channel.id}-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+                  <span class="ct-channel-label">{channel.label}</span>
+                  <span class="ct-channel-arrow" aria-hidden="true">&#8599;</span>
+                </a>
+              ) : (
+                <span
+                  class="ct-channel ct-channel-disabled"
+                  aria-disabled="true"
+                  tabindex="0"
+                  aria-describedby={`ct-${channel.id}-tooltip`}
+                >
+                  <img class="ct-channel-logo" src={`${base}/assets/icons/social/${channel.id}-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+                  <span class="ct-channel-label">{channel.label}</span>
+                  <span class="ct-tooltip" role="tooltip" id={`ct-${channel.id}-tooltip`}>{channel.tooltip}</span>
+                </span>
+              )}
+            </li>
+          ))}
         </ul>
       </aside>
+
+      <div class="ct-card ct-form-card">
+        <h3 class="ct-card-title">{c.formTitle}</h3>
+        <ContactForm t={t} />
+      </div>
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* The gold metal button of the page (same finish as the sidebar's and the
+     Servicios one): face, skewed bevel, stationary edge beneath, pressed state.
+     Used by the email button and the form's send button. */
+  .ct-metal {
+    --m-light: #dfc357;
+    --m-face: #c19b3d;
+    --m-shade: #b08a32;
+    --m-base: #49361a;
+    --m-side: #b89036;
+    --m-rim: #efd683;
+    --m-glint: 244 216 126;
+    --m-ink: #211b0e;
+    --m-offset: 0px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    min-height: 3.1rem;
+    padding: 0.85rem 2rem;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--m-ink);
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgb(255 255 255 / 28%);
+    cursor: pointer;
+  }
+
+  .ct-metal > * {
+    transform: translateY(var(--m-offset));
+    transition: transform 140ms ease;
+  }
+
+  .ct-metal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3.5%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--m-glint) / 38%) 23%, rgb(var(--m-glint) / 12%) 47%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--m-light), var(--m-face) 48%, var(--m-shade)) padding-box,
+      linear-gradient(135deg, var(--m-rim) 8%, var(--m-side) 30%, var(--m-base) 48%, var(--m-rim) 72%, var(--m-side)) border-box;
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 65%),
+      inset 0 -1px 2px rgb(0 0 0 / 22%);
+    transform: skewX(-4deg) translateY(var(--m-offset));
+    transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  }
+
+  .ct-metal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    border: 1px solid var(--m-base);
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      var(--m-base),
+      var(--m-side) 16%,
+      var(--m-rim) 28%,
+      var(--m-side) 34%,
+      var(--m-base) 62%,
+      var(--m-side) 84%,
+      var(--m-base)
+    );
+    box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+    transform: skewX(-4deg) translateY(3px);
+  }
+
+  .ct-metal:hover:not(:disabled) {
+    --m-offset: -1px;
+  }
+
+  .ct-metal:hover:not(:disabled)::before {
+    filter: brightness(1.06);
+  }
+
+  .ct-metal:active:not(:disabled) {
+    --m-offset: 2px;
+  }
+
+  .ct-metal:active:not(:disabled)::before {
+    filter: none;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--m-glint) / 14%) 23%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--m-shade), #b38d36) padding-box,
+      linear-gradient(135deg, var(--m-base), var(--m-side) 45%, var(--m-rim) 72%, var(--m-base)) border-box;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 18%),
+      inset 0 2px 4px rgb(0 0 0 / 32%),
+      inset 0 -1px 0 rgb(255 255 255 / 28%);
+  }
+
+  .ct-metal:focus-visible {
+    outline: 2px solid var(--m-rim);
+    outline-offset: 5px;
+  }
+
+  .ct-metal:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .ct-metal--wide {
+    width: 100%;
+  }
+
+  .ct-metal-icon {
+    flex-shrink: 0;
+  }
+</style>
 
 <style>
   /* Dark section; its background is the "dawn" SectionBackdrop layer. */
@@ -83,39 +229,60 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     background: #0b0a09;
   }
 
+  /* Centred head, like the other sections of the journey. */
+  .ct-section :global(.shc-art) {
+    margin-inline: auto;
+  }
+
   .ct-lead {
-    max-width: 46rem;
-    margin: 0 0 clamp(2rem, 4vw, 3rem);
+    max-width: 40rem;
+    margin: 0 auto clamp(2rem, 4vw, 3rem);
+    text-align: center;
     font-family: var(--font-body);
     font-size: clamp(1.1rem, 1.5vw, 1.35rem);
     line-height: 1.6;
     letter-spacing: -0.01em;
     color: var(--theme-text-muted);
-    text-wrap: pretty;
+    text-wrap: balance;
   }
 
   .ct-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: clamp(1.5rem, 3vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: clamp(1.25rem, 2.6vw, 2rem);
     align-items: start;
+    /* Room under the cards for the sunrise into FAQ (see FaqBridge). */
+    margin-bottom: clamp(5rem, 9vw, 8rem);
   }
 
-  /* The form panel is a size container: its fields go to one column when the
-     panel itself is narrow, whatever the viewport width is. */
-  .ct-form-card {
-    container-type: inline-size;
+  .ct-card {
     padding: clamp(1.1rem, 2.4vw, 1.75rem);
     border: 1px solid var(--theme-border);
     border-radius: 14px;
     background: var(--theme-surface);
   }
 
-  .ct-aside {
+  /* The form panel is a size container: its fields go to one column when the
+     panel itself is narrow, whatever the viewport width is. */
+  .ct-form-card {
+    container-type: inline-size;
+  }
+
+  .ct-direct {
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
     min-width: 0;
+  }
+
+  .ct-card-title {
+    margin: 0 0 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-brand-gold);
   }
 
   .ct-aside-text {
@@ -125,11 +292,70 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     color: var(--theme-text-muted);
   }
 
+  /* The address on its own line (it never breaks mid-word), the copy button
+     under it. */
+  .ct-email-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 0.8rem;
+    min-width: 0;
+  }
+
+  .ct-email-addr {
+    flex: 1 1 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--theme-text);
+  }
+
+  .ct-copy {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 999px;
+    background: var(--theme-surface-strong);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--theme-text);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .ct-copy:hover {
+    border-color: var(--color-brand-gold);
+  }
+
+  .ct-copy.is-copied {
+    border-color: var(--color-brand-gold);
+    color: var(--color-brand-gold);
+  }
+
+  .ct-copy:focus-visible {
+    outline: 2px solid var(--color-brand-gold);
+    outline-offset: 3px;
+  }
+
+  .ct-channels-label {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+  }
+
   .ct-channels {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
-    margin: 0.4rem 0 0;
+    gap: 0.6rem;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
@@ -140,25 +366,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     align-items: center;
     gap: 0.8rem;
     min-width: 0;
-    min-height: 3.4rem;
-    padding: 0.8rem 1.1rem;
+    min-height: 3rem;
+    padding: 0.65rem 1rem;
     border: 1px solid var(--theme-border);
     border-radius: 12px;
     background: var(--theme-surface);
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     color: var(--theme-text);
     text-decoration: none;
     transition: border-color 0.25s ease, transform 0.25s ease;
-  }
-
-  .ct-channel-email {
-    font-size: 0.9rem;
-    border-color: rgb(224 197 139 / 45%);
-    background:
-      linear-gradient(135deg, rgba(138, 106, 31, 0.16), transparent 60%),
-      var(--theme-surface);
   }
 
   .ct-channel:not(.ct-channel-disabled):hover {
@@ -177,11 +395,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     height: 20px;
   }
 
-  .ct-channel :global(.ct-channel-icon) {
-    flex-shrink: 0;
-    color: var(--color-brand-gold);
-  }
-
   .ct-channel-label {
     flex: 1;
     min-width: 0;
@@ -192,9 +405,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     color: var(--color-brand-gold);
   }
 
+  /* Same as LinkedIn in the sidebar: dimmed, not a link, with its tooltip. */
   .ct-channel-disabled {
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   .ct-tooltip {
@@ -227,3 +441,33 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     }
   }
 </style>
+
+<script>
+  // "Copy": puts the email on the clipboard and says so for a moment.
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+    const label = button.querySelector<HTMLElement>(".ct-copy-label");
+    let timer = 0;
+    button.addEventListener("click", async () => {
+      const text = button.dataset.copy ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      button.classList.add("is-copied");
+      if (label) label.textContent = button.dataset.copied ?? "";
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        button.classList.remove("is-copied");
+        if (label) label.textContent = button.dataset.idle ?? "";
+      }, 1800);
+    });
+  });
+</script>

@@ -16,9 +16,7 @@ export function validateContactForm(data: ContactFormData): FormFieldError[] {
   const required: Array<[keyof ContactFormData, string]> = [
     ["name", "name"],
     ["reason", "reason"],
-    ["subject", "subject"],
     ["message", "message"],
-    ["preferredResponse", "preferredResponse"],
   ];
 
   required.forEach(([key, field]) => {

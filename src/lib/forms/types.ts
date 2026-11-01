@@ -12,9 +12,7 @@ export interface ContactFormData {
   name: string;
   email: string;
   reason: string;
-  subject: string;
   message: string;
-  preferredResponse: string;
 }
 
 export interface ServicesFormData {
