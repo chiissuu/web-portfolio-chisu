@@ -1,0 +1,456 @@
+---
+// The way into Servicios: the path of light of Proyectos goes on. Servicios has
+// no wavy edge: it begins at a straight gold rule with a graduated scale under
+// it (the edge of a drawing sheet). Two threads come down from the lower
+// corners of the stack's plate and reach two diamonds on that rule, inside
+// registration marks; the diamonds turn gold. Two rails then go on down both
+// sides of the section, like the
+// margins of a drawing sheet, to a second pair of diamonds at the closing
+// rule. From the first diamonds a scan line of light runs down the section;
+// the rails light up behind it, and the blueprint grid, the title, the
+// introduction, the cards and the "how I work" strip are drawn in exactly as
+// the line passes them (top to bottom, all with the same clock).
+//
+// It all runs by TIME once the plate has come up (like the head of Proyectos),
+// only on wide desktop (1200px and up) and with motion; without it Servicios is simply there. The
+// rails and diamonds are placed from measured positions (the plate and the
+// section), and the content is narrowed to fit between the rails.
+---
+
+<div class="sb" data-sb aria-hidden="true">
+  <span class="sb-thread sb-thread--l"><i class="sb-lit"></i><i class="sb-spark"></i></span>
+  <span class="sb-thread sb-thread--r"><i class="sb-lit"></i><i class="sb-spark"></i></span>
+  <span class="sb-rail sb-rail--l"><i class="sb-rail-lit"></i></span>
+  <span class="sb-rail sb-rail--r"><i class="sb-rail-lit"></i></span>
+  <i class="sb-node sb-node--l"></i>
+  <i class="sb-node sb-node--r"></i>
+  <i class="sb-node sb-end sb-end--l"></i>
+  <i class="sb-node sb-end sb-end--r"></i>
+  <i class="sb-reg sb-reg--l"></i>
+  <i class="sb-reg sb-reg--r"></i>
+  <i class="sb-scan"></i>
+</div>
+<!-- The boundary itself, always there: a gold rule with a graduated scale
+     under it, where Servicios begins (it replaces the wavy edge). -->
+<div class="sb-sheet" aria-hidden="true">
+  <i class="sb-fade"></i>
+  <i class="sb-theme section-theme-dark"></i>
+  <i class="sb-rule"></i>
+  <i class="sb-ruler"></i>
+</div>
+
+<style is:global>
+  /* Until the scan passes them, the blueprint grid and everything that is
+     drawn in is clipped to what the scan has covered: --sb-p (0 to 1 of the
+     section's height) times --sb-h, minus the element's own top (--rt). */
+  .sb-wired .bd--blueprint .bd-grid,
+  .sb-wired .bd--blueprint .bd-pulse {
+    clip-path: inset(0 0 calc(100% - var(--sb-p, 1) * 100%) 0);
+  }
+
+  .sb-wired:not(.sb-revealed) [data-sb-reveal] {
+    clip-path: inset(0 0 calc(100% - clamp(0px, var(--sb-p, 1) * var(--sb-h, 0px) - var(--rt, 0px), 100%)) 0);
+  }
+</style>
+
+<style>
+  /* The boundary: a straight gold rule at the section's top with a graduated
+     scale under it, like the edge of a drawing sheet. Static (lit) by default;
+     when the bridge is wired it is dim until the light arrives (.sb.is-lit). */
+  .sb-sheet {
+    --fade-h: clamp(8rem, 12vw, 10.5rem);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    height: 0;
+    pointer-events: none;
+  }
+
+  /* The light does not stop dead at the rule: over the end of the section
+     above, champagne goes to the plan's black through gold (a metal darkening,
+     not a grey in between). The stops are eased so no start or end shows. */
+  .sb-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--fade-h);
+    background: linear-gradient(
+      180deg,
+      rgb(193 155 61 / 0%) 0,
+      rgb(193 155 61 / 14%) 18%,
+      rgb(165 125 42 / 42%) 38%,
+      rgb(110 80 28 / 72%) 58%,
+      rgb(52 42 24 / 92%) 78%,
+      #1b1a17 100%
+    );
+  }
+
+  /* Counts as a dark section for the sidebar's per-card text colour from the
+     middle of the fade (its gold), instead of only from the rule. */
+  .sb-theme {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(var(--fade-h) * 0.5);
+    background: none;
+  }
+
+  .sb-rule {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1.5px;
+    height: 3px;
+    background: linear-gradient(90deg, #b08a32, #efd683 12%, #c19b3d 25%, #efd683 38%, #b08a32 50%, #efd683 62%, #c19b3d 75%, #efd683 88%, #b08a32);
+    box-shadow: 0 -2px 10px rgb(239 214 131 / 35%);
+    transition: filter 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .sb-ruler {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1.5px;
+    height: 14px;
+    background-image:
+      linear-gradient(90deg, rgb(224 197 139 / 70%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(224 197 139 / 85%) 1px, transparent 1px);
+    background-size: 16px 6px, 80px 14px;
+    background-repeat: repeat-x;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    transition: opacity 0.5s ease;
+  }
+
+  :global(.sb-wired) .sb-rule {
+    filter: brightness(0.55) saturate(0.8);
+    box-shadow: none;
+  }
+
+  :global(.sb-wired) .sb-ruler {
+    opacity: 0;
+  }
+
+  /* Registration marks: a ring with a cross through it around each diamond,
+     as on the corners of a drawing; dim until the light arrives. */
+  .sb-reg {
+    position: absolute;
+    top: var(--ny);
+    left: var(--lx, 0);
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid rgb(176 138 50 / 55%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .sb-reg--r {
+    left: var(--rx, 0);
+  }
+
+  .sb-reg::before,
+  .sb-reg::after {
+    content: "";
+    position: absolute;
+    background: rgb(176 138 50 / 55%);
+    transition: background 0.5s ease;
+  }
+
+  .sb-reg::before {
+    left: -0.6rem;
+    right: -0.6rem;
+    top: calc(50% - 0.5px);
+    height: 1px;
+  }
+
+  .sb-reg::after {
+    top: -0.6rem;
+    bottom: -0.6rem;
+    left: calc(50% - 0.5px);
+    width: 1px;
+  }
+
+  .sb.is-lit .sb-reg {
+    border-color: rgb(239 214 131 / 85%);
+    box-shadow: 0 0 12px rgb(239 214 131 / 40%);
+  }
+
+  .sb.is-lit .sb-reg::before,
+  .sb.is-lit .sb-reg::after {
+    background: rgb(239 214 131 / 85%);
+  }
+
+  .sb.is-lit + .sb-sheet .sb-rule {
+    filter: none;
+    box-shadow: 0 -2px 10px rgb(239 214 131 / 35%), 0 0 14px rgb(239 214 131 / 45%);
+  }
+
+  .sb.is-lit + .sb-sheet .sb-ruler {
+    opacity: 1;
+  }
+
+  .sb {
+    --ny: 0px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 3;
+    display: none;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .sb.is-wired {
+    display: block;
+  }
+
+  /* The dim thread (always there) from the plate's corner down to its diamond. */
+  .sb-thread {
+    position: absolute;
+    top: calc(-1 * var(--up, 0px));
+    left: var(--lx, 0);
+    width: 3px;
+    height: calc(var(--up, 0px) + var(--ny));
+    background: linear-gradient(180deg, transparent, rgb(176 138 50 / 58%) 22%, rgb(176 138 50 / 72%));
+    transform: translateX(-50%);
+  }
+
+  .sb-thread--r {
+    left: var(--rx, 0);
+  }
+
+  .sb-lit {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, #b08a32 22%, #c19b3d);
+    transform: scaleY(var(--c, 1));
+    transform-origin: top;
+  }
+
+  .sb-spark {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--c, 1) * (100% - 11px));
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff3c4;
+    box-shadow: 0 0 16px 6px rgb(239 214 131 / 90%);
+    opacity: min(1, calc(var(--c, 1) * 30), calc((1 - var(--c, 1)) * 30));
+    transform: translateX(-50%);
+  }
+
+  /* The rails: the threads go on down both sides to the closing rule. Dim
+     always; the scan lights them (--sb-p) as it goes down. */
+  .sb-rail {
+    position: absolute;
+    top: var(--ny);
+    left: var(--lx, 0);
+    width: 3px;
+    height: var(--rh, 0px);
+    overflow: hidden;
+    background: linear-gradient(180deg, rgb(176 138 50 / 62%), rgb(176 138 50 / 38%));
+    transform: translateX(-50%);
+  }
+
+  .sb-rail--r {
+    left: var(--rx, 0);
+  }
+
+  .sb-rail-lit {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: max(0px, calc(var(--sb-p, 1) * var(--sb-h, 0px) - var(--ny)));
+    background: linear-gradient(180deg, #c19b3d, #b08a32);
+  }
+
+  /* The diamonds: brown until the light arrives, then gold with a flash. */
+  .sb-node {
+    position: absolute;
+    top: var(--ny);
+    left: var(--lx, 0);
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid #8f6c24;
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 40%);
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .sb-node--r {
+    left: var(--rx, 0);
+  }
+
+  /* The second pair, where the rails meet the closing rule. */
+  .sb-end {
+    top: calc(var(--ny) + var(--rh, 0px));
+  }
+
+  .sb-end--l {
+    left: var(--lx, 0);
+  }
+
+  .sb-end--r {
+    left: var(--rx, 0);
+  }
+
+  .sb.is-lit .sb-node:not(.sb-end),
+  .sb.is-end .sb-end {
+    border-color: #fff0b0;
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1.5px #8f6c24,
+      0 0 18px rgb(239 214 131 / 95%),
+      0 0 40px rgb(239 214 131 / 55%);
+    animation: sb-flash 0.8s ease-out;
+  }
+
+  @keyframes sb-flash {
+    0% {
+      filter: brightness(2.2);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
+  /* The scan line: a horizontal line of light that runs down the section. */
+  .sb-scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgb(239 214 131 / 25%) 8%, #fff0b0 50%, rgb(239 214 131 / 25%) 92%, transparent);
+    box-shadow: 0 0 18px 3px rgb(239 214 131 / 55%), 0 -18px 40px 6px rgb(239 214 131 / 12%);
+    opacity: var(--so, 0);
+    transform: translateY(calc(var(--sb-p, 1) * var(--sb-h, 0px)));
+    will-change: transform;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const bridge = document.querySelector<HTMLElement>("[data-sb]");
+  const section = bridge?.closest<HTMLElement>("section");
+  const board = document.querySelector<HTMLElement>(".pt-board");
+  const inner = section?.querySelector<HTMLElement>(".sc-inner");
+
+  if (bridge && section && board && inner) {
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 1200px) and (prefers-reduced-motion: no-preference)", () => {
+      // The plate has come up this far (the bottom of the plate, from the top of
+      // the screen as a share of its height) when the light starts.
+      const START_AT = "bottom 62%";
+      const LIT_AT = 1.2; // s: the threads have arrived, the diamonds light up
+      const SCAN = 2.8; // s: the scan line goes from the diamonds to the bottom
+      const INSET = 16; // px: the rails sit this far inside the plate's sides
+
+      const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const targets = Array.from(
+        section.querySelectorAll<HTMLElement>(".shc-art-frame, .sc-intro, .sc-card, .sp, .sv-rule, .sc-cta")
+      );
+      // The closing rule (or, without it, the button) is where the rails end.
+      const cta = section.querySelector<HTMLElement>(".sv-rule") ?? section.querySelector<HTMLElement>(".sc-cta");
+      let endY = 0;
+
+      // Horizontal: independent of the pins above, so it is safe before a
+      // refresh. The rails sit INSET inside the plate; the content is narrowed
+      // so that it fits between them with a gutter.
+      const layoutX = () => {
+        inner.style.paddingLeft = "";
+        inner.style.paddingRight = "";
+        const base = getComputedStyle(inner);
+        const baseL = parseFloat(base.paddingLeft) || 0;
+        const baseR = parseFloat(base.paddingRight) || 0;
+        const b = board.getBoundingClientRect();
+        const i = inner.getBoundingClientRect();
+        const gutter = 1.5 * rem();
+        inner.style.paddingLeft = Math.max(baseL, b.left + INSET + gutter - i.left) + "px";
+        inner.style.paddingRight = Math.max(baseR, i.right - (b.right - INSET - gutter)) + "px";
+      };
+
+      // Vertical: after every pin above is in place.
+      const layoutY = () => {
+        const s = section.getBoundingClientRect();
+        const b = board.getBoundingClientRect();
+        const ny = 0; // the diamonds sit on the boundary rule (see --ny)
+        bridge.style.setProperty("--up", Math.max(0, s.top - b.bottom) + "px");
+        bridge.style.setProperty("--lx", b.left - s.left + INSET + "px");
+        bridge.style.setProperty("--rx", b.right - s.left - INSET + "px");
+        section.style.setProperty("--sb-h", section.offsetHeight + "px");
+        // The rails end at the top of the closing rule (or near the bottom).
+        endY = cta ? cta.getBoundingClientRect().top - s.top : section.offsetHeight - 4 * rem();
+        bridge.style.setProperty("--rh", Math.max(0, endY - ny) + "px");
+        targets.forEach((el) => el.style.setProperty("--rt", el.getBoundingClientRect().top - s.top + "px"));
+      };
+
+      layoutX();
+      layoutY();
+      const onRefreshInit = () => layoutX();
+      ScrollTrigger.addEventListener("refreshInit", onRefreshInit);
+      ScrollTrigger.addEventListener("refresh", layoutY);
+
+      bridge.classList.add("is-wired");
+      section.classList.add("sb-wired");
+      targets.forEach((el) => el.setAttribute("data-sb-reveal", ""));
+
+      // The scan starts on the boundary rule, where the diamonds are.
+      gsap.set(bridge, { "--c": 0, "--so": 0 });
+      gsap.set(section, { "--sb-p": 0 });
+
+      const run = gsap.timeline({
+        paused: true,
+        onUpdate: () => {
+          bridge.classList.toggle("is-lit", run.time() >= LIT_AT);
+          const p = parseFloat(section.style.getPropertyValue("--sb-p")) || 0;
+          bridge.classList.toggle("is-end", p * section.offsetHeight >= endY - 2);
+          // Done: the clips come off (they would cut shadows and focus rings).
+          section.classList.toggle("sb-revealed", run.progress() === 1);
+        },
+      });
+      run
+        .to(bridge, { "--c": 1, duration: LIT_AT, ease: "power1.inOut" }, 0)
+        .to(bridge, { "--so": 1, duration: 0.15, ease: "none" }, LIT_AT)
+        .to(section, { "--sb-p": 1, duration: SCAN, ease: "power1.out" }, LIT_AT + 0.05)
+        .to(bridge, { "--so": 0, duration: 0.5, ease: "none" }, LIT_AT + SCAN - 0.45);
+
+      const trigger = ScrollTrigger.create({
+        trigger: board,
+        start: START_AT,
+        end: "max",
+        // Measured after every pin above it is in place.
+        refreshPriority: -4,
+        onEnter: () => run.timeScale(1).play(),
+        onLeaveBack: () => run.timeScale(2.5).reverse(),
+        // Loaded already past it (restored scroll, resize): show it done.
+        onRefresh: (self) => {
+          if (self.isActive) run.progress(1);
+        },
+      });
+
+      return () => {
+        trigger.kill();
+        ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
+        ScrollTrigger.removeEventListener("refresh", layoutY);
+        bridge.classList.remove("is-wired", "is-lit", "is-end");
+        section.classList.remove("sb-wired", "sb-revealed");
+        inner.style.paddingLeft = "";
+        inner.style.paddingRight = "";
+        targets.forEach((el) => el.removeAttribute("data-sb-reveal"));
+      };
+    });
+  }
+</script>

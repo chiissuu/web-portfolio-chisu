@@ -27,9 +27,14 @@ interface Props {
   iris?: boolean;
   /** Centre the title and the introduction (with a stronger introduction type). */
   center?: boolean;
+  /** `flat`: no wavy edge; the section draws its own boundary (slot "bridge"). */
+  edge?: "wave" | "flat";
+  /** Wrap the default slot in the 3-column card grid (default). A section
+   *  that lays out its own content (slot "after") turns it off. */
+  grid?: boolean;
 }
 
-const { id, title, titleImage, ctaHref, ctaLabel, backdrop, rail = false, iris = false, center = false } = Astro.props as Props;
+const { id, title, titleImage, ctaHref, ctaLabel, backdrop, rail = false, iris = false, center = false, edge = "wave", grid = true } = Astro.props as Props;
 const light = backdrop !== "blueprint";
 ---
 
@@ -61,7 +66,8 @@ const light = backdrop !== "blueprint";
       <span class="sc-iris-node"></span>
     </div>
   )}
-  <SectionBackdrop kind={backdrop} />
+  <SectionBackdrop kind={backdrop} edge={edge !== "flat"} />
+  <slot name="bridge" />
   <div class="section-inner sc-inner">
     {rail ? (
       <>
@@ -108,9 +114,11 @@ const light = backdrop !== "blueprint";
           <slot name="intro" />
         </div>
 
-        <div class="sc-grid">
-          <slot />
-        </div>
+        {grid && (
+          <div class="sc-grid">
+            <slot />
+          </div>
+        )}
       </>
     )}
 
@@ -343,8 +351,145 @@ const light = backdrop !== "blueprint";
     }
   }
 
-  .sc-head--center :global(.shc-art) {
+  .sc-head--center :global(.shc-art),
+  .sc-section--center :global(.shc-art) {
     margin-inline: auto;
+  }
+
+  .sc-section--center .sc-intro {
+    text-align: center;
+  }
+
+  /* On a dark backdrop the introduction is lighter ink on the dark, the key
+     phrases keep a (softer) gold marker, and there is no cream patch. */
+  .sc-section--center.section-theme-dark .sc-intro {
+    color: var(--theme-text-muted);
+  }
+
+  .sc-section--center.section-theme-dark .sc-intro :global(strong) {
+    background: linear-gradient(
+      transparent 60%,
+      rgb(193 155 61 / 38%) 60%,
+      rgb(193 155 61 / 38%) 92%,
+      transparent 92%
+    );
+  }
+
+  .sc-section--center.section-theme-dark .sc-intro::before {
+    display: none;
+  }
+
+  /* Centred sections close with a gold metal button: the same finish as the
+     sidebar's (face, skewed bevel, stationary edge beneath, pressed state). */
+  .sc-section--center .sc-cta {
+    --cta-light: #dfc357;
+    --cta-face: #c19b3d;
+    --cta-shade: #b08a32;
+    --cta-base: #49361a;
+    --cta-side: #b89036;
+    --cta-rim: #efd683;
+    --cta-glint: 244 216 126;
+    --cta-ink: #211b0e;
+    --cta-offset: 0px;
+    position: relative;
+    isolation: isolate;
+    width: fit-content;
+    margin-inline: auto;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 0.95rem 2.4rem;
+    border: 0;
+    border-radius: 3px;
+    color: var(--cta-ink);
+    text-shadow: 0 1px 0 rgb(255 255 255 / 28%);
+    transition: none;
+  }
+
+  .sc-section--center .sc-cta-label,
+  .sc-section--center .sc-cta-arrow {
+    color: var(--cta-ink);
+    transform: translateY(var(--cta-offset));
+    transition: transform 140ms ease;
+  }
+
+  .sc-section--center .sc-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3.5%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--cta-glint) / 38%) 23%, rgb(var(--cta-glint) / 12%) 47%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--cta-light), var(--cta-face) 48%, var(--cta-shade)) padding-box,
+      linear-gradient(135deg, var(--cta-rim) 8%, var(--cta-side) 30%, var(--cta-base) 48%, var(--cta-rim) 72%, var(--cta-side)) border-box;
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 65%),
+      inset 0 -1px 2px rgb(0 0 0 / 22%);
+    transform: skewX(-4deg) translateY(var(--cta-offset));
+    transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  }
+
+  .sc-section--center .sc-cta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    border: 1px solid var(--cta-base);
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      var(--cta-base),
+      var(--cta-side) 16%,
+      var(--cta-rim) 28%,
+      var(--cta-side) 34%,
+      var(--cta-base) 62%,
+      var(--cta-side) 84%,
+      var(--cta-base)
+    );
+    box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+    transform: skewX(-4deg) translateY(3px);
+  }
+
+  .sc-section--center .sc-cta:hover,
+  .sc-section--center .sc-cta:focus-visible {
+    --cta-offset: -1px;
+    gap: 0.9rem;
+    color: var(--cta-ink);
+  }
+
+  .sc-section--center .sc-cta:hover::before {
+    filter: brightness(1.06);
+  }
+
+  .sc-section--center .sc-cta:active {
+    --cta-offset: 2px;
+  }
+
+  .sc-section--center .sc-cta:active::before {
+    filter: none;
+    background:
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 3%) 0 1px, rgb(0 0 0 / 1.5%) 1px 2px) padding-box,
+      linear-gradient(125deg, transparent 22%, rgb(var(--cta-glint) / 14%) 23%, transparent 48%) padding-box,
+      linear-gradient(180deg, var(--cta-shade), #b38d36) padding-box,
+      linear-gradient(135deg, var(--cta-base), var(--cta-side) 45%, var(--cta-rim) 72%, var(--cta-base)) border-box;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 18%),
+      inset 0 2px 4px rgb(0 0 0 / 32%),
+      inset 0 -1px 0 rgb(255 255 255 / 28%);
+  }
+
+  .sc-section--center .sc-cta:focus-visible {
+    outline: 2px solid var(--cta-rim);
+    outline-offset: 5px;
+  }
+
+  .sc-section--center .sc-cta:hover .sc-cta-arrow,
+  .sc-section--center .sc-cta:focus-visible .sc-cta-arrow {
+    transform: translate(4px, var(--cta-offset));
   }
 
   /* Larger, heavier introduction in the body face and near-black ink, with a

@@ -209,6 +209,8 @@ export interface ServiceArticle {
   title: string;
   text: string;
   tags: string[];
+  /** Illustration motif of the home card: flow | web | audit (see ServiceArt.astro). */
+  art?: string;
 }
 
 export interface ServicesFormFields {
@@ -263,6 +265,17 @@ export interface ToolItem {
   text: string;
   tags: string[];
   cta: string;
+  /** Stage of the tool: `available` | `building` | `soon`. A fixed key (not the
+   * label) so the home catalog can colour and filter by it; `status` stays the
+   * human label in each language. */
+  state: string;
+  /** Group of the tool (label in each language). The home catalog builds its
+   * filter chips from the distinct values, so a new category needs no code. */
+  category: string;
+  /** Shown first and wide in the home catalog. */
+  featured?: boolean;
+  /** Icon motif of the card: video | social (see ToolArt.astro). */
+  art?: string;
   /** Relative path (no BASE_URL prefix — `ToolsPageContent.astro` applies
    * `withBase()` itself, same as every other internal link in this project)
    * to the tool's own page. Omitted for placeholder/"coming soon" tools
@@ -305,12 +318,39 @@ export interface ServicesToolsTextSegment {
   strong?: boolean;
 }
 
+/** One step of the "how I work" strip under the service cards. */
+export interface ServicesProcessStep {
+  title: string;
+  text: string;
+}
+
+export interface ServicesProcess {
+  title: string;
+  steps: readonly ServicesProcessStep[];
+}
+
 export interface ServicesToolsServicesColumn {
   /** Accessible heading text; the visual title is `titleImage` when present. */
   title: string;
   titleImage?: TitleImage;
   description: readonly ServicesToolsTextSegment[];
+  process: ServicesProcess;
+  /** Closing link of the section (goes to the contact section). */
   ctaLabel: string;
+}
+
+/** Texts of the home tools catalog (filters, counter, "show all"). */
+export interface ToolsCatalogCopy {
+  /** First filter chip: the featured tools (the view the catalog opens on). */
+  filterFeatured: string;
+  /** Accessible name of the chip group. */
+  categoriesLabel: string;
+  /** "Show all (N)" button; `{n}` is replaced by the number of tools. */
+  moreLabel: string;
+  lessLabel: string;
+  emptyLabel: string;
+  /** [singular, plural] words of the counter line. */
+  count: { tools: string[]; available: string[] };
 }
 
 export interface ServicesToolsToolsColumn {
@@ -318,6 +358,7 @@ export interface ServicesToolsToolsColumn {
   title: string;
   titleImage?: TitleImage;
   description: string;
+  catalog: ToolsCatalogCopy;
   ctaLabel: string;
 }
 
@@ -354,6 +395,9 @@ export interface ContactLinks {
    * intentionally `aria-disabled`, not a real link, and shows this text as
    * an accessible tooltip on hover/focus instead of a permanent "Próximamente". */
   linkedinTooltip: string;
+  /** Optional: when a LinkedIn URL exists, the Contact section turns its
+   * disabled card into a real link (the sidebar still needs the same change). */
+  linkedin?: string;
 }
 
 export interface ContactFormFields {
@@ -361,15 +405,15 @@ export interface ContactFormFields {
   email: string;
   reason: string;
   reasonOptions: string[];
-  subject: string;
   message: string;
-  preferredResponse: string;
-  preferredResponseOptions: string[];
 }
 
 export interface ContactFormCopy {
+  /** Line above the fields: says what "send" does (opens the mail app). */
+  notice: string;
   submitIdle: string;
   submitLoading: string;
+  /** Shown after the mail app has been asked to open. */
   submitSuccess: string;
   submitError: string;
   fields: ContactFormFields;
@@ -379,13 +423,22 @@ export interface ContactContent {
   eyebrow: string;
   title: string;
   titleImage?: TitleImage;
+  /** Short line under the title. */
   text: string;
-  /** The line introducing the mailto fallback button below the form. */
+  /** Title and line of the "write to me directly" card. */
+  directTitle: string;
   emailIntro: string;
+  /** Label of the gold email button, and of the copy button before / after copying. */
+  emailButton: string;
+  copyLabel: string;
+  copiedLabel: string;
+  /** Label above the channel buttons. */
+  channelsLabel: string;
+  /** Title of the message form card. */
+  formTitle: string;
   links: ContactLinks;
   form: ContactFormCopy;
 }
-
 export interface ContactSectionContent {
   contact: ContactContent;
 }
@@ -395,17 +448,25 @@ export interface ContactSectionContent {
 export interface FaqItem {
   q: string;
   a: string;
+  /** Optional shortcut under the answer (an internal section or page). */
+  link?: { label: string; href: string };
 }
 
 export interface FaqContent {
   eyebrow: string;
   title: string;
   titleImage?: TitleImage;
+  /** Short line under the title. */
+  lead: string;
   items: FaqItem[];
+  /** The "your question is not here?" line and its link to Contact. */
+  more: { text: string; linkLabel: string; href: string };
 }
 
 export interface FaqSectionContent {
   faq: FaqContent;
+  /** The last words of the page, under the questions. */
+  closing: ClosingContent;
 }
 
 // ---- Video converter tool ---------------------------------------------------------
@@ -501,6 +562,8 @@ export interface VideoConverterSectionContent {
 export interface ClosingContent {
   text: string;
   signature: string;
+  /** Accessible name of the round "back to top" button. */
+  topLabel: string;
 }
 
 export interface ClosingStatementContent {
