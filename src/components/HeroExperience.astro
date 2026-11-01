@@ -3207,8 +3207,11 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           let maxOverlap = 0;
           darkSections.forEach((section) => {
             const secRect = section.getBoundingClientRect();
+            // A dark section can declare (data-theme-trim, px) that its last
+            // stretch already reads light (the gradient out of Servicios).
+            const secBottom = secRect.bottom - (Number(section.dataset.themeTrim) || 0);
             const overlapTop = Math.max(artRect.top, secRect.top);
-            const overlapBottom = Math.min(artRect.bottom, secRect.bottom);
+            const overlapBottom = Math.min(artRect.bottom, secBottom);
             const overlap = Math.max(0, overlapBottom - overlapTop);
             if (overlap > maxOverlap) maxOverlap = overlap;
           });

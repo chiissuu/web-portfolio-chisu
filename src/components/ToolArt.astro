@@ -1,0 +1,57 @@
+---
+// Gold line icons for the tool cards of the home page, one motif per `art`
+// value (see ToolItem). Square (120x120) so the same drawing works as a small
+// badge and as the large icon of a featured tool. Decorative: the card's text
+// says what the tool is. Unknown values draw a generic gear.
+interface Props {
+  kind?: string;
+}
+
+const { kind } = Astro.props as Props;
+const teeth = Array.from({ length: 8 }, (_, i) => (i / 8) * Math.PI * 2);
+---
+
+<svg
+  class="ta-svg"
+  viewBox="0 0 120 120"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="4"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  focusable="false"
+  aria-hidden="true"
+>
+  {kind === "video" && (
+    <>
+      <rect x="8" y="26" width="62" height="48" rx="8" />
+      <path d="M32 40l20 10-20 10z" fill="currentColor" fill-opacity="0.45" />
+      <path d="M76 50h16M86 44l6 6-6 6" />
+      <path d="M108 38v30" />
+      <circle cx="101" cy="70" r="7" fill="currentColor" fill-opacity="0.45" />
+      <path d="M108 38l9 5" />
+      <path d="M16 92v10M28 86v22M40 94v8M52 82v30M64 90v14" stroke-opacity="0.55" />
+    </>
+  )}
+  {kind === "social" && (
+    <>
+      <path d="M12 98l26-24 20 9 28-40" />
+      <path d="M68 40h18v18" />
+      <circle cx="12" cy="98" r="6" fill="currentColor" fill-opacity="0.45" />
+      <circle cx="38" cy="74" r="6" fill="currentColor" fill-opacity="0.45" />
+      <circle cx="58" cy="83" r="6" fill="currentColor" fill-opacity="0.45" />
+      <path d="M96 18v14M89 25h14" stroke-opacity="0.7" />
+      <path d="M20 22v8M16 26h8" stroke-opacity="0.5" />
+      <path d="M12 110h96" stroke-opacity="0.35" />
+    </>
+  )}
+  {kind !== "video" && kind !== "social" && (
+    <>
+      <circle cx="60" cy="60" r="18" />
+      <circle cx="60" cy="60" r="6" fill="currentColor" fill-opacity="0.45" />
+      {teeth.map((a) => (
+        <path d={`M${60 + Math.cos(a) * 26} ${60 + Math.sin(a) * 26}L${60 + Math.cos(a) * 38} ${60 + Math.sin(a) * 38}`} />
+      ))}
+    </>
+  )}
+</svg>

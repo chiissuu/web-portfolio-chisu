@@ -1,0 +1,507 @@
+---
+// The home "Tools" catalog, built to grow: the list will get long and new tools
+// are added all the time, so nothing here is counted or listed by hand.
+//   - It opens on "Featured": only the best `featuredLimit` tools (the ones
+//     marked `featured`, in written order), so a long list never opens as a
+//     cascade. The other chips are the categories, built from the data (a new
+//     category needs no code).
+//   - A category shows its first `limit` tools until "Show all (N)" is pressed.
+//   - A single tool in view is shown wide; several flow as compact cards that
+//     centre, so a short last row is not left-aligned.
+//   - Without script every card is simply shown and the chips are hidden.
+import { withBase } from "../lib/paths.js";
+import type { ToolItem, ToolsCatalogCopy } from "../lib/content-types";
+import ToolArt from "./ToolArt.astro";
+
+interface Props {
+  items: readonly ToolItem[];
+  copy: ToolsCatalogCopy;
+  /** How many tools of a category are shown before "Show all". */
+  limit?: number;
+  /** How many tools the "Featured" view shows at most. */
+  featuredLimit?: number;
+}
+
+const { items, copy, limit = 6, featuredLimit = 3 } = Astro.props as Props;
+
+// Featured first; `sort` is stable, so the written order is kept inside each group.
+const sorted = [...items].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
+const categories = [...new Set(sorted.map((item) => item.category).filter(Boolean))];
+const hasFeatured = sorted.some((item) => item.featured);
+
+const word = (n: number, [one, many]: string[]) => (n === 1 ? one : many);
+const availableCount = items.filter((item) => item.state === "available").length;
+const countText = `${items.length} ${word(items.length, copy.count.tools)} · ${availableCount} ${word(availableCount, copy.count.available)}`;
+---
+
+<div
+  class="tc"
+  data-tc
+  data-limit={limit}
+  data-featured-limit={featuredLimit}
+  data-more={copy.moreLabel}
+  data-less={copy.lessLabel}
+>
+  <div class="tc-bar">
+    <p class="tc-count">{countText}</p>
+
+    {(categories.length > 1 || hasFeatured) && (
+      <div class="tc-chips" role="group" aria-label={copy.categoriesLabel}>
+        {hasFeatured && (
+          <button type="button" class="tc-chip is-on" data-value="__featured" aria-pressed="true">{copy.filterFeatured}</button>
+        )}
+        {categories.map((category, index) => (
+          <button
+            type="button"
+            class:list={["tc-chip", { "is-on": !hasFeatured && index === 0 }]}
+            data-value={category}
+            aria-pressed={!hasFeatured && index === 0 ? "true" : "false"}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <ul class="tc-list">
+    {sorted.map((item) => (
+      <li
+        class:list={["tc-card", { "is-link": !!item.href }]}
+        data-cat={item.category}
+        data-featured={item.featured ? "true" : "false"}
+        data-state={item.state}
+      >
+        <div class="tc-art" aria-hidden="true"><ToolArt kind={item.art} /></div>
+        <div class="tc-body">
+          <p class="tc-meta" data-state={item.state}>
+            <i class="tc-led" aria-hidden="true"></i>{item.status}<span class="tc-sep" aria-hidden="true">·</span><span class="tc-cat">{item.category}</span>
+          </p>
+          <h3 class="tc-title">
+            {item.href ? <a class="tc-link" href={withBase(item.href)}>{item.title}</a> : item.title}
+          </h3>
+          <p class="tc-text">{item.text}</p>
+          <ul class="tc-tags">
+            {item.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+          <p class="tc-cta">
+            <span>{item.cta}</span>
+            {item.href && <span class="tc-cta-arrow" aria-hidden="true">&#8594;</span>}
+          </p>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <p class="tc-empty" hidden>{copy.emptyLabel}</p>
+  <button type="button" class="tc-more" hidden></button>
+</div>
+
+<style>
+  .tc {
+    --tc-available: #3f8f4a;
+    --tc-building: #c8921f;
+    --tc-soon: #8c8576;
+    margin-top: clamp(0.4rem, 1.5vw, 1rem);
+  }
+
+  /* --- Toolbar ---------------------------------------------------------- */
+  .tc-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem 1.4rem;
+  }
+
+  .tc-count {
+    flex-basis: 100%;
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--theme-accent, var(--color-brand-gold));
+  }
+
+  /* Filters need script: without it the bar only keeps the counter. */
+  .tc:not(.is-ready) .tc-chips {
+    display: none;
+  }
+
+  .tc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  .tc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 45%);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    color: var(--theme-text);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tc-chip:hover {
+    border-color: var(--color-brand-gold);
+    background: rgb(255 255 255 / 70%);
+  }
+
+  /* The pressed chip takes the gold metal of the page's buttons. */
+  .tc-chip.is-on {
+    border-color: #8f6c24;
+    background: linear-gradient(180deg, #dfc357, #c19b3d 48%, #b08a32);
+    color: #211b0e;
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 65%), 0 1px 3px rgb(0 0 0 / 25%);
+  }
+
+  .tc-chip:focus-visible,
+  .tc-more:focus-visible {
+    outline: 2px solid #7a5a12;
+    outline-offset: 3px;
+  }
+
+  .tc-led {
+    display: inline-block;
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: var(--tc-led, var(--tc-soon));
+    box-shadow: 0 0 6px var(--tc-led, transparent);
+  }
+
+  .tc-chip .tc-led {
+    margin-right: 0;
+  }
+
+  [data-state="available"] {
+    --tc-led: var(--tc-available);
+  }
+
+  [data-state="building"] {
+    --tc-led: var(--tc-building);
+  }
+
+  [data-state="soon"] {
+    --tc-led: var(--tc-soon);
+  }
+
+  /* --- Cards ------------------------------------------------------------ */
+  .tc-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin: clamp(1.2rem, 2.4vw, 1.8rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tc-card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex: 1 1 17rem;
+    gap: 1rem;
+    max-width: 22rem;
+    padding: 1.1rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 14px;
+    background: var(--theme-surface);
+    animation: tc-in 0.4s ease both;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .tc-card[hidden] {
+    display: none;
+  }
+
+  @keyframes tc-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .tc-card.is-link:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-brand-gold);
+    box-shadow: 0 10px 24px rgb(96 72 24 / 16%);
+  }
+
+  .tc-card:has(.tc-link:focus-visible) {
+    outline: 2px solid #7a5a12;
+    outline-offset: 4px;
+  }
+
+  .tc-art {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 1px solid rgb(143 108 36 / 45%);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 55%);
+    color: #7a5a12;
+  }
+
+  .tc-art :global(.ta-svg) {
+    width: 72%;
+    height: 72%;
+  }
+
+  .tc-body {
+    min-width: 0;
+  }
+
+  .tc-meta {
+    display: flex;
+    align-items: center;
+    margin: 0 0 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--theme-text-muted);
+  }
+
+  .tc-sep {
+    margin-inline: 0.5em;
+  }
+
+  .tc-cat {
+    color: var(--theme-accent, var(--color-brand-gold));
+  }
+
+  .tc-title {
+    margin: 0 0 0.45rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--theme-text);
+  }
+
+  .tc-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Stretched link: the whole card is the click and tap target. */
+  .tc-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .tc-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--theme-text-muted);
+  }
+
+  .tc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tc-tags li {
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--theme-border);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 55%);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.2;
+    color: var(--theme-text-muted);
+    white-space: nowrap;
+  }
+
+  .tc-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.85rem 0 0;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--theme-text-muted);
+  }
+
+  .tc-card.is-link .tc-cta {
+    color: #7a5a12;
+  }
+
+  .tc-cta-arrow {
+    transition: transform 0.25s ease;
+  }
+
+  .tc-card.is-link:hover .tc-cta-arrow {
+    transform: translateX(5px);
+  }
+
+  /* A single tool in view: one wide card, with a large icon plate on the left. */
+  .tc-card.is-wide {
+    flex: 1 1 100%;
+    max-width: 46rem;
+    gap: 1.4rem;
+    padding: 1.4rem;
+  }
+
+  .tc-card.is-wide .tc-art {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 14px;
+  }
+
+  .tc-card.is-wide .tc-title {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .tc-card.is-wide .tc-text {
+    font-size: 0.97rem;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+  }
+
+  /* --- Empty state and "show all" ---------------------------------------- */
+  .tc-empty {
+    margin: 1.4rem 0 0;
+    text-align: center;
+    color: var(--theme-text-muted);
+  }
+
+  .tc-empty[hidden],
+  .tc-more[hidden] {
+    display: none;
+  }
+
+  .tc-more {
+    display: block;
+    margin: 1.6rem auto 0;
+    padding: 0.6rem 1.5rem;
+    border: 1px solid #8f6c24;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 45%);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #5a420d;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tc-more:hover {
+    background: rgb(255 255 255 / 75%);
+    box-shadow: 0 4px 14px rgb(96 72 24 / 18%);
+  }
+
+  @media (max-width: 640px) {
+    .tc-card,
+    .tc-card.is-wide {
+      flex-basis: 100%;
+      max-width: none;
+    }
+
+    .tc-card.is-wide {
+      flex-direction: column;
+    }
+
+    .tc-card.is-wide .tc-art {
+      width: 4.5rem;
+      height: 4.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tc-card {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Chips and "show all", on the data attributes of the cards. "Featured" shows
+  // at most `featuredLimit` featured tools; a category shows its first `limit`
+  // tools until the button expands the rest. One tool in view is shown wide.
+  const FEATURED = "__featured";
+
+  document.querySelectorAll<HTMLElement>("[data-tc]").forEach((root) => {
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".tc-card"));
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>(".tc-chip"));
+    const empty = root.querySelector<HTMLElement>(".tc-empty");
+    const more = root.querySelector<HTMLButtonElement>(".tc-more");
+    const limit = Number(root.dataset.limit) || 6;
+    const featuredLimit = Number(root.dataset.featuredLimit) || 3;
+    // The chip that is on in the markup is the starting view.
+    let current = chips.find((chip) => chip.classList.contains("is-on"))?.dataset.value ?? "";
+    let expanded = false;
+
+    const apply = () => {
+      const featured = current === FEATURED;
+      const matches = cards.filter((card) =>
+        !current ? true : featured ? card.dataset.featured === "true" : card.dataset.cat === current
+      );
+      const shown = matches.slice(0, featured ? featuredLimit : expanded ? matches.length : limit);
+      cards.forEach((card) => {
+        card.hidden = !shown.includes(card);
+        card.classList.toggle("is-wide", shown.length === 1 && shown[0] === card);
+      });
+      if (empty) empty.hidden = shown.length > 0;
+      if (more) {
+        more.hidden = featured || matches.length <= limit;
+        more.textContent = expanded
+          ? (root.dataset.less ?? "")
+          : (root.dataset.more ?? "").replace("{n}", String(matches.length));
+      }
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        current = chip.dataset.value ?? "";
+        chips.forEach((other) => {
+          const on = other === chip;
+          other.classList.toggle("is-on", on);
+          other.setAttribute("aria-pressed", String(on));
+        });
+        expanded = false;
+        apply();
+      });
+    });
+
+    more?.addEventListener("click", () => {
+      expanded = !expanded;
+      apply();
+    });
+
+    root.classList.add("is-ready");
+    apply();
+  });
+</script>

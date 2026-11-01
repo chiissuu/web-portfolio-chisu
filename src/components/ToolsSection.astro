@@ -1,8 +1,8 @@
 ---
-import { withBase } from "../lib/paths.js";
 import type { ToolsHomeSectionContent } from "../lib/content-types";
 import ShowcaseSection from "./ShowcaseSection.astro";
-import ShowcaseCard from "./ShowcaseCard.astro";
+import ToolsBridge from "./ToolsBridge.astro";
+import ToolsCatalog from "./ToolsCatalog.astro";
 
 interface Props {
   t: ToolsHomeSectionContent;
@@ -18,17 +18,21 @@ const items = t.tools.page.items;
   title={copy.title}
   titleImage={copy.titleImage}
   backdrop="brushed"
+  center
+  edge="flat"
+  grid={false}
 >
+  <ToolsBridge slot="bridge" />
+
   <p slot="intro">{copy.description}</p>
 
-  {items.map((item, index) => (
-    <ShowcaseCard
-      number={String(index + 1).padStart(2, "0")}
-      eyebrow={item.status}
-      title={item.title}
-      text={item.text}
-      tags={item.tags}
-      href={item.href ? withBase(item.href) : undefined}
-    />
-  ))}
+  <ToolsCatalog slot="after" items={items} copy={copy.catalog} />
 </ShowcaseSection>
+
+<style is:global>
+  /* Room under the catalog for the gradient into Contacto and for the thread
+     that leaves from the foot of the catalog (see ContactBridge). */
+  #tools .tc {
+    margin-bottom: clamp(6rem, 9vw, 8rem);
+  }
+</style>
