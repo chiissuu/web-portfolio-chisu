@@ -1,0 +1,223 @@
+---
+// The way out of Contacto into FAQ: the sunrise. Contacto is the dawn (black
+// with a gold sun at its foot) and FAQ is day on ivory paper, so the boundary
+// is the sun itself: over the end of Contacto the black warms through gold to
+// the paper's ivory, a sun rises on the line between the two (it grows and
+// brightens as the scroll brings the section in) and its motes of light drift
+// up, some of them turning into the question marks that float over FAQ.
+// No rule, no scale, no thread: those belong to the other sections.
+// The sun is tied to the scroll (scrub); the motes are a CSS loop. Without
+// motion or script the sun is simply up and the motes are not drawn.
+const motes = [
+  { x: 8, s: 0.9, d: 11, o: 0, q: false },
+  { x: 17, s: 1.5, d: 14, o: -5, q: true },
+  { x: 27, s: 0.8, d: 10, o: -2, q: false },
+  { x: 36, s: 1.2, d: 13, o: -8, q: true },
+  { x: 45, s: 0.9, d: 9, o: -4, q: false },
+  { x: 55, s: 1.7, d: 15, o: -10, q: true },
+  { x: 64, s: 0.8, d: 11, o: -1, q: false },
+  { x: 73, s: 1.3, d: 12, o: -7, q: true },
+  { x: 82, s: 0.9, d: 10, o: -3, q: false },
+  { x: 91, s: 1.4, d: 14, o: -9, q: true },
+];
+---
+
+<div class="fb-sheet" data-fb aria-hidden="true">
+  <i class="fb-fade"></i>
+  <i class="fb-sun"></i>
+  <div class="fb-motes">
+    {motes.map((m) => (
+      <span
+        class:list={["fb-mote", { "is-q": m.q }]}
+        style={`--x:${m.x}%;--s:${m.s};--d:${m.d}s;--o:${m.o}s`}
+      >{m.q ? "?" : ""}</span>
+    ))}
+  </div>
+  <i class="fb-spill"></i>
+</div>
+
+<style>
+  .fb-sheet {
+    --fade-h: clamp(9rem, 14vw, 12rem);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    height: 0;
+    /* The sun is a wide glow: keep it from widening the page. */
+    overflow-x: clip;
+    pointer-events: none;
+  }
+
+  /* Over the end of Contacto: black to ivory through gold, eased. */
+  .fb-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--fade-h);
+    background: linear-gradient(
+      180deg,
+      rgb(239 214 131 / 0%) 0,
+      rgb(239 214 131 / 20%) 24%,
+      rgb(232 198 108 / 52%) 44%,
+      rgb(238 218 158 / 84%) 64%,
+      rgb(239 230 205 / 97%) 85%,
+      #eee7d3 100%
+    );
+  }
+
+  /* The sun: half of it on the line between the two sections. It rises with the
+     scroll (--sun, 0 to 1): from low and dim to its place, full and bright. */
+  .fb-sun {
+    position: absolute;
+    left: calc(var(--fx, 50%) - 28rem);
+    width: 56rem;
+    bottom: 0;
+    height: calc(var(--fade-h) * 1.25);
+    background: radial-gradient(
+      ellipse 50% 100% at 50% 100%,
+      rgb(255 252 232 / 96%) 0,
+      rgb(255 238 175 / 78%) 9%,
+      rgb(240 208 120 / 42%) 24%,
+      rgb(239 214 131 / 12%) 46%,
+      transparent 70%
+    );
+    opacity: calc(0.15 + 0.85 * var(--sun, 1));
+    transform: translateY(calc((1 - var(--sun, 1)) * 45%)) scale(calc(0.7 + 0.3 * var(--sun, 1)));
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+
+  /* The other half of the sun, below the line: the same glow mirrored, so the
+     light is continuous across the boundary (no step where it meets the paper). */
+  .fb-spill {
+    position: absolute;
+    left: calc(var(--fx, 50%) - 28rem);
+    width: 56rem;
+    top: 0;
+    height: calc(var(--fade-h) * 1.25);
+    background: radial-gradient(
+      ellipse 50% 100% at 50% 0,
+      rgb(255 252 232 / 96%) 0,
+      rgb(255 238 175 / 78%) 9%,
+      rgb(240 208 120 / 42%) 24%,
+      rgb(239 214 131 / 12%) 46%,
+      transparent 70%
+    );
+    opacity: calc(0.15 + 0.85 * var(--sun, 1));
+    transform: scale(calc(0.7 + 0.3 * var(--sun, 1)));
+    transform-origin: 50% 0;
+  }
+
+  /* Motes of light that rise from the sun; some are the question marks. */
+  .fb-motes {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3rem;
+    height: calc(var(--fade-h) + 9rem);
+    overflow: hidden;
+  }
+
+  .fb-mote {
+    position: absolute;
+    left: var(--x);
+    bottom: 0;
+    width: calc(5px * var(--s));
+    height: calc(5px * var(--s));
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6d0 0 35%, rgb(239 214 131 / 60%) 70%, transparent);
+    opacity: 0;
+    animation: fb-rise var(--d) ease-in-out var(--o) infinite;
+  }
+
+  .fb-mote.is-q {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    font-family: var(--font-display);
+    font-size: calc(1rem * var(--s));
+    font-weight: 700;
+    line-height: 1;
+    color: #c19b3d;
+    text-shadow: 0 0 8px rgb(255 236 170 / 70%);
+  }
+
+  @keyframes fb-rise {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.85;
+    }
+    70% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(calc(-1 * (var(--fade-h) + 6rem)));
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fb-motes {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const sheet = document.querySelector<HTMLElement>("[data-fb]");
+  const section = sheet?.closest<HTMLElement>("section");
+  const contact = document.getElementById("contact");
+
+  if (sheet && section && contact) {
+    // The sidebar's cards turn light when they leave the dark of Contacto: the
+    // gradient is lighter than dark over its lower half, so Contacto counts as
+    // ending in the middle of it (see checkArticleThemes in the Hero).
+    const trim = () => {
+      const fade = sheet.querySelector<HTMLElement>(".fb-fade");
+      if (fade) contact.dataset.themeTrim = String(fade.getBoundingClientRect().height * 0.5);
+    };
+    trim();
+    window.addEventListener("resize", trim);
+
+    // The sun is centred on the questions (the page's content axis, which is not
+    // the middle of the window because of the sidebar).
+    const list = section.querySelector<HTMLElement>(".fq-list");
+    const centre = () => {
+      if (!list) return;
+      const s = section.getBoundingClientRect();
+      const l = list.getBoundingClientRect();
+      section.style.setProperty("--fx", l.left + l.width / 2 - s.left + "px");
+    };
+    centre();
+    ScrollTrigger.addEventListener("refresh", centre);
+
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // The sun rises while the section comes into view.
+      gsap.fromTo(
+        section,
+        { "--sun": 0 },
+        {
+          "--sun": 1,
+          ease: "none",
+          scrollTrigger: { trigger: section, start: "top 96%", end: "top 38%", scrub: true },
+        }
+      );
+      return () => {
+        section.style.removeProperty("--sun");
+      };
+    });
+  }
+</script>
