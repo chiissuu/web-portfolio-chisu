@@ -21,10 +21,10 @@ Estado comprobado el 10 de octubre en [[Auditoria-Web]]: formularios siguen simu
 |---|---|
 | Inicio y secciones editoriales | Implementados |
 | Proyectos | **Terminado** (31 de octubre de 2026): carrusel horizontal anclado con seis proyectos reales, cabecera con hilo de luz y contador, cierre luminoso hacia «Mi stack de trabajo». Para añadir, quitar o editar proyectos: [[Mantener-Proyectos]] |
-| Servicios | Contenido y formulario implementados; envío **simulado** |
-| Tools | Conversor de vídeo implementado; comprobador de Instagram sin lógica ni página |
-| Contacto | Enlaces externos + correo `mailto:`; formulario con envío simulado |
-| FAQ | Cuatro preguntas; una respuesta provisional |
+| Servicios | **Terminado** (1 de noviembre de 2026): transición desde el stack (degradado champán → oro → negro, regla con escala, raíles y escáner), cabecera centrada, tres tarjetas con ilustración, franja «Cómo trabajo» y botón dorado a Contacto. Mantenimiento: [[Mantener-Servicios]]. El formulario de la página `/servicios` (no montada) sigue con envío **simulado** |
+| Tools | Conversor de vídeo implementado; «Herramientas de boosting para redes sociales» (antes «comprobador de Instagram») sin lógica ni página. **Terminado** (1 de noviembre de 2026): catálogo escalable que abre en «Destacadas» (máx. 3) con chips por categoría, y transición desde Servicios (degradado, hilos y destello). Mantenimiento: [[Mantener-Tools]] |
+| Contacto | **Rediseñado** (1 de noviembre de 2026): cabecera centrada, tarjeta directa (botón dorado de email, copiar, canales; LinkedIn apagado) y formulario de 4 campos que abre el correo del visitante con `mailto:`; transición «señal» desde Tools. Mantenimiento: [[Mantener-Contacto]]. La salida hacia FAQ sigue con la ola |
+| FAQ | **Rediseñada** (1 de noviembre de 2026): frontera «Amanecer» desde Contacto, siete preguntas en una columna con apertura animada (solo una abierta), atajos a otras secciones y cierre «Gracias por llegar hasta aquí. — chiissuu» con botón de volver arriba. Plantilla: se irá ampliando. Mantenimiento: [[Mantener-FAQ]] |
 | Idiomas | Español servido; inglés existe en los datos pero sin rutas y con una clave ausente |
 | Backend / API / auth / BD | No existen en este repositorio |
 

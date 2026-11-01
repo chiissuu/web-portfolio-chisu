@@ -19,7 +19,7 @@ El formulario de **Contacto** está estilado para la sección oscura (panel de t
 
 | Formulario | Campos obligatorios | Opcionales |
 |---|---|---|
-| Contacto | name, email, reason, subject, message, preferredResponse | Ninguno |
+| Contacto | name, email, reason, message (desde el 1 de noviembre de 2026; antes también subject y preferredResponse) | Ninguno: al enviar se abre el correo del visitante con `mailto:` ya redactado (ver [[Mantener-Contacto]]) |
 | Servicios | name, email, serviceType, problem | company, budget, timeline, message |
 
 Contacto permite motivos: Colaboración, Proyecto, Pregunta general u Otro; y respuesta preferida: Email o Cualquiera. Servicios permite tipo de servicio: Automatización de procesos, Web comercial/visual, Auditoría y asesoramiento, u Otro. Presupuesto y plazo son texto libre, sin validación numérica ni de fechas.
