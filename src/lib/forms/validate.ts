@@ -1,4 +1,4 @@
-import type { ContactFormData, FormFieldError, ServicesFormData } from "./types";
+import type { ContactFormData, FormFieldError } from "./types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -30,21 +30,3 @@ export function validateContactForm(data: ContactFormData): FormFieldError[] {
   return errors;
 }
 
-export function validateServicesForm(data: ServicesFormData): FormFieldError[] {
-  const errors: FormFieldError[] = [];
-  const required: Array<[keyof ServicesFormData, string]> = [
-    ["name", "name"],
-    ["serviceType", "serviceType"],
-    ["problem", "problem"],
-  ];
-
-  required.forEach(([key, field]) => {
-    const error = requireField(data[key] ?? "", field);
-    if (error) errors.push(error);
-  });
-
-  const emailError = validateEmail(data.email);
-  if (emailError) errors.push(emailError);
-
-  return errors;
-}

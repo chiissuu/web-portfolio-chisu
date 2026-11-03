@@ -66,7 +66,7 @@ Existe una carpeta hermana `portfolio-web-chiissuu-recovery/` con una copia de c
 **Componentes**
 - [[Hero-y-Sidebar]] — HeroExperience: entrada, morph de scroll, temas del sidebar, menú móvil
 - [[Sobre-Mi]] — AboutSection: título Sobre mí, resumen inicial, formación/idiomas y skills
-- [[Formularios]] — ContactForm / ServicesForm: validación, envío simulado, límites reales
+- [[Formularios]] — ContactForm: validación y límites reales (ServicesForm se borró; el formulario vigente abre el correo con `mailto:`, ver [[Mantener-Contacto]])
 - [[Conversor-de-Video]] — isla React: estados, validación, FFmpeg, progreso/cancelación
 - [[Otras-Secciones-y-Compartidos]] — Proyectos, Servicios/Tools, Contacto, FAQ, Layout, componentes sin montar
 

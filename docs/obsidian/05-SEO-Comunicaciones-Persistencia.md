@@ -1,7 +1,7 @@
 ---
 tags: [seo, comunicaciones, persistencia, seguridad]
 aliases: [SEO-Comunicaciones-Persistencia]
-actualizado: 2026-10-10
+actualizado: 2026-11-03
 fuente: [src/layouts/Layout.astro, src/content/site.js]
 ---
 
@@ -11,9 +11,17 @@ fuente: [src/layouts/Layout.astro, src/content/site.js]
 
 Cada página tiene título, descripción, charset, viewport y `lang`; el favicon PNG se comparte entre todas. La portada usa `content.es.seo`. Servicios y Tools combinan título propio con el título del sitio y usan sus introducciones como descripción. El conversor usa `videoConverter.title` para el `<title>` y `videoConverter.seo.description` para la descripción — **`videoConverter.seo.title` existe en los datos pero no se consume actualmente** para el `<title>`.
 
-## Lo que no existe
+## Publicación: dominio, tarjeta de compartir, robots y sitemap (3 de noviembre de 2026)
 
-No hay canonical, Open Graph, Twitter Cards, sitemap, robots.txt, JSON-LD, manifest PWA ni 404 propia. La ausencia de `robots.txt` no impide por sí misma la indexación. No hay dominio configurado en `site` (astro.config.mjs); no se ha comprobado un dominio remoto, analítica, Lighthouse ni Search Console.
+- **Dominio:** `site: "https://chiissuu.com"` en [astro.config.mjs](../../astro.config.mjs). De ahí salen todas las URLs absolutas; si cambia el dominio, se cambia solo ahí.
+- **`<head>`** ([Layout.astro](../../src/layouts/Layout.astro)): canonical (omitido con `noindex`), Open Graph (`og:type/site_name/locale/title/description/url/image` con ancho, alto y alt) y Twitter Card `summary_large_image`, además de `theme-color` (#050505). Prop `noindex` para páginas que no deben indexarse.
+- **Imagen al compartir:** [og-chiissuu.png](../../public/assets/images/og-chiissuu.png), 1200×630, generada por [generate-og-image.mjs](../../scripts/generate-og-image.mjs) con el wordmark dorado. Para cambiarla, editar el script y volver a ejecutarlo. Las redes guardan en caché la tarjeta: tras publicar, hay que refrescarla con sus depuradores.
+- **404:** [404.astro](../../src/pages/404.astro) con el estilo de la web (hilo cortado, 404 dorado, botón dorado a Inicio); `noindex`, textos en `notFound` de `site.js`. Cada host la sirve a su manera (Netlify, Vercel, Cloudflare Pages y GitHub Pages usan `404.html` solos).
+- **robots.txt y sitemap.xml:** son rutas de código ([robots.txt.ts](../../src/pages/robots.txt.ts), [sitemap.xml.ts](../../src/pages/sitemap.xml.ts)) que usan `site`. Al crear una página indexable nueva, añadir su ruta a `paths` en `sitemap.xml.ts`.
+
+## Lo que sigue sin existir
+
+No hay JSON-LD ni manifest PWA. Los textos de compartir solo existen en español (la web se sirve solo en español).
 
 ## Comunicaciones reales
 

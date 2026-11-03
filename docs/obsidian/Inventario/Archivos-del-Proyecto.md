@@ -20,7 +20,6 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/components/AboutSection.astro](../../../src/components/AboutSection.astro) | Título PNG dorado, siete párrafos en dos grupos y stack de 42 herramientas; formación e idiomas van dentro de la biografía — ver [[Sobre-Mi]] |
 | Banderas [España](../../../public/assets/icons/flags/es.svg), [Reino Unido](../../../public/assets/icons/flags/gb.svg) y [Alemania](../../../public/assets/icons/flags/de.svg) | SVG locales simplificados para ubicación e idiomas de la biografía; no dependen de emojis de banderas |
 | [scripts/test-video-converter.mjs](../../../scripts/test-video-converter.mjs) | Prueba reproducible del conversor (6 casos con el motor real); ver [[Comandos-y-Pruebas]] |
-| [src/components/ClosingStatement.astro](../../../src/components/ClosingStatement.astro) | Cierre conservado; sin uso en rutas actuales — ver [[Otras-Secciones-y-Compartidos]] |
 | [src/components/ContactForm.astro](../../../src/components/ContactForm.astro) | Formulario de contacto y estados de validación/envío simulado — ver [[Formularios]] |
 | [src/components/ContactSection.astro](../../../src/components/ContactSection.astro) | Tarjetas sociales, formulario y correo manual |
 | [src/components/FaqSection.astro](../../../src/components/FaqSection.astro) | Cuatro detalles desplegables nativos |
@@ -28,16 +27,11 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/components/ProjectsSection.astro](../../../src/components/ProjectsSection.astro) | Tres tarjetas provisionales de proyectos |
 | [src/components/RollLink.astro](../../../src/components/RollLink.astro) | Enlace con duplicación visual y rollover accesible |
 | [src/components/SectionHeadingCard.astro](../../../src/components/SectionHeadingCard.astro) | Primitiva de título: tarjeta de cristal o, con `image`, título gráfico recortado por CSS |
-| [src/components/ServicesForm.astro](../../../src/components/ServicesForm.astro) | Solicitud de servicios con envío simulado — ver [[Formularios]] |
-| [src/components/ServicesPageContent.astro](../../../src/components/ServicesPageContent.astro) | Página de servicios, artículos y formulario |
-| [src/components/ServicesTeaser.astro](../../../src/components/ServicesTeaser.astro) | Teaser antiguo de servicios; sin uso actual |
 | [src/components/ServicesSection.astro](../../../src/components/ServicesSection.astro) | Sección `#services` de la portada: tres tarjetas desde `services.page.articles` |
 | [src/components/ToolsSection.astro](../../../src/components/ToolsSection.astro) | Sección `#tools` de la portada: tarjetas desde `tools.page.items` |
 | [src/components/ShowcaseSection.astro](../../../src/components/ShowcaseSection.astro) | Sección compartida de Servicios/Tools: fondo grafito, título con halo, introducción, rejilla y CTA |
 | [src/components/ShowcaseCard.astro](../../../src/components/ShowcaseCard.astro) | Tarjeta compartida: número, estado, hueco de imagen, título, texto, etiquetas y flecha |
 | [src/components/SimpleNav.astro](../../../src/components/SimpleNav.astro) | Navegación sticky de las tres subpáginas |
-| [src/components/ToolsPageContent.astro](../../../src/components/ToolsPageContent.astro) | Catálogo con CTA condicional según `href` |
-| [src/components/ToolsTeaser.astro](../../../src/components/ToolsTeaser.astro) | Teaser antiguo de herramientas; sin uso actual |
 | [src/components/VideoConverterPageContent.astro](../../../src/components/VideoConverterPageContent.astro) | Encabezado de conversor y montaje `client:only` |
 | [src/components/VideoConverter/ConversionProgress.tsx](../../../src/components/VideoConverter/ConversionProgress.tsx) | Estado, porcentaje y cancelación |
 | [src/components/VideoConverter/ConversionResult.tsx](../../../src/components/VideoConverter/ConversionResult.tsx) | Resultado, descarga y reset |
@@ -49,7 +43,6 @@ Inventario completo de `src/` + configuración. Las bibliotecas instaladas y el 
 | [src/content/site.js](../../../src/content/site.js) | Contenido español e inglés — ver [[Contenido-por-Seccion]] |
 | [src/layouts/Layout.astro](../../../src/layouts/Layout.astro) | HTML, fuentes, tokens, estilos, reveal y clic central — ver [[03-Sistema-de-Diseno|Sistema-de-Diseno]] |
 | [src/lib/content-types.ts](../../../src/lib/content-types.ts) | Contratos de datos y props por componente |
-| [src/lib/forms/submit.ts](../../../src/lib/forms/submit.ts) | Simulación asíncrona de 500ms |
 | [src/lib/forms/types.ts](../../../src/lib/forms/types.ts) | Datos de ambos formularios y estado/resultado |
 | [src/lib/forms/validate.ts](../../../src/lib/forms/validate.ts) | Validadores de campos y email |
 | [src/lib/heroFluid.ts](../../../src/lib/heroFluid.ts) | Efecto del ratón sobre el fondo del Hero: WebGL2 sin dependencias, ver [[Hero-y-Sidebar]] |

@@ -576,6 +576,16 @@ export interface ClosingStatementContent {
 // satisfies (structurally) every one of the narrower `*Content` aliases
 // above — it's the ground truth the others are `Pick`-style views of.
 
+/** Page shown for any URL that doesn't exist (`src/pages/404.astro`). */
+export interface NotFoundContent {
+  seo: { title: string; description: string };
+  /** Small mono line above the number, e.g. "Error 404". */
+  eyebrow: string;
+  title: string;
+  text: string;
+  cta: string;
+}
+
 export interface SiteContent {
   seo: SeoContent;
   nav: NavigationContent;
@@ -589,6 +599,7 @@ export interface SiteContent {
   faq: FaqContent;
   closing: ClosingContent;
   videoConverter: VideoConverterContent;
+  notFound: NotFoundContent;
 }
 
 // ---- Locale root ------------------------------------------------------------

@@ -782,9 +782,10 @@ const light = backdrop !== "blueprint";
 
   /* --- Rail ------------------------------------------------------------ */
 
-  /* The row runs past the right edge of the page while it slides; clipping
-     (not hiding) keeps the page from gaining a horizontal scrollbar. */
-  .sc-section--rail {
+  /* Decorative glows and the sliding row run past the sides of the page;
+     clipping (not hiding) keeps the page from gaining a horizontal scrollbar
+     and leaves vertical overflow (bridges, iris) untouched. */
+  .sc-section {
     overflow-x: clip;
   }
 

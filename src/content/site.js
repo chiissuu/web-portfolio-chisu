@@ -38,12 +38,12 @@ const es = {
     title: ["Software Engineer", "Data Science", "GFX"],
     primaryCta: "Ver Proyectos",
     secondaryCta: "Sobre Mí",
-    imageAlt: "Retrato recortado provisional de Jesús León",
+    imageAlt: "Retrato de Jesús León",
     tagline:
       "Mentalidad competitiva forjada en esports, criterio de equipo y una obsesión constante por la cultura visual.",
     metrics: [
-      { value: "2+", label: "años construyendo y aprendiendo" },
-      { value: "10+", label: "proyectos académicos y personales" },
+      { value: "3+", label: "años construyendo y aprendiendo" },
+      { value: "20+", label: "proyectos académicos y personales" },
     ],
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
     personalNote:
@@ -592,6 +592,16 @@ const es = {
     memoryWarning:
       "Este archivo es grande para un dispositivo móvil o con poca memoria. La conversión puede ir lenta o fallar.",
   },
+  notFound: {
+    seo: {
+      title: "Página no encontrada",
+      description: "La página que buscas no existe o se ha movido.",
+    },
+    eyebrow: "Error 404",
+    title: "Aquí el camino se corta",
+    text: "La página que buscas no existe o se ha movido. Vuelve al inicio y sigue el hilo desde allí.",
+    cta: "Volver al inicio",
+  },
 };
 
 const en = {
@@ -617,12 +627,12 @@ const en = {
     title: ["Software Engineer", "Data Science", "Applied visually."],
     primaryCta: "View Projects",
     secondaryCta: "About Me",
-    imageAlt: "Temporary cropped portrait of Jesús León",
+    imageAlt: "Portrait of Jesús León",
     tagline:
       "Competitive mindset forged in esports, team judgment, and a constant obsession with visual culture.",
     metrics: [
-      { value: "2+", label: "years building and learning" },
-      { value: "10+", label: "academic and personal projects" },
+      { value: "3+", label: "years building and learning" },
+      { value: "20+", label: "academic and personal projects" },
     ],
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
   },
@@ -1138,6 +1148,16 @@ const en = {
     },
     memoryWarning:
       "This file is large for a mobile or low-memory device. Conversion may be slow or fail.",
+  },
+  notFound: {
+    seo: {
+      title: "Page not found",
+      description: "The page you are looking for does not exist or has moved.",
+    },
+    eyebrow: "Error 404",
+    title: "The path ends here",
+    text: "The page you are looking for does not exist or has moved. Head back home and follow the thread from there.",
+    cta: "Back to home",
   },
 };
 

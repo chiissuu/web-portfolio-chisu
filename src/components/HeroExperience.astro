@@ -446,11 +446,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        crossfade (see the script block below) never risks revealing a
        beige/light flash underneath the background image. */
     background: var(--section-dark-start);
-    /* First pass of the new Hero background art. Same file the user
-       verified byte-for-byte (public/assets/images/hero-background-gold.png,
-       untouched PNG, no recompression/format conversion). Root-relative
-       path, matching how every other `public/assets/...` asset in this
-       component is already referenced. */
+    /* Hero background art: untouched PNG, no recompression/format
+       conversion. Root-relative path, matching how every other
+       `public/assets/...` asset in this component is already referenced. */
     background-image: url(/assets/images/hero-background-gold-alternative.png);
     background-size: cover;
     background-position: center;
@@ -737,7 +735,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     color: var(--hx-ui-gold);
   }
 
-  /* The figures ("2+", "10+") share one finish with the nav buttons and the
+  /* The figures ("3+", "20+") share one finish with the nav buttons and the
      wordmark: a polished gold face (light top, darker waist, bright base)
      with a dark-bronze extruded edge underneath. */
   .hx-metric-value,
@@ -1150,7 +1148,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   /* Contrast fix, warm theme only: an extremely thin black outline on the
-     glyph so "2+"/"10+" stay legible when the article is over a light/warm
+     glyph so "3+"/"20+" stay legible when the article is over a light/warm
      section. Same gold fill, same font-size/weight/line-height/box model —
      `-webkit-text-stroke` paints along the glyph outline, it doesn't add
      layout width. Dark theme is untouched (no reset needed — this selector

@@ -1,12 +1,12 @@
 ---
 tags: [componente, formularios, validacion]
 actualizado: 2026-10-10
-fuente: [src/components/ContactForm.astro, src/components/ServicesForm.astro, src/lib/forms/validate.ts, src/lib/forms/submit.ts]
+fuente: [src/components/ContactForm.astro, src/lib/forms/validate.ts]
 ---
 
 # Formularios
 
-Fuentes: [ContactForm.astro](../../../src/components/ContactForm.astro), [ServicesForm.astro](../../../src/components/ServicesForm.astro), [validate.ts](../../../src/lib/forms/validate.ts), [submit.ts](../../../src/lib/forms/submit.ts).
+Fuentes: [ContactForm.astro](../../../src/components/ContactForm.astro) y [validate.ts](../../../src/lib/forms/validate.ts). `ServicesForm` y `submit.ts` se borraron el 3 de noviembre de 2026 (las páginas que los usaban ya no existen); la guía vigente del formulario es [[Mantener-Contacto]].
 
 > [!important]
 > **Ningún formulario de este sitio envía nada de verdad.** Esto hay que tenerlo presente antes de referenciarlos como un canal de contacto real en cualquier otro sitio (README, LinkedIn, etc.).
