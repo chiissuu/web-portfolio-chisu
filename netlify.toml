@@ -1,0 +1,16 @@
+# Netlify build settings. `npm install` runs the postinstall script that copies
+# the FFmpeg core into public/ffmpeg/ (it is not stored in Git), then
+# `astro build` writes the site to dist/.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # package.json requires Node >= 22.12.0.
+  NODE_VERSION = "22"
+
+# Files in /_astro/ have a hash in their name, so they can be cached forever.
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
