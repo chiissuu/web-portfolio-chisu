@@ -20,7 +20,7 @@ Las rutas antiguas devuelven 404 (el sitio aún no estaba publicado, así que no
 
 Todas usan `lang="es"` y `bodyClass="redesign"`. Solo la portada añade `redesign-home`, que activa la reserva de espacio del sidebar y la excepción de clic central (ver [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]). Los cambios de página son cargas completas — no se instala `ClientRouter`.
 
-No existen rutas `/en`, `/servicios`, `/tools`, detalle de proyecto, Instagram checker, contacto independiente, política de privacidad, página de gracias ni 404 personalizada.
+Existen las rutas `/en/` y `/en/video-converters/` (ver [[Bilingue-ES-EN]]). No existen `/servicios`, `/tools`, detalle de proyecto, Instagram checker, contacto independiente, política de privacidad, página de gracias ni 404 personalizada.
 
 ## Anclas de la portada
 

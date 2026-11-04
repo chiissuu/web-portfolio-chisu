@@ -1,18 +1,5 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import SimpleNav from "../../components/SimpleNav.astro";
-import VideoConverterPageContent from "../../components/VideoConverterPageContent.astro";
-import { content } from "../../content/site.js";
-
-const t = content.es;
+import ConverterPage from "../../components/ConverterPage.astro";
 ---
 
-<Layout
-  title={`${t.videoConverter.title} | ${t.seo.title}`}
-  description={t.videoConverter.seo.description}
-  bodyClass="redesign"
-  lang="es"
->
-  <SimpleNav t={t} />
-  <VideoConverterPageContent t={t} />
-</Layout>
+<ConverterPage locale="es" />

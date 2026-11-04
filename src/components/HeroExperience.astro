@@ -7,12 +7,25 @@ import RollLink from "./RollLink.astro";
 // active box text color — see `.hx-compact-vertical-nav a` below).
 import { House, UserRound, Mail, FolderKanban, BriefcaseBusiness, Wrench, CircleHelp } from "lucide-astro";
 import type { HeroExperienceContent } from "../lib/content-types";
+import type { Locale } from "../lib/i18n";
 
 interface Props {
   t: HeroExperienceContent;
+  /** Language of this page and the URL of the same page in each language
+   * (for the ES | EN switch). Without `alternates` the switch is not drawn. */
+  locale?: Locale;
+  alternates?: Record<Locale, string>;
 }
 
-const { t } = Astro.props as Props;
+const { t, locale = "es", alternates } = Astro.props as Props;
+
+// ES | EN options: the current one is plain text, the other one is a link.
+const langOptions = alternates
+  ? ([
+      { code: "es", label: "ES", href: alternates.es, aria: t.hero.language.toEs },
+      { code: "en", label: "EN", href: alternates.en, aria: t.hero.language.toEn },
+    ] as const)
+  : [];
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // Hero's own top nav (`.hx-nav-left`/`.hx-nav-right`, RollLink) + the
@@ -274,16 +287,24 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     </nav>
   </article>
 
-  <!-- Orden fijo: LinkedIn (deshabilitado, sin URL) -> GitHub -> Redes
+  <!-- Orden fijo: LinkedIn (enlace; deshabilitado si no hay URL) -> GitHub -> Redes
        Sociales -> Botón Contacto. El botón vive DENTRO de este artículo
        ahora (ya no es un elemento hermano fuera de él) para evitar una
        instancia duplicada. -->
   <article class="hx-sidebar-article hx-glass hx-sidebar-socials" data-theme="warm">
     <div class="hx-compact-socials">
-      <span class="hx-compact-social-row hx-compact-social-linkedin" aria-disabled="true" title={t.contact.links.linkedinTooltip}>
-        <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
-        <span>{t.contact.links.linkedinLabel}</span>
-      </span>
+      {t.contact.links.linkedin ? (
+        <a class="hx-compact-social-row" href={t.contact.links.linkedin} target="_blank" rel="noopener noreferrer">
+          <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+          <span>{t.contact.links.linkedinLabel}</span>
+          <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+        </a>
+      ) : (
+        <span class="hx-compact-social-row hx-compact-social-linkedin" aria-disabled="true" title={t.contact.links.linkedinTooltip}>
+          <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+          <span>{t.contact.links.linkedinLabel}</span>
+        </span>
+      )}
       <a class="hx-compact-social-row" href={t.contact.links.github} target="_blank" rel="noopener noreferrer">
         <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/github-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
         <span>{t.contact.links.githubLabel}</span>
@@ -305,7 +326,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   id="hx-mobile-toggle"
   aria-expanded="false"
   aria-controls="hx-mobile-nav"
-  aria-label="Abrir menú"
+  aria-label={t.hero.menu.open}
+  data-label-open={t.hero.menu.open}
+  data-label-close={t.hero.menu.close}
 >
   <span></span><span></span><span></span>
 </button>
@@ -314,6 +337,18 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   {navItems.map((item) => (
     <a href={item.href}>{item.label}</a>
   ))}
+  {langOptions.length > 0 && (
+    <nav class="hx-lang hx-lang-mobile" aria-label={t.hero.language.label}>
+      {langOptions.map((opt, i) => [
+        i > 0 && <span class="hx-lang-sep" aria-hidden="true">|</span>,
+        opt.code === locale ? (
+          <span class="hx-lang-opt is-current" lang={opt.code} aria-current="true">{opt.label}</span>
+        ) : (
+          <a class="hx-lang-opt" href={opt.href} hreflang={opt.code} lang={opt.code} aria-label={opt.aria} data-lang-link>{opt.label}</a>
+        ),
+      ])}
+    </nav>
+  )}
   <button
     type="button"
     class="hx-motion hx-motion-mobile"
@@ -346,6 +381,22 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   <span class="hx-motion-state">{t.hero.motion.on}</span>
   <span class="hx-motion-track" aria-hidden="true"><i></i></span>
 </button>
+
+<!-- Language switch (desktop): a fixed pill at the top left, mirroring the
+     animations pill. Once the sidebar is on it moves to the right of it. On
+     mobile the same switch lives in the menu. -->
+{langOptions.length > 0 && (
+  <nav class="hx-lang hx-lang-desktop" aria-label={t.hero.language.label}>
+    {langOptions.map((opt, i) => [
+      i > 0 && <span class="hx-lang-sep" aria-hidden="true">|</span>,
+      opt.code === locale ? (
+        <span class="hx-lang-opt is-current" lang={opt.code} aria-current="true">{opt.label}</span>
+      ) : (
+        <a class="hx-lang-opt" href={opt.href} hreflang={opt.code} lang={opt.code} aria-label={opt.aria} data-lang-link>{opt.label}</a>
+      ),
+    ])}
+  </nav>
+)}
 
 <style>
   /* Structural fix, not another height tweak — `position: sticky` +
@@ -1103,6 +1154,97 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     .hx-motion-mobile {
       display: inline-flex;
       margin-top: 1rem;
+    }
+  }
+
+  /* --- Language switch (ES | EN) ---------------------------------------- */
+  .hx-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.42rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #f3e6c4;
+    background: rgb(14 12 8 / 74%);
+    border: 1px solid rgb(224 197 139 / 55%);
+    border-radius: 999px;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 28%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .hx-lang-sep {
+    color: rgb(224 197 139 / 55%);
+  }
+
+  .hx-lang-opt {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .hx-lang-opt.is-current {
+    font-weight: 700;
+    color: #efd683;
+  }
+
+  .hx-lang a.hx-lang-opt:hover,
+  .hx-lang a.hx-lang-opt:focus-visible {
+    color: #fff;
+  }
+
+  .hx-lang a.hx-lang-opt:focus-visible {
+    outline: 2px solid #efd683;
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  .hx-lang-desktop {
+    position: fixed;
+    top: 0.9rem;
+    left: 1rem;
+    z-index: 120;
+    transition: left 0.25s ease;
+  }
+
+  /* With the sidebar on, the switch moves to the right of it. */
+  .hx-compact-sidebar.is-active ~ .hx-lang-desktop {
+    left: calc(var(--hx-sidebar-width, 19.5rem) + 1rem);
+  }
+
+  .hx-lang-mobile {
+    display: none;
+  }
+
+  @media (max-width: 899px) {
+    .hx-lang-desktop {
+      display: none;
+    }
+
+    .hx-lang-mobile {
+      display: inline-flex;
+      margin-top: 1.25rem;
+    }
+
+    /* The menu links are big titles (.hx-mobile-nav a); the language options
+       are small text inside a pill, so they undo that. */
+    .hx-mobile-nav .hx-lang a.hx-lang-opt {
+      display: inline;
+      width: auto;
+      max-width: none;
+      min-height: 0;
+      border-top: none;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      color: inherit;
+    }
+
+    .hx-mobile-nav .hx-lang a.hx-lang-opt:hover {
+      color: #fff;
     }
   }
 
@@ -2339,14 +2481,43 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   const wordmark = document.getElementById("hx-wordmark");
   const compactSidebar = document.getElementById("hx-compact-sidebar");
 
+  // Deep links (/#contact, shared links, and the language switch, which keeps
+  // the section): the browser does its own jump to the anchor before the page
+  // has its final height, so it ends up at the top. Jump here, as early as the
+  // script runs (so the hero also treats the page as already scrolled and skips
+  // its entrance), and once more when the hero has finished setting up --
+  // unless the visitor has interacted in the meantime (the browser itself
+  // also moves the page while it loads, so position cannot tell the two apart).
+  let hashJumped = false;
+  let visitorInteracted = false;
+  (["wheel", "touchstart", "keydown", "pointerdown"] as const).forEach((type) =>
+    window.addEventListener(type, () => (visitorInteracted = true), { once: true, passive: true })
+  );
+  function jumpToHash() {
+    if (visitorInteracted) return;
+    let id = "";
+    try {
+      id = decodeURIComponent(window.location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const target = id ? document.getElementById(id) : null;
+    if (!target) return;
+    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
+    hashJumped = true;
+  }
+  jumpToHash();
+  window.addEventListener("load", jumpToHash, { once: true });
+
   const mobileToggle = document.getElementById("hx-mobile-toggle");
   const mobileNav = document.getElementById("hx-mobile-nav");
   const mobileLinks = mobileNav ? Array.from(mobileNav.querySelectorAll("a")) : [];
 
   const MOBILE_MENU_QUERY = "(max-width: 899px)";
   const SCROLL_LOCK_CLASS = "hx-mobile-nav-open";
-  const TOGGLE_OPEN_LABEL = "Cerrar menú";
-  const TOGGLE_CLOSED_LABEL = "Abrir menú";
+  // Names of the menu button, from the page data (language-aware).
+  const TOGGLE_OPEN_LABEL = mobileToggle?.dataset.labelClose ?? "Close menu";
+  const TOGGLE_CLOSED_LABEL = mobileToggle?.dataset.labelOpen ?? "Open menu";
   const mobileMenuMediaQuery = window.matchMedia(MOBILE_MENU_QUERY);
 
   // .hx-wrap and main.home-main (see src/pages/index.astro) are the only
@@ -3279,6 +3450,13 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         // (old and new) agree on final positions.
         ctx.add(() => createNavActiveTriggers());
         ScrollTrigger.refresh();
+        if (hashJumped && !visitorInteracted) {
+          // Landed on an anchor: place the page again with the final geometry
+          // and recompute which link / theme applies at that spot.
+          jumpToHash();
+          ctx.add(() => createNavActiveTriggers());
+          checkArticleThemes();
+        }
       }
 
       void bootScrollTimeline();
@@ -3532,6 +3710,15 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   // `html[data-motion]`, set from localStorage by public/motion-init.js before
   // anything else runs. Changing it reloads the page, so every section starts
   // again in the right mode instead of switching halfway.
+  // Language links keep the section the visitor is on (#services, ...): the
+  // ids are the same in both languages.
+  document.querySelectorAll<HTMLAnchorElement>("[data-lang-link]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const base = link.getAttribute("href")?.split("#")[0] ?? "";
+      link.setAttribute("href", base + window.location.hash);
+    });
+  });
+
   const MOTION_KEY = "chiissuu:motion";
   const motionIsOff = () => document.documentElement.dataset.motion === "off";
 

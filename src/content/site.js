@@ -45,6 +45,12 @@ const es = {
       off: "no",
       aria: "Activar o desactivar las animaciones de la web",
     },
+    language: {
+      label: "Idioma",
+      toEs: "Ver la web en español",
+      toEn: "Ver la web en inglés",
+    },
+    menu: { open: "Abrir menú", close: "Cerrar menú" },
     tagline:
       "Mentalidad competitiva forjada en esports, criterio de equipo y una obsesión constante por la cultura visual.",
     metrics: [
@@ -202,6 +208,11 @@ const es = {
     noteStrong: ["proyectos más relevantes", "ingeniero tecnológico"],
     moreLabel: "Ver más en GitHub",
     moreHref: "https://github.com/chiissuu",
+    railNav: {
+      label: "Carrusel de proyectos",
+      prev: "Proyecto anterior",
+      next: "Proyecto siguiente",
+    },
     items: [
       {
         id: "01",
@@ -392,7 +403,7 @@ const es = {
         steps: [
           {
             title: "Asesoramiento previo",
-            text: "Valoramos qué necesitas, en lo técnico y en lo visual, antes de escribir una línea.",
+            text: "Se valora qué necesitas, en lo técnico y en lo visual, antes de escribir una línea.",
           },
           {
             title: "Auditoría obligatoria",
@@ -454,6 +465,7 @@ const es = {
       githubLabel: "GitHub",
       linktree: "https://linktr.ee/chiissuu",
       linktreeLabel: "Redes Sociales",
+      linkedin: "https://www.linkedin.com/in/jesusleonromero/",
       linkedinLabel: "LinkedIn",
       linkedinTooltip: "Enlace todavía no disponible",
     },
@@ -630,7 +642,7 @@ const en = {
     displayWordmark: "CHISU",
     siteName: "CHIISSUU",
     sidebarMark: "CHISU®",
-    title: ["Software Engineer", "Data Science", "Applied visually."],
+    title: ["Software Engineer", "Data Science", "GFX"],
     primaryCta: "View Projects",
     secondaryCta: "About Me",
     imageAlt: "Portrait of Jesús León",
@@ -640,6 +652,12 @@ const en = {
       off: "off",
       aria: "Turn the site animations on or off",
     },
+    language: {
+      label: "Language",
+      toEs: "View the site in Spanish",
+      toEn: "View the site in English",
+    },
+    menu: { open: "Open menu", close: "Close menu" },
     tagline:
       "Competitive mindset forged in esports, team judgment, and a constant obsession with visual culture.",
     metrics: [
@@ -647,6 +665,8 @@ const en = {
       { value: "20+", label: "academic and personal projects" },
     ],
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
+    personalNote:
+      "Outside of code, I am interested in investing, financial markets and business analysis.",
   },
   about: {
     aboutMe: {
@@ -784,11 +804,22 @@ const en = {
   projects: {
     eyebrow: "Projects",
     title: "Featured Projects",
+    titleImage: {
+      src: "/assets/images/section-title-projects-en.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 181, y: 387, width: 1621, height: 445 },
+    },
     note:
       "A selection of the most relevant projects I have developed throughout my career as a technology engineer.",
     noteStrong: ["most relevant projects", "technology engineer"],
     moreLabel: "See more on GitHub",
     moreHref: "https://github.com/chiissuu",
+    railNav: {
+      label: "Projects carousel",
+      prev: "Previous project",
+      next: "Next project",
+    },
     items: [
       {
         id: "01",
@@ -941,7 +972,7 @@ const en = {
           category: "Video",
           featured: true,
           art: "video",
-          href: "/video-converters/",
+          href: "/en/video-converters/",
         },
         {
           title: "Social media boosting tools",
@@ -961,6 +992,12 @@ const en = {
   servicesTools: {
     services: {
       title: "Services",
+      titleImage: {
+        src: "/assets/images/section-title-services-en.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 91, y: 360, width: 1831, height: 491 },
+      },
       description: [
         { text: "I combine " },
         { text: "technical development", strong: true },
@@ -973,7 +1010,7 @@ const en = {
         steps: [
           {
             title: "Prior guidance",
-            text: "We assess what you need, technically and visually, before a single line is written.",
+            text: "What you need is assessed, technically and visually, before a single line is written.",
           },
           {
             title: "Mandatory audit",
@@ -993,6 +1030,12 @@ const en = {
     },
     tools: {
       title: "Tools",
+      titleImage: {
+        src: "/assets/images/section-title-tools-es.webp",
+        width: 2000,
+        height: 1145,
+        crop: { x: 535, y: 407, width: 965, height: 414 },
+      },
       description:
         "Small personal tools that start from concrete needs: simple, accessible and transparent. The collection grows little by little.",
       catalog: {
@@ -1009,6 +1052,12 @@ const en = {
   contact: {
     eyebrow: "Contact",
     title: "Let's talk about your next idea",
+    titleImage: {
+      src: "/assets/images/section-title-contact-en.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 108, y: 333, width: 1804, height: 542 },
+    },
     text: "Open to collaborating, continuing to learn, and building digital products with technical and visual judgment.",
     directTitle: "Write to me directly",
     emailIntro: "The quickest way: I reply from this address.",
@@ -1023,6 +1072,7 @@ const en = {
       githubLabel: "GitHub",
       linktree: "https://linktr.ee/chiissuu",
       linktreeLabel: "Social Links",
+      linkedin: "https://www.linkedin.com/in/jesusleonromero/",
       linkedinLabel: "LinkedIn",
       linkedinTooltip: "Link not yet available",
     },
@@ -1044,6 +1094,12 @@ const en = {
   faq: {
     eyebrow: "FAQ",
     title: "Frequently Asked Questions",
+    titleImage: {
+      src: "/assets/images/section-title-faq-es.webp",
+      width: 2000,
+      height: 1145,
+      crop: { x: 692, y: 423, width: 621, height: 416 },
+    },
     lead: "What people usually ask before we start.",
     items: [
       {

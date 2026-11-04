@@ -32,9 +32,12 @@ interface Props {
   /** Wrap the default slot in the 3-column card grid (default). A section
    *  that lays out its own content (slot "after") turns it off. */
   grid?: boolean;
+  /** Rail only: names of the arrow buttons and of the row (the buttons are shown
+   *  when the animations are off, see `html[data-motion="off"]`). */
+  railNav?: { label: string; prev: string; next: string };
 }
 
-const { id, title, titleImage, ctaHref, ctaLabel, backdrop, rail = false, iris = false, center = false, edge = "wave", grid = true } = Astro.props as Props;
+const { id, title, titleImage, ctaHref, ctaLabel, backdrop, rail = false, iris = false, center = false, edge = "wave", grid = true, railNav } = Astro.props as Props;
 const light = backdrop !== "blueprint";
 ---
 
@@ -97,11 +100,19 @@ const light = backdrop !== "blueprint";
           <span class="sc-bar"><i data-sc-bar></i></span>
         </div>
 
-        <div class="sc-rail" data-sc-rail>
+        <div class="sc-rail" data-sc-rail data-sc-rail-label={railNav?.label}>
           <div class="sc-track" data-sc-track>
             <slot />
           </div>
         </div>
+
+        {railNav && (
+          <div class="sc-nav" data-sc-nav>
+            <button type="button" class="sc-nav-btn" data-sc-prev aria-label={railNav.prev}>&#8592;</button>
+            <span class="sc-nav-count" data-sc-nav-count aria-hidden="true">01 / 06</span>
+            <button type="button" class="sc-nav-btn" data-sc-next aria-label={railNav.next}>&#8594;</button>
+          </div>
+        )}
 
         <div class="sc-foot" aria-hidden="true"></div>
         </div>
@@ -797,6 +808,69 @@ const light = backdrop !== "blueprint";
     scrollbar-color: rgb(224 197 139 / 45%) transparent;
   }
 
+  /* Animations off: the row is a plain scrollable strip. Make its scrollbar
+     visible and give it arrow buttons (the wheel only scrolls the page). */
+  :global(html[data-motion="off"]) .sc-rail {
+    scrollbar-width: auto;
+    scrollbar-color: rgb(176 138 50 / 90%) rgb(0 0 0 / 10%);
+  }
+
+  :global(html[data-motion="off"]) .sc-rail:focus-visible {
+    outline: 2px solid var(--color-brand-gold);
+    outline-offset: 4px;
+  }
+
+  .sc-nav {
+    display: none;
+  }
+
+  :global(html[data-motion="off"]) .sc-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .sc-nav-btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: #211b0e;
+    background: linear-gradient(180deg, #dfc357, #c19b3d 48%, #b08a32);
+    border: 1px solid #49361a;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 55%), 0 2px 4px rgb(0 0 0 / 30%);
+    cursor: pointer;
+  }
+
+  .sc-nav-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  .sc-nav-btn:focus-visible {
+    outline: 2px solid var(--theme-text, #1a1919);
+    outline-offset: 3px;
+  }
+
+  .sc-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .sc-nav-count {
+    min-width: 5ch;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--theme-text-muted);
+  }
+
   .sc-track {
     display: flex;
     gap: clamp(1rem, 1.6vw, 1.5rem);
@@ -1402,4 +1476,43 @@ const light = backdrop !== "blueprint";
 
   document.querySelectorAll<HTMLElement>("[data-sc-iris-root]").forEach(initIris);
   document.querySelectorAll<HTMLElement>("[data-sc-rail-root]").forEach(initRail);
+
+  // Animations off: the row of cards is a plain scrollable strip. The arrow
+  // buttons scroll it one card at a time, the counter follows, and the strip
+  // itself can be focused so the arrow keys work too.
+  function initRailNav(nav: HTMLElement) {
+    if (document.documentElement.dataset.motion !== "off") return;
+    const rail = nav.closest(".sc-section")?.querySelector<HTMLElement>("[data-sc-rail]");
+    const prev = nav.querySelector<HTMLButtonElement>("[data-sc-prev]");
+    const next = nav.querySelector<HTMLButtonElement>("[data-sc-next]");
+    const countEl = nav.querySelector<HTMLElement>("[data-sc-nav-count]");
+    if (!rail || !prev || !next) return;
+
+    rail.setAttribute("tabindex", "0");
+    rail.setAttribute("role", "region");
+    const label = rail.dataset.scRailLabel;
+    if (label) rail.setAttribute("aria-label", label);
+
+    const cards = Array.from(rail.querySelectorAll<HTMLElement>("[data-sc-card]"));
+    const pad = (value: number) => String(value).padStart(2, "0");
+    // Distance from one card to the next (card width + gap).
+    const step = () => (cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : rail.clientWidth * 0.8);
+
+    const update = () => {
+      const atStart = rail.scrollLeft <= 1;
+      const atEnd = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 1;
+      prev.disabled = atStart;
+      next.disabled = atEnd;
+      const index = atEnd ? cards.length : Math.min(cards.length, Math.round(rail.scrollLeft / step()) + 1);
+      if (countEl) countEl.textContent = `${pad(index)} / ${pad(cards.length)}`;
+    };
+
+    prev.addEventListener("click", () => rail.scrollBy({ left: -step(), behavior: "auto" }));
+    next.addEventListener("click", () => rail.scrollBy({ left: step(), behavior: "auto" }));
+    rail.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-sc-nav]").forEach(initRailNav);
 </script>

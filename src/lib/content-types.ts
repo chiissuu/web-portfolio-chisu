@@ -83,6 +83,11 @@ export interface HeroContent {
    * `public/motion-init.js`). `on`/`off` are the state words shown after
    * `label`; `aria` is the accessible name of the button. */
   motion: { label: string; on: string; off: string; aria: string };
+  /** Language switch (ES | EN): `label` names the group; `toEs`/`toEn` are the
+   * accessible names of the link that goes to each language's version. */
+  language: { label: string; toEs: string; toEn: string };
+  /** Accessible names of the mobile menu button. */
+  menu: { open: string; close: string };
   tagline: string;
   metrics: readonly HeroMetric[];
   chips: readonly string[];
@@ -108,6 +113,7 @@ export interface HeroExperienceContent {
  * `withBase("/")` rather than `t.nav.home`. */
 export interface SimpleNavContent {
   nav: Pick<HeroNavigationContent, "about" | "contact" | "projects" | "services" | "tools">;
+  hero: { language: HeroContent["language"] };
 }
 
 // ---- About ------------------------------------------------------------------
@@ -196,6 +202,9 @@ export interface ProjectsContent {
   /** Last item of the row: a link to the rest of the work. */
   moreLabel: string;
   moreHref: string;
+  /** Names of the row's arrow buttons and of the row itself (shown when the
+   * animations are off and the row is a plain scrollable strip). */
+  railNav: { label: string; prev: string; next: string };
   items: ProjectItem[];
 }
 
@@ -395,12 +404,12 @@ export interface ContactLinks {
    * word "Linktree" itself. */
   linktreeLabel: string;
   linkedinLabel: string;
-  /** LinkedIn has no real URL anywhere in the content system — the card is
-   * intentionally `aria-disabled`, not a real link, and shows this text as
-   * an accessible tooltip on hover/focus instead of a permanent "Próximamente". */
+  /** Only used while `linkedin` has no URL: the card is then `aria-disabled`,
+   * not a link, and shows this text as an accessible tooltip on hover/focus. */
   linkedinTooltip: string;
-  /** Optional: when a LinkedIn URL exists, the Contact section turns its
-   * disabled card into a real link (the sidebar still needs the same change). */
+  /** LinkedIn profile URL. When present, both the sidebar and the Contact
+   * section show a real link; remove it to turn both back into the disabled
+   * card with its tooltip. */
   linkedin?: string;
 }
 

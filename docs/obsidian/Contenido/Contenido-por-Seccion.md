@@ -74,7 +74,7 @@ Título, introducción, y tres artículos con tags: automatización de procesos,
 
 ## Contacto y FAQ
 
-Contacto: texto de disponibilidad, formulario, y los canales directos: `mailto:jesusleonromero233@gmail.com`, LinkedIn (deshabilitado), GitHub y «Redes Sociales» (Linktree). Sin cambios de texto en el rediseño; la disposición está en [[Otras-Secciones-y-Compartidos]].
+Contacto: texto de disponibilidad, formulario, y los canales directos: `mailto:jesusleonromero233@gmail.com`, LinkedIn (enlace desde el 4 de noviembre de 2026), GitHub y «Redes Sociales» (Linktree). Sin cambios de texto en el rediseño; la disposición está en [[Otras-Secciones-y-Compartidos]].
 
 FAQ: experiencia profesional, disponibilidad freelance, acceso al trabajo de diseño, mejor vía de contacto. La segunda respuesta es un placeholder; la cuarta menciona el formulario.
 

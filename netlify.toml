@@ -25,3 +25,21 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Languages: Spanish is the root, English lives under /en/.
+# /es/ is not a real page: send it to the root so there is a single Spanish URL.
+[[redirects]]
+  from = "/es"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/es/*"
+  to = "/:splat"
+  status = 301
+
+# A missing page under /en/ shows the English 404, which Astro builds as /en/404/index.html (real files win over this).
+[[redirects]]
+  from = "/en/*"
+  to = "/en/404/"
+  status = 404
