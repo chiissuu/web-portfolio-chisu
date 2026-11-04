@@ -440,8 +440,9 @@ const countText = `${items.length} ${word(items.length, copy.count.tools)} · ${
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .tc-card {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .tc-card {
       animation: none;
     }
   }

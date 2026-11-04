@@ -1,7 +1,7 @@
 ---
 tags: [accesibilidad, movimiento, reveals]
 aliases: [Accesibilidad-y-Movimiento]
-actualizado: 2026-10-23
+actualizado: 2026-11-04
 fuente: [src/layouts/Layout.astro, src/components/RollLink.astro]
 ---
 
@@ -21,7 +21,17 @@ Los títulos gráficos de Proyectos, Servicios, Tools, Contacto y FAQ no usan `.
 
 [RollLink.astro](../../src/components/RollLink.astro) duplica visualmente el texto para desplazarlo verticalmente en hover/focus durante 0,4s. Oculta esas copias duplicadas a lectores de pantalla y usa `aria-label` en el enlace. `prefers-reduced-motion` quita la transición.
 
-## Movimiento reducido (global)
+## Interruptor de animaciones (4 de noviembre de 2026)
+
+**Decisión:** las animaciones están **activadas para todo el mundo**, aunque el sistema operativo pida «reducir movimiento» (lo que antes dejaba la web estática: en una torre con los efectos de animación de Windows desactivados se veía sin animar). A cambio hay un botón visible para apagarlas, que cumple la necesidad de poder detener el movimiento.
+
+- **Botón** «Animaciones: sí / no» ([HeroExperience.astro](../../src/components/HeroExperience.astro)): una píldora fija arriba a la derecha en escritorio (`.hx-motion-desktop`) y el mismo botón al final del menú móvil (`.hx-motion-mobile`). Textos en `hero.motion` de `site.js` (ES/EN). `aria-pressed` = animaciones activas.
+- **Estado:** `localStorage["chiissuu:motion"]` (`"off"` = apagadas; cualquier otra cosa o nada = activas). Al pulsar, se guarda y **se recarga la página**, para que cada sección arranque en el modo correcto.
+- **Un solo interruptor:** [public/motion-init.js](../../public/motion-init.js), un script clásico síncrono en el `<head>` ([Layout.astro](../../src/layouts/Layout.astro)). Fija `html[data-motion="on|off"]` y **sustituye `window.matchMedia`** para que toda consulta `prefers-reduced-motion` (la de los scripts y la de `gsap.matchMedia`) responda según el interruptor y no según el sistema. Es un archivo y no un `<script>` incrustado porque la CSP solo admite scripts incrustados con hash de Astro, y Astro no los calcula para `is:inline`.
+- **CSS:** las reglas que antes colgaban de `@media (prefers-reduced-motion: …)` ahora cuelgan de `:global(html[data-motion="off"])` (apagado) o `:global(html:not([data-motion="off"]))` (encendido); el bloque global de [Layout.astro](../../src/layouts/Layout.astro) usa `:where(html[data-motion="off"] *)`. Una regla nueva que dependa del movimiento debe seguir ese patrón: una `@media (prefers-reduced-motion)` en CSS **ya no responde al botón**.
+- **Apagado en escritorio:** no hay morfo ni entrada del Hero; el menú lateral aparece como menú fijo cuando el Hero se ha ido (`updateStaticSidebar` en el script del Hero) y se oculta al volver arriba. Antes, con movimiento reducido en escritorio, el menú lateral **no aparecía nunca** y se perdía la navegación.
+
+## Movimiento reducido (histórico, ya no se sigue)
 
 Layout reduce las duraciones globales a 0,001ms y cambia el smooth scroll a `auto`. **Importante:** esto no hace visibles los reveals por sí mismo, ni resuelve la excepción `.hx-static` del Hero (ver [[Hero-y-Sidebar]], sección de resize/limpieza) — son tres mecanismos independientes que hay que verificar por separado.
 

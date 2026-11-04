@@ -330,8 +330,9 @@ const external = href ? /^https?:/.test(href) : false;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .pj-live {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .pj-live {
       animation: none;
     }
   }

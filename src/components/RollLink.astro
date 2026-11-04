@@ -55,9 +55,10 @@ const { href, label, class: className = "" } = Astro.props;
     transform: translateY(0);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .roll-current,
-    .roll-clone {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .roll-current,
+    :global(html[data-motion="off"]) .roll-clone {
       transition: none;
     }
   }

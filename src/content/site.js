@@ -39,6 +39,12 @@ const es = {
     primaryCta: "Ver Proyectos",
     secondaryCta: "Sobre Mí",
     imageAlt: "Retrato de Jesús León",
+    motion: {
+      label: "Animaciones",
+      on: "sí",
+      off: "no",
+      aria: "Activar o desactivar las animaciones de la web",
+    },
     tagline:
       "Mentalidad competitiva forjada en esports, criterio de equipo y una obsesión constante por la cultura visual.",
     metrics: [
@@ -628,6 +634,12 @@ const en = {
     primaryCta: "View Projects",
     secondaryCta: "About Me",
     imageAlt: "Portrait of Jesús León",
+    motion: {
+      label: "Animations",
+      on: "on",
+      off: "off",
+      aria: "Turn the site animations on or off",
+    },
     tagline:
       "Competitive mindset forged in esports, team judgment, and a constant obsession with visual culture.",
     metrics: [

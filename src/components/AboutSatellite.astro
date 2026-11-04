@@ -380,9 +380,10 @@ const bars = [30, 56, 40, 76, 50, 68, 34, 60, 24];
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    :global(.ab-journey .ab-step) .eq,
-    :global(.ab-journey .ab-step) .cursor {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) :global(.ab-journey .ab-step) .eq,
+    :global(html[data-motion="off"]) :global(.ab-journey .ab-step) .cursor {
       animation: none;
     }
   }

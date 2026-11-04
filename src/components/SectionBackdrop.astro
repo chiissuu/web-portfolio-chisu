@@ -440,16 +440,17 @@ const fill = `${curve} L ${WIDTH} ${HEIGHT} L 0 ${HEIGHT} Z`;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .bd-pulse,
-    .bd-dust,
-    .bd-sheen,
-    .bd-float,
-    .bd-mark {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .bd-pulse,
+    :global(html[data-motion="off"]) .bd-dust,
+    :global(html[data-motion="off"]) .bd-sheen,
+    :global(html[data-motion="off"]) .bd-float,
+    :global(html[data-motion="off"]) .bd-mark {
       animation: none;
     }
 
-    .bd-pulse {
+    :global(html[data-motion="off"]) .bd-pulse {
       display: none;
     }
   }

@@ -314,7 +314,38 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   {navItems.map((item) => (
     <a href={item.href}>{item.label}</a>
   ))}
+  <button
+    type="button"
+    class="hx-motion hx-motion-mobile"
+    data-motion-toggle
+    data-on={t.hero.motion.on}
+    data-off={t.hero.motion.off}
+    aria-pressed="true"
+    aria-label={t.hero.motion.aria}
+  >
+    <span class="hx-motion-label">{t.hero.motion.label}:</span>
+    <span class="hx-motion-state">{t.hero.motion.on}</span>
+    <span class="hx-motion-track" aria-hidden="true"><i></i></span>
+  </button>
 </nav>
+
+<!-- Animations on/off (desktop): a fixed pill, so it is reachable from the first
+     frame and in every section. On mobile the same button lives in the menu
+     above. The choice is stored by the script at the end of this file and
+     read by public/motion-init.js. -->
+<button
+  type="button"
+  class="hx-motion hx-motion-desktop"
+  data-motion-toggle
+  data-on={t.hero.motion.on}
+  data-off={t.hero.motion.off}
+  aria-pressed="true"
+  aria-label={t.hero.motion.aria}
+>
+  <span class="hx-motion-label">{t.hero.motion.label}:</span>
+  <span class="hx-motion-state">{t.hero.motion.on}</span>
+  <span class="hx-motion-track" aria-hidden="true"><i></i></span>
+</button>
 
 <style>
   /* Structural fix, not another height tweak — `position: sticky` +
@@ -979,6 +1010,102 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     pointer-events: auto;
   }
 
+  /* Animations off: there is no scroll timeline to fade the sidebar in, so
+     once the hero has scrolled away (see `updateStaticSidebar` in the script)
+     it is simply shown. */
+  :global(html[data-motion="off"]) .hx-compact-sidebar.is-active {
+    opacity: 1;
+  }
+
+  /* --- Animations on/off button ----------------------------------------- */
+  .hx-motion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #f3e6c4;
+    background: rgb(14 12 8 / 74%);
+    border: 1px solid rgb(224 197 139 / 55%);
+    border-radius: 999px;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 28%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .hx-motion:hover {
+    color: #fff;
+    border-color: #efd683;
+  }
+
+  .hx-motion:focus-visible {
+    outline: 2px solid #efd683;
+    outline-offset: 3px;
+  }
+
+  .hx-motion-state {
+    min-width: 2ch;
+    font-weight: 600;
+    color: #efd683;
+  }
+
+  .hx-motion-track {
+    position: relative;
+    flex: none;
+    width: 26px;
+    height: 14px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 16%);
+    transition: background 0.2s ease;
+  }
+
+  .hx-motion-track i {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #8d8a82;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .hx-motion[aria-pressed="true"] .hx-motion-track {
+    background: rgb(224 197 139 / 55%);
+  }
+
+  .hx-motion[aria-pressed="true"] .hx-motion-track i {
+    transform: translateX(12px);
+    background: #efd683;
+  }
+
+  .hx-motion-desktop {
+    position: fixed;
+    top: 0.9rem;
+    right: 1rem;
+    z-index: 120;
+  }
+
+  .hx-motion-mobile {
+    display: none;
+  }
+
+  @media (max-width: 899px) {
+    .hx-motion-desktop {
+      display: none;
+    }
+
+    .hx-motion-mobile {
+      display: inline-flex;
+      margin-top: 1rem;
+    }
+  }
+
   /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
      `<aside>` anymore. Each `.hx-sidebar-article` carries its OWN
      `data-theme` ("warm"/"dark"), flipped independently by the per-article
@@ -1304,9 +1431,10 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     outline-offset: 5px;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hx-metal-button::before,
-    .hx-metal-content {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .hx-metal-button::before,
+    :global(html[data-motion="off"]) .hx-metal-content {
       transition: none;
     }
   }
@@ -2000,47 +2128,47 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      states instantly (those end states -- the X shape, visible links --
      are unconditional above, since they're the actual UI state, not the
      animation). Nothing extra to strip out under `reduce`. */
-  @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
-    .hx-mobile-toggle span {
+  @media (max-width: 899px) {
+    :global(html:not([data-motion="off"])) .hx-mobile-toggle span {
       transition: transform 220ms ease, opacity 220ms ease;
     }
 
-    .hx-mobile-nav {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav {
       transition: opacity 220ms ease, visibility 220ms ease;
     }
 
-    .hx-mobile-nav a {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav a {
       opacity: 0;
       transform: translateY(10px);
       transition: opacity 220ms ease, transform 220ms ease, color 180ms ease;
     }
 
-    .hx-mobile-nav.hx-open a {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a {
       opacity: 1;
       transform: translateY(0);
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(1) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(1) {
       transition-delay: 40ms;
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(2) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(2) {
       transition-delay: 80ms;
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(3) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(3) {
       transition-delay: 120ms;
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(4) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(4) {
       transition-delay: 160ms;
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(5) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(5) {
       transition-delay: 200ms;
     }
 
-    .hx-mobile-nav.hx-open a:nth-child(6) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(6) {
       transition-delay: 240ms;
     }
   }
@@ -2437,6 +2565,13 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       // meaningless). Font-size is read off an actual letter span, since
       // `.hx-wordmark`/`.hx-wordmark-row` never set `font-size`
       // themselves — only `.hx-wordmark-letter` does.
+      // `HTMLImageElement.decode()` never settles for an image that is off-screen
+      // (e.g. the page was reloaded already scrolled), and both async chains below
+      // wait on it before they initialise the sidebar, themes and scroll timeline.
+      // Cap the wait: the image still renders, it just is not guaranteed decoded first.
+      const decodeWithTimeout = (img: HTMLImageElement) =>
+        Promise.race([img.decode(), new Promise<void>((resolve) => window.setTimeout(resolve, 1200))]);
+
       function fitWordmarkWidth() {
         const targetWidth = window.innerWidth * 0.94;
         pinEl.style.removeProperty("--hx-wordmark-font-size");
@@ -2582,7 +2717,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
         if (portraitImg instanceof HTMLImageElement && typeof portraitImg.decode === "function") {
           try {
-            await portraitImg.decode();
+            await decodeWithTimeout(portraitImg);
           } catch {
             // decode() can reject on cache/network races — the image still
             // renders, it just wasn't guaranteed decoded first.
@@ -3062,6 +3197,25 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
       let scrollTl: gsap.core.Timeline | null = null;
 
+      // Animations off on a desktop screen: there is no hero-to-sidebar morph,
+      // so the sidebar is shown as a plain fixed menu once the hero has mostly
+      // scrolled away (and hidden again when scrolling back up). Without this
+      // the page would have no navigation after the hero.
+      let staticSidebarShown = false;
+      function updateStaticSidebar() {
+        if (!prefersReducedMotion || !isDesktopViewport()) {
+          staticSidebarShown = false;
+          return;
+        }
+        const heroGone = wrapEl.getBoundingClientRect().bottom < window.innerHeight * 0.6;
+        if (heroGone === staticSidebarShown) return;
+        staticSidebarShown = heroGone;
+        compactSidebarEl.classList.toggle("is-active", heroGone);
+        compactSidebarEl.setAttribute("aria-hidden", heroGone ? "false" : "true");
+      }
+      window.addEventListener("scroll", updateStaticSidebar, { passive: true });
+      window.addEventListener("resize", updateStaticSidebar);
+
       function evaluateMode() {
         const shouldScroll = !prefersReducedMotion && isDesktopViewport();
 
@@ -3086,6 +3240,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
           pinEl.classList.add("hx-static");
           clearScrollDrivenState();
         }
+        updateStaticSidebar();
       }
 
       // The very first measurement pass must wait for fonts/portrait decode
@@ -3102,7 +3257,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
         const portraitImgEl = introMotionEl.querySelector<HTMLImageElement>(".hx-portrait img");
         if (portraitImgEl && typeof portraitImgEl.decode === "function") {
           try {
-            await portraitImgEl.decode();
+            await decodeWithTimeout(portraitImgEl);
           } catch {
             // decode() can reject on cache/network races — proceed anyway.
           }
@@ -3370,4 +3525,28 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       document.addEventListener("astro:before-swap", () => fluid?.destroy());
     }
   }
+</script>
+
+<script>
+  // Animations on/off buttons (desktop pill + mobile menu). The state lives in
+  // `html[data-motion]`, set from localStorage by public/motion-init.js before
+  // anything else runs. Changing it reloads the page, so every section starts
+  // again in the right mode instead of switching halfway.
+  const MOTION_KEY = "chiissuu:motion";
+  const motionIsOff = () => document.documentElement.dataset.motion === "off";
+
+  document.querySelectorAll<HTMLButtonElement>("[data-motion-toggle]").forEach((button) => {
+    const state = button.querySelector<HTMLElement>(".hx-motion-state");
+    button.setAttribute("aria-pressed", String(!motionIsOff()));
+    if (state) state.textContent = (motionIsOff() ? button.dataset.off : button.dataset.on) ?? "";
+
+    button.addEventListener("click", () => {
+      try {
+        localStorage.setItem(MOTION_KEY, motionIsOff() ? "on" : "off");
+      } catch {
+        return; // storage blocked: nothing can be remembered, so leave things as they are
+      }
+      window.location.reload();
+    });
+  });
 </script>

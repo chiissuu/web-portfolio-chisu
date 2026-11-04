@@ -179,9 +179,10 @@
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .cb-stars::before,
-    .cb-stars::after {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .cb-stars::before,
+    :global(html[data-motion="off"]) .cb-stars::after {
       animation: none;
     }
   }

@@ -163,8 +163,9 @@ const motes = [
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .fb-motes {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .fb-motes {
       display: none;
     }
   }

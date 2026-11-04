@@ -79,6 +79,10 @@ export interface HeroContent {
   primaryCta: string;
   secondaryCta: string;
   imageAlt: string;
+  /** Button that turns the site animations on or off (see
+   * `public/motion-init.js`). `on`/`off` are the state words shown after
+   * `label`; `aria` is the accessible name of the button. */
+  motion: { label: string; on: string; off: string; aria: string };
   tagline: string;
   metrics: readonly HeroMetric[];
   chips: readonly string[];

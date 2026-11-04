@@ -528,9 +528,10 @@ const columns = groups.map((group, gi) => {
 
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .pt-cell,
-    .pt-col {
+  /* motion off (nav button) */
+  @media all {
+    :global(html[data-motion="off"]) .pt-cell,
+    :global(html[data-motion="off"]) .pt-col {
       transition: none;
     }
   }

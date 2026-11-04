@@ -35,6 +35,7 @@ const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Scie
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#050505" />
+    <script is:inline src={`${base}/motion-init.js`}></script>
     {noindex && <meta name="robots" content="noindex" />}
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
@@ -256,16 +257,17 @@ const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Scie
     --sidebar-content-gap: clamp(2.5rem, 3vw, 4rem);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    :where(*) {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
-    }
+  /* Motion off (the nav button; see public/motion-init.js): no animations or
+     transitions, and no smooth scrolling. The operating system's "reduce
+     motion" is not followed on purpose. */
+  :where(html[data-motion="off"] *) {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 
-    :where(html) {
-      scroll-behavior: auto;
-    }
+  :where(html[data-motion="off"]) {
+    scroll-behavior: auto;
   }
 
   /* ============================================================

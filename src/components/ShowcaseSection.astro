@@ -542,12 +542,12 @@ const light = backdrop !== "blueprint";
     display: none;
   }
 
-  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-    .sc-section--center .sc-intro {
+  @media (min-width: 900px) {
+    :global(html:not([data-motion="off"])) .sc-section--center .sc-intro {
       margin-bottom: 1.1rem;
     }
 
-    .sc-thread {
+    :global(html:not([data-motion="off"])) .sc-thread {
       position: relative;
       display: block;
       width: 3px;
@@ -555,7 +555,7 @@ const light = backdrop !== "blueprint";
       margin: 0 auto;
     }
 
-    .sc-progress {
+    :global(html:not([data-motion="off"])) .sc-progress {
       height: 1.75rem;
     }
   }

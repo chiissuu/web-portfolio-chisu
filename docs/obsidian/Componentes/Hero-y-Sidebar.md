@@ -156,6 +156,10 @@ Se cierra por: botón, Escape, clic en el fondo del panel, selección de un enla
 
 El menú usa fade de 220ms y entrada escalonada 40–240ms solo con `prefers-reduced-motion: no-preference`; bajo reducción, cambia de estado directamente sin transición. Los nombres accesibles del menú están escritos directamente en el componente, no traducidos vía `site.js`.
 
+## Interruptor de animaciones y modo apagado (4 de noviembre de 2026)
+
+La decisión, el botón y el estado están en [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]. En este componente: el marcado de las dos píldoras (`.hx-motion-desktop`, `.hx-motion-mobile`), su script final, `updateStaticSidebar` (menú lateral sin morfo, en escritorio y con las animaciones apagadas) y `decodeWithTimeout` (límite de 1,2 s a la espera de decodificar el retrato). Las menciones a `prefers-reduced-motion` de esta nota se leen ahora como «animaciones apagadas con el botón».
+
 ## Relacionado
 
 [[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] · [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[Hallazgos-y-Pendientes]]
