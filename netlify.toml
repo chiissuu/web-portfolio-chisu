@@ -9,6 +9,17 @@
   # package.json requires Node >= 22.12.0.
   NODE_VERSION = "22"
 
+# Basic security headers for every page. No Content-Security-Policy on purpose:
+# the site uses inline scripts/styles, Google Fonts and an FFmpeg WebAssembly
+# worker, so a CSP has to be written and tested separately.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
 # Files in /_astro/ have a hash in their name, so they can be cached forever.
 [[headers]]
   for = "/_astro/*"
