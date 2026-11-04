@@ -19,9 +19,16 @@ Cada página tiene título, descripción, charset, viewport y `lang`; el favicon
 - **404:** [404.astro](../../src/pages/404.astro) con el estilo de la web (hilo cortado, 404 dorado, botón dorado a Inicio); `noindex`, textos en `notFound` de `site.js`. Cada host la sirve a su manera (Netlify, Vercel, Cloudflare Pages y GitHub Pages usan `404.html` solos).
 - **robots.txt y sitemap.xml:** son rutas de código ([robots.txt.ts](../../src/pages/robots.txt.ts), [sitemap.xml.ts](../../src/pages/sitemap.xml.ts)) que usan `site`. Al crear una página indexable nueva, añadir su ruta a `paths` en `sitemap.xml.ts`.
 
+## Cabeceras de seguridad y CSP (4 de noviembre de 2026)
+
+- **Cabeceras** en [netlify.toml](../../netlify.toml) para todas las rutas: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` (cámara, micrófono, geolocalización y pagos desactivados). Netlify ya envía HSTS. Comprobado en producción con `curl.exe -I https://chiissuu.com`.
+- **Content Security Policy:** la escribe Astro (`security.csp` en [astro.config.mjs](../../astro.config.mjs)) en una etiqueta `<meta http-equiv="content-security-policy">` de cada página, con los hashes de sus scripts y estilos incrustados. Lo permitido además de `self`: Google Fonts (hoja de estilos y fuentes), `wasm-unsafe-eval` (compilar FFmpeg), `blob:` (worker y archivos del conversor) y `unsafe-inline` **solo en atributos `style`** (`style-src-attr`, por GSAP y los componentes). Si se añade un origen externo (analítica, otra fuente, un iframe…), hay que añadirlo ahí o se bloqueará.
+- **No se aplica en `astro dev`:** probarla con `npm run build` y `npm run preview`. Una violación aparece en la consola del navegador como «Refused to…».
+- Verificado en local con el build: home recorrida entera, conversión de un vídeo de prueba a MP4 (genera el archivo) y 404, sin violaciones ni errores en consola. **No verificado:** MP3, el envío real del `mailto:` ni la web publicada con la CSP (hay que comprobarla tras el despliegue).
+
 ## Lo que sigue sin existir
 
-No hay JSON-LD ni manifest PWA. Los textos de compartir solo existen en español (la web se sirve solo en español).
+No hay JSON-LD ni manifest PWA ni CSP por cabecera (va en `<meta>`, que no admite `frame-ancestors`; eso lo cubre `X-Frame-Options`). Los textos de compartir solo existen en español (la web se sirve solo en español).
 
 ## Comunicaciones reales
 

@@ -692,6 +692,13 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - **Contenido:** métricas del Hero «3+» años y «20+» proyectos (ES/EN); `imageAlt` del retrato ya no dice «provisional». Tarjetas de Proyectos y LinkedIn apagado se dejan como están a propósito.
 - **Verificado:** `npm run check` 0 errores y 0 avisos; `npm run build` genera `404.html`, `robots.txt`, `sitemap.xml`, `index.html` y `video-converters/index.html` con canonical y metadatos correctos (la 404 con `noindex`); en el navegador la 404 se ve con el estilo del sitio y la home carga todos sus recursos con 200, con el botón dorado, las cifras nuevas y sin scroll horizontal. **No verificado:** la tarjeta real al compartir en redes (depende del dominio publicado), la 404 en el hosting final, la web en móvil tras estos cambios.
 
+## Publicación, dependencias y CSP (4 de noviembre de 2026)
+
+- **Publicada** en https://chiissuu.com (Netlify desde la rama `master` de GitHub; dominio comprado en Cloudflare con los registros A y CNAME en «Solo DNS»; certificado de Let’s Encrypt). `www` redirige a `chiissuu.com`. Registros SPF y DMARC restrictivos (el dominio no envía correo).
+- **Dependencias:** `npm audit` pasó de 4 avisos (Vite, undici, fast-uri, zod; solo herramientas de desarrollo) a 0 con `npm audit fix` (solo cambió `package-lock.json`). Pendientes sin aplicar: menores de `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12 y `gsap` 3.15.1; mayores (React 19, TypeScript 7, lucide) no recomendados por ahora.
+- **CSP y cabeceras:** ver [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]]. Configuración de preview añadida a `.claude/launch.json` (puerto 4330).
+- **Fuente PP Neue Montreal:** `PPNeueMontreal-Book.woff2` **sí se usa y se sirve en producción** (párrafos `editorial-text` de Servicios/Tools y la 404). Su licencia gratuita es solo personal; decisión pendiente: comprar la licencia web o retirarla (cae a Inter).
+
 ## Cómo mantener este vault al día
 
 Actualizar junto al cambio de código: rutas, contratos, límites, estados, fuentes y hallazgos afectados. Volver a medir antes de copiar resultados de build o tamaños de archivo — no asumir que siguen igual. El contenido de [[Contenido-por-Seccion]] es una instantánea de `site.js`: al editar ese archivo, hay que regenerar o actualizar la nota — nunca debe convertirse en una segunda fuente de la aplicación. No dejar un hallazgo marcado como abierto en [[Hallazgos-y-Pendientes]] cuando el código y una prueba pertinente ya confirmen que está resuelto.

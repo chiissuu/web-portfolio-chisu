@@ -9,9 +9,9 @@
   # package.json requires Node >= 22.12.0.
   NODE_VERSION = "22"
 
-# Basic security headers for every page. No Content-Security-Policy on purpose:
-# the site uses inline scripts/styles, Google Fonts and an FFmpeg WebAssembly
-# worker, so a CSP has to be written and tested separately.
+# Basic security headers for every page. The Content-Security-Policy is not
+# here: Astro writes it into a <meta> tag on each page (see `security.csp` in
+# astro.config.mjs), because it needs the hashes of the inline scripts.
 [[headers]]
   for = "/*"
   [headers.values]
