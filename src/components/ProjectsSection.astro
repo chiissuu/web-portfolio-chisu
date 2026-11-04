@@ -32,7 +32,7 @@ const noteParts = keys.length
 const [left, right] = t.projects.items.filter((project) => project.art);
 ---
 
-<ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} backdrop="champagne" rail iris center>
+<ShowcaseSection id="projects" title={t.projects.title} titleImage={t.projects.titleImage} backdrop="champagne" rail iris center railNav={t.projects.railNav}>
   <Fragment slot="deco">
     {left && (
       <div class="pj-motif pj-motif--l" data-deco-l>

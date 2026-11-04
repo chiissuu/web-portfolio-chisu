@@ -1,7 +1,7 @@
 ---
 tags: [seo, comunicaciones, persistencia, seguridad]
 aliases: [SEO-Comunicaciones-Persistencia]
-actualizado: 2026-11-03
+actualizado: 2026-11-04
 fuente: [src/layouts/Layout.astro, src/content/site.js]
 ---
 
@@ -18,6 +18,14 @@ Cada página tiene título, descripción, charset, viewport y `lang`; el favicon
 - **Imagen al compartir:** [og-chiissuu.png](../../public/assets/images/og-chiissuu.png), 1200×630, generada por [generate-og-image.mjs](../../scripts/generate-og-image.mjs) con el wordmark dorado. Para cambiarla, editar el script y volver a ejecutarlo. Las redes guardan en caché la tarjeta: tras publicar, hay que refrescarla con sus depuradores.
 - **404:** [404.astro](../../src/pages/404.astro) con el estilo de la web (hilo cortado, 404 dorado, botón dorado a Inicio); `noindex`, textos en `notFound` de `site.js`. Cada host la sirve a su manera (Netlify, Vercel, Cloudflare Pages y GitHub Pages usan `404.html` solos).
 - **robots.txt y sitemap.xml:** son rutas de código ([robots.txt.ts](../../src/pages/robots.txt.ts), [sitemap.xml.ts](../../src/pages/sitemap.xml.ts)) que usan `site`. Al crear una página indexable nueva, añadir su ruta a `paths` en `sitemap.xml.ts`.
+
+## Idiomas y SEO (4 de noviembre de 2026)
+
+- **`hreflang`:** cada página lleva `<link rel="alternate" hreflang>` para `es`, `en` y `x-default` (= español), generados por [Layout.astro](../../src/layouts/Layout.astro) a partir de la prop `alternates`. Sirve para que Google muestre a cada visitante la versión de su idioma y no trate las dos como contenido duplicado. Las páginas 404 no los llevan (son `noindex`).
+- **Canonical propio por idioma:** `/` y `/en/` se apuntan a sí mismas.
+- **Open Graph:** `og:locale` es `es_ES` o `en_US` según la página, y `og:locale:alternate` el otro. La imagen de compartir es la misma (no lleva texto traducible); su `alt` sí cambia de idioma.
+- **Sitemap:** [sitemap.xml.ts](../../src/pages/sitemap.xml.ts) lista las cuatro URLs, cada una con `xhtml:link` a todas sus versiones. Al crear una página nueva, añadir su ruta (la española) a `paths`.
+- **Sin redirección automática** por idioma del navegador (confunde a usuarios y buscadores). Tras publicar, vale la pena enviar el sitemap en Search Console.
 
 ## Cabeceras de seguridad y CSP (4 de noviembre de 2026)
 

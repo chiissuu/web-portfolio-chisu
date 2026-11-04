@@ -6,6 +6,9 @@ interface Props {
   lang?: string;
   /** Keeps the page out of search engines and omits its canonical (404). */
   noindex?: boolean;
+  /** This page in every language (paths), for `hreflang`. Omit on pages that
+   * only exist in one language. */
+  alternates?: Partial<Record<"es" | "en", string>>;
 }
 
 const {
@@ -14,6 +17,7 @@ const {
   bodyClass = "",
   lang = "es",
   noindex = false,
+  alternates,
 } = Astro.props as Props;
 
 const fontHref =
@@ -25,7 +29,20 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const site = Astro.site;
 const canonical = site && !noindex ? new URL(Astro.url.pathname, site).href : undefined;
 const shareImage = site ? new URL(`${base}/assets/images/og-chiissuu.png`, site).href : undefined;
-const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Science y GFX";
+const shareImageAlt =
+  lang === "en"
+    ? "chiissuu — Jesús León · Software Engineer, Data Science and GFX"
+    : "chiissuu — Jesús León · Software Engineer, Data Science y GFX";
+const localeTag = (l: string) => (l === "en" ? "en_US" : "es_ES");
+// `hreflang` links: one per language plus `x-default` (the Spanish root).
+const alternateLinks =
+  site && alternates
+    ? [
+        ...Object.entries(alternates).map(([hreflang, path]) => ({ hreflang, href: new URL(path, site).href })),
+        ...(alternates.es ? [{ hreflang: "x-default", href: new URL(alternates.es, site).href }] : []),
+      ]
+    : [];
+const otherLocales = Object.keys(alternates ?? {}).filter((l) => l !== lang);
 ---
 
 <!DOCTYPE html>
@@ -38,9 +55,11 @@ const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Scie
     <script is:inline src={`${base}/motion-init.js`}></script>
     {noindex && <meta name="robots" content="noindex" />}
     {canonical && <link rel="canonical" href={canonical} />}
+    {alternateLinks.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="chiissuu" />
-    <meta property="og:locale" content={lang === "en" ? "en_US" : "es_ES"} />
+    <meta property="og:locale" content={localeTag(lang)} />
+    {otherLocales.map((l) => <meta property="og:locale:alternate" content={localeTag(l)} />)}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}

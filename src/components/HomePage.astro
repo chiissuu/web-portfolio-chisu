@@ -1,0 +1,48 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HeroExperience from "./HeroExperience.astro";
+import AboutSection from "./AboutSection.astro";
+import ContactSection from "./ContactSection.astro";
+import ProjectsSection from "./ProjectsSection.astro";
+import ServicesSection from "./ServicesSection.astro";
+import ToolsSection from "./ToolsSection.astro";
+import FaqSection from "./FaqSection.astro";
+import { alternatesFor, type Locale } from "../lib/i18n";
+import { content } from "../content/site.js";
+
+// The home page of one language: src/pages/index.astro (es, site root) and
+// src/pages/en/index.astro (en) both render this with their locale.
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props as Props;
+const t = content[locale];
+const alternates = alternatesFor("/");
+---
+
+{/*
+  Section order: Home (hero) -> Sobre mí -> Proyectos -> Servicios -> Tools ->
+  Contacto -> FAQ. The closing line lives inside FAQ.
+*/}
+<Layout title={t.seo.title} description={t.seo.description} bodyClass="redesign redesign-home" lang={locale} alternates={alternates}>
+  <HeroExperience t={t} locale={locale} alternates={alternates} />
+  <main class="home-main">
+    <AboutSection t={t} />
+    <ProjectsSection t={t} />
+    <ServicesSection t={t} />
+    <ToolsSection t={t} />
+    <ContactSection t={t} />
+    <FaqSection t={t} />
+  </main>
+</Layout>
+
+<style is:global>
+  /* Every home section paints its own opaque background, so the page colour
+     only ever shows through hairline seams where two sections meet on a
+     fractional pixel (browser zoom, high-DPI scaling). Cream there read as a
+     pale line crossing the page and the sidebar glass; dark makes it vanish. */
+  body.redesign-home {
+    background: var(--section-dark-start);
+  }
+</style>

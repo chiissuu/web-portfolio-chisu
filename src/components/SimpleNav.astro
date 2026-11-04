@@ -1,13 +1,19 @@
 ---
 import { withBase } from "../lib/paths.js";
 import type { SimpleNavContent } from "../lib/content-types";
+import type { Locale } from "../lib/i18n";
 
 interface Props {
   t: SimpleNavContent;
+  /** Home of the page's language ("/" or "/en/"). */
+  home?: string;
+  /** Language of this page and this same page in each language (ES | EN). */
+  locale?: Locale;
+  alternates?: Record<Locale, string>;
 }
 
-const { t } = Astro.props as Props;
-const home = withBase("/");
+const { t, home: homeProp, locale = "es", alternates } = Astro.props as Props;
+const home = homeProp ?? withBase("/");
 
 const navItems = [
   { href: `${home}#about`, label: t.nav.about },
@@ -23,6 +29,21 @@ const navItems = [
   <div class="rd-simple-nav-links">
     {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
   </div>
+  {alternates && (
+    <div class="rd-simple-nav-lang" role="group" aria-label={t.hero.language.label}>
+      {locale === "es" ? (
+        <span class="is-current" lang="es" aria-current="true">ES</span>
+      ) : (
+        <a href={alternates.es} hreflang="es" lang="es" aria-label={t.hero.language.toEs}>ES</a>
+      )}
+      <span aria-hidden="true">|</span>
+      {locale === "en" ? (
+        <span class="is-current" lang="en" aria-current="true">EN</span>
+      ) : (
+        <a href={alternates.en} hreflang="en" lang="en" aria-label={t.hero.language.toEn}>EN</a>
+      )}
+    </div>
+  )}
 </nav>
 
 <style>
@@ -58,6 +79,24 @@ const navItems = [
 
   .rd-simple-nav-links a:hover {
     color: var(--color-text);
+  }
+
+  .rd-simple-nav-lang {
+    display: flex;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .rd-simple-nav-lang a:hover {
+    color: var(--color-text);
+  }
+
+  .rd-simple-nav-lang .is-current {
+    font-weight: 700;
+    color: var(--color-accent);
   }
 
   @media (max-width: 700px) {

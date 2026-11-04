@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SimpleNav from "./SimpleNav.astro";
+import VideoConverterPageContent from "./VideoConverterPageContent.astro";
+import { alternatesFor, pathFor, type Locale } from "../lib/i18n";
+import { content } from "../content/site.js";
+
+// The video converter page of one language (src/pages/video-converters/ and
+// src/pages/en/video-converters/).
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props as Props;
+const t = content[locale];
+---
+
+<Layout
+  title={`${t.videoConverter.title} | ${t.seo.title}`}
+  description={t.videoConverter.seo.description}
+  bodyClass="redesign"
+  lang={locale}
+  alternates={alternatesFor("/video-converters/")}
+>
+  <SimpleNav t={t} home={pathFor(locale, "/")} locale={locale} alternates={alternatesFor("/video-converters/")} />
+  <VideoConverterPageContent t={t} />
+</Layout>

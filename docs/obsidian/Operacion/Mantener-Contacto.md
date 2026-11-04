@@ -20,7 +20,7 @@ Contacto es el final del recorrido: cabecera centrada, una tarjeta «Escríbeme 
 
 - El botón dorado (`.ct-metal`, definido en [ContactSection.astro](../../../src/components/ContactSection.astro)) es el mismo acabado del sidebar y de Servicios; lo usan el botón de email y el de enviar.
 - Textos de la tarjeta directa: `directTitle`, `emailIntro`, `emailButton`, `copyLabel`, `copiedLabel`, `channelsLabel`, y `formTitle` para la tarjeta del formulario.
-- Canales: LinkedIn, GitHub y Redes sociales (de `contact.links`). **LinkedIn** se muestra apagado, como en la barra lateral, con su tooltip; en cuanto exista `links.linkedin` (URL) se convierte en enlace en esta sección (la barra lateral hay que cambiarla a la vez, está en [HeroExperience.astro](../../../src/components/HeroExperience.astro)). Para otro canal: añadir su objeto a `channels` en `ContactSection.astro` y su logo `public/assets/icons/social/<id>-gold.png`.
+- Canales: LinkedIn, GitHub y Redes sociales (de `contact.links`). **LinkedIn** es un enlace real (`contact.links.linkedin`, desde el 4 de noviembre de 2026) tanto aquí como en la barra lateral (`HeroExperience.astro`); si se borra esa URL de `site.js`, los dos vuelven a la tarjeta apagada con su tooltip (`linkedinTooltip`). Para otro canal: añadir su objeto a `channels` en `ContactSection.astro` y su logo `public/assets/icons/social/<id>-gold.png`.
 
 ## La transición desde Tools
 

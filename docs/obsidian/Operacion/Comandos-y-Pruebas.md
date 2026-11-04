@@ -708,6 +708,26 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - **No verificado:** en el PC de torre real, el ritmo a 60 fps, el inglés, la 404 y el conversor con el modo apagado, y el comportamiento con el panel de pruebas oculto (los eventos de scroll reales no llegan: es una limitación del entorno de pruebas, no de la web).
 - Copias de seguridad: `backups/*.pre-motion-toggle-2026-11-04.bak`.
 
+## Web en inglés (4 de noviembre de 2026)
+
+- **Hecho:** `/en/` y `/en/video-converters/` (+ 404 inglesa), selector «ES | EN» arriba a la izquierda (simétrico al botón de animaciones), `hreflang`, canonical y `og:locale` por idioma, sitemap con alternativas, reglas de Netlify (`/es/` → raíz y 404 inglesa), títulos gráficos en inglés (Projects, Services, Contact), `hero.personalNote` en inglés (la «clave ausente»). Detalle: [[Bilingue-ES-EN]].
+- **Fallo previo corregido:** los enlaces con ancla (`/#contact`) no aterrizaban en la sección ni en producción; ahora el Hero salta al ancla (también al cambiar de idioma).
+- **Verificado** (build de producción con CSP, puerto 4330, panel visible): `npm run check` 0 errores (el inglés cumple los tipos); 6 páginas generadas con `<html lang>`, canonical, `hreflang` y `og:locale` correctos; sitemap con las cuatro URLs y alternativas; en `/en/`: Hero, menú lateral y secciones en inglés con los títulos nuevos, el selector se desplaza a la derecha del menú lateral, el botón ES lleva a `/#contact` conservando la sección y aterriza en ella; `/en/video-converters/` con textos, enlaces y selector en inglés; móvil (375 px): menú con «ES | EN» y «Animations: on», etiquetas «Open/Close menu», sin desbordamiento; sin violaciones de CSP.
+- **No verificado:** la regla de Netlify de la 404 inglesa y la redirección `/es/` (solo existen en producción), el conversor funcionando en inglés (solo se vio la interfaz), la página en Safari/Firefox, el sitemap en Search Console.
+- Copias de seguridad: `backups/*.pre-i18n-2026-11-04.bak`.
+
+## Servicios, carrusel sin animaciones y GFX (4 de noviembre de 2026)
+
+- **Texto:** el primer paso de «Cómo trabajo» deja de estar en plural de equipo: «Se valora qué necesitas…» / «What you need is assessed…». Se dejaron las frases de la FAQ que incluyen al cliente («¿Cómo empezamos un proyecto?», «valoramos juntos…»), que no afirman un equipo. El tercer renglón del título del Hero en inglés vuelve a ser «GFX».
+- **Fallo corregido:** con las animaciones apagadas no había forma de ver los proyectos que no cabían: el carril es una tira con scroll nativo, pero con la barra casi invisible, sin controles y con la rueda moviendo solo la página. Ahora ([ShowcaseSection.astro](../../../src/components/ShowcaseSection.astro)), **solo con `html[data-motion="off"]`**: barra de desplazamiento visible, dos flechas doradas con contador «01 / 06» que avanzan una tarjeta (`sc-nav`, `initRailNav`), y el carril enfocable con teclado (`tabindex`, `role="region"`, nombre desde `projects.railNav` en ES/EN). Con las animaciones encendidas no cambia nada (carrusel anclado).
+- **Verificado** (build de producción, 1280 px): apagado = 6 tarjetas, cada flecha avanza 341 px, el contador llega a 06 / 06, «siguiente» se desactiva al final y «anterior» vuelve; encendido = flechas ocultas y carril anclado; textos y «GFX» correctos en español y en inglés; `check` 0 errores y `build` correcto. **No verificado:** las flechas del teclado con una pulsación real (el navegador de pruebas solo emite eventos sintéticos), el arrastre táctil, el móvil con las animaciones apagadas.
+- Copias de seguridad: `backups/*.pre-rail-nav-2026-11-04.bak`.
+
+## LinkedIn enlazado (4 de noviembre de 2026)
+
+- `contact.links.linkedin` = perfil de LinkedIn del usuario (ES y EN). La barra lateral ([HeroExperience.astro](../../../src/components/HeroExperience.astro)) y el canal de Contacto pasan de tarjeta apagada a enlace (`target="_blank"`, `rel="noopener noreferrer"`, flecha dorada como GitHub). Sin URL siguen apareciendo apagados con su tooltip.
+- Verificado en el HTML generado: 2 enlaces por página (barra lateral y Contacto) en español e inglés, ninguno apagado; `check` 0 errores. No verificado en el navegador a mano.
+
 ## Cómo mantener este vault al día
 
 Actualizar junto al cambio de código: rutas, contratos, límites, estados, fuentes y hallazgos afectados. Volver a medir antes de copiar resultados de build o tamaños de archivo — no asumir que siguen igual. El contenido de [[Contenido-por-Seccion]] es una instantánea de `site.js`: al editar ese archivo, hay que regenerar o actualizar la nota — nunca debe convertirse en una segunda fuente de la aplicación. No dejar un hallazgo marcado como abierto en [[Hallazgos-y-Pendientes]] cuando el código y una prueba pertinente ya confirmen que está resuelto.
