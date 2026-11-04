@@ -61,7 +61,7 @@ Excepción local de About a ≥1200px: centra `.ab-body` entre el borde visible 
 
 ## Fuentes
 
-Remotas (Google Fonts): Space Grotesk, Archivo Black, Inter Tight, Inter, JetBrains Mono. Editorial local: `PPNeueMontreal-Book.woff2` (27.516 bytes, con fallback a Inter/Arial) — el archivo sí existe en `public/assets/fonts/`, pese a algún comentario histórico que decía lo contrario.
+Remotas (Google Fonts): Space Grotesk, Archivo Black, Inter Tight, Inter, JetBrains Mono. Texto editorial (`--font-editorial`): Inter, ya cargada desde Google Fonts. PP Neue Montreal se retiró el 4 de noviembre de 2026 (su versión gratuita es solo de uso personal); no queda ninguna fuente local.
 
 Excepción de About: su biografía usa Inter, con pesos reales 400, 500 y 600 ya disponibles, para diferenciar cuerpo y énfasis. Las demás secciones conservan `--font-editorial`.
 

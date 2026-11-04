@@ -697,7 +697,7 @@ La configuración separa `node_modules/.vite-astro-dev` y `.vite-astro-build` me
 - **Publicada** en https://chiissuu.com (Netlify desde la rama `master` de GitHub; dominio comprado en Cloudflare con los registros A y CNAME en «Solo DNS»; certificado de Let’s Encrypt). `www` redirige a `chiissuu.com`. Registros SPF y DMARC restrictivos (el dominio no envía correo).
 - **Dependencias:** `npm audit` pasó de 4 avisos (Vite, undici, fast-uri, zod; solo herramientas de desarrollo) a 0 con `npm audit fix` (solo cambió `package-lock.json`). Pendientes sin aplicar: menores de `astro` 7.4.5, `@astrojs/react` 7.1.2, `@astrojs/check` 0.9.12 y `gsap` 3.15.1; mayores (React 19, TypeScript 7, lucide) no recomendados por ahora.
 - **CSP y cabeceras:** ver [[05-SEO-Comunicaciones-Persistencia|SEO-Comunicaciones-Persistencia]]. Configuración de preview añadida a `.claude/launch.json` (puerto 4330).
-- **Fuente PP Neue Montreal:** `PPNeueMontreal-Book.woff2` **sí se usa y se sirve en producción** (párrafos `editorial-text` de Servicios/Tools y la 404). Su licencia gratuita es solo personal; decisión pendiente: comprar la licencia web o retirarla (cae a Inter).
+- **Fuente PP Neue Montreal: retirada** (4 de noviembre de 2026). Su versión gratuita es solo de uso personal y se servía en producción. Se borraron el archivo y su `@font-face`; `--font-editorial` es ahora Inter. Medido a 16 px: Inter es un 15 % más ancha (669 frente a 582 px la misma frase) y un 8 % más alta de «x» que PP Neue, así que no hizo falta ajustar tamaños. En la home los intros de Servicios y Tools ya usaban Space Grotesk (su estilo centrado lo fuerza): el único texto que cambió es el de la 404.
 
 ## Cómo mantener este vault al día
 

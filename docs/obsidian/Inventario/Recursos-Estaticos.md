@@ -10,7 +10,6 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 
 | Recurso | Bytes | Uso actual |
 |---|---:|---|
-| [public/assets/fonts/PPNeueMontreal-Book.woff2](../../../public/assets/fonts/PPNeueMontreal-Book.woff2) | 27.516 | Fuente editorial local |
 | [public/assets/icons/flags/de.svg](../../../public/assets/icons/flags/de.svg) | 204 | Bandera decorativa (idioma) en la biografía de About; se carga por código de país |
 | [public/assets/icons/flags/es.svg](../../../public/assets/icons/flags/es.svg) | 153 | Bandera decorativa (ubicación e idioma) en la biografía de About |
 | [public/assets/icons/flags/gb.svg](../../../public/assets/icons/flags/gb.svg) | 373 | Bandera decorativa (idioma) en la biografía de About; se carga por código de país |

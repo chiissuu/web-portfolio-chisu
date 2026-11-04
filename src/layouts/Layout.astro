@@ -202,11 +202,10 @@ const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Scie
     --font-title: "Inter Tight", "Inter", sans-serif;
     --font-body: "Inter", system-ui, sans-serif;
     --font-mono: "JetBrains Mono", monospace;
-    /* Editorial body copy across the redesigned sections. The licensed
-       woff2 isn't in this project (see the @font-face below) — until it's
-       added, every one of these falls through to "Inter", which is already
-       loaded above. */
-    --font-editorial: "PP Neue Montreal Book", "PP Neue Montreal", "Inter", Arial, sans-serif;
+    /* Editorial body copy across the redesigned sections: Inter, which is
+       already loaded from Google Fonts. (PP Neue Montreal was removed: its
+       free version is personal-use only.) */
+    --font-editorial: "Inter", Arial, sans-serif;
 
     /* Dark section gradient (Sobre mí / Servicios y Tools / FAQ) —
        provisional values, centralized here so they're a single edit once a
@@ -255,21 +254,6 @@ const shareImageAlt = "chiissuu — Jesús León · Software Engineer, Data Scie
        start as sidebar-left(0) + `--hx-sidebar-width` + this gap, not a
        fixed/measured-at-one-viewport-size offset. */
     --sidebar-content-gap: clamp(2.5rem, 3vw, 4rem);
-  }
-
-  /* PP Neue Montreal Book — licensed font, not bundled with this project.
-     Point this at the real file once it's added under
-     `public/assets/fonts/`; until then the request 404s silently and every
-     `var(--font-editorial)` consumer falls back to "Inter" (already loaded
-     via Google Fonts above). Root-relative on purpose, matching this
-     project's unset `base` — if `base` is ever configured this path needs
-     to move to a BASE_URL-aware injection instead. */
-  @font-face {
-    font-family: "PP Neue Montreal Book";
-    src: url("/assets/fonts/PPNeueMontreal-Book.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
   }
 
   @media (prefers-reduced-motion: reduce) {
