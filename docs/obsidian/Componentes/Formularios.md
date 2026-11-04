@@ -1,12 +1,12 @@
 ---
 tags: [componente, formularios, validacion]
 actualizado: 2026-10-10
-fuente: [src/components/ContactForm.astro, src/components/ServicesForm.astro, src/lib/forms/validate.ts, src/lib/forms/submit.ts]
+fuente: [src/components/ContactForm.astro, src/lib/forms/validate.ts]
 ---
 
 # Formularios
 
-Fuentes: [ContactForm.astro](../../../src/components/ContactForm.astro), [ServicesForm.astro](../../../src/components/ServicesForm.astro), [validate.ts](../../../src/lib/forms/validate.ts), [submit.ts](../../../src/lib/forms/submit.ts).
+Fuentes: [ContactForm.astro](../../../src/components/ContactForm.astro) y [validate.ts](../../../src/lib/forms/validate.ts). `ServicesForm` y `submit.ts` se borraron el 3 de noviembre de 2026 (las páginas que los usaban ya no existen); la guía vigente del formulario es [[Mantener-Contacto]].
 
 > [!important]
 > **Ningún formulario de este sitio envía nada de verdad.** Esto hay que tenerlo presente antes de referenciarlos como un canal de contacto real en cualquier otro sitio (README, LinkedIn, etc.).
@@ -19,7 +19,7 @@ El formulario de **Contacto** está estilado para la sección oscura (panel de t
 
 | Formulario | Campos obligatorios | Opcionales |
 |---|---|---|
-| Contacto | name, email, reason, subject, message, preferredResponse | Ninguno |
+| Contacto | name, email, reason, message (desde el 1 de noviembre de 2026; antes también subject y preferredResponse) | Ninguno: al enviar se abre el correo del visitante con `mailto:` ya redactado (ver [[Mantener-Contacto]]) |
 | Servicios | name, email, serviceType, problem | company, budget, timeline, message |
 
 Contacto permite motivos: Colaboración, Proyecto, Pregunta general u Otro; y respuesta preferida: Email o Cualquiera. Servicios permite tipo de servicio: Automatización de procesos, Web comercial/visual, Auditoría y asesoramiento, u Otro. Presupuesto y plazo son texto libre, sin validación numérica ni de fechas.

@@ -33,16 +33,6 @@ Servicios genera sus tres tarjetas desde `services.page.articles` (las tres enla
 
 El componente combinado `ServicesToolsSection.astro` ya no existe. Los datos siguen bajo `servicesTools` en `site.js` con `services.title`/`titleImage` y `tools.title`/`titleImage` (sin `servicesTools.title`); los contratos son `ServicesHomeSectionContent` y `ToolsHomeSectionContent`. Para añadir imágenes reales, ver la recomendación 2 de [[Auditoria-Servicios-Tools]].
 
-## Servicios: página independiente — [ServicesPageContent.astro](../../../src/components/ServicesPageContent.astro)
-
-Título, introducción, tres artículos con tags (automatización de procesos / páginas web comerciales y visuales / auditoría y asesoramiento técnico-visual) y una llamada a «Cuéntame tu proyecto» que lleva al formulario (ver [[Formularios]]). No hay tarifas, calculadora de presupuesto, pagos, agenda ni contratación automática — el texto sobre auditoría describe una propuesta de trabajo, no un sistema que la programe o la exija técnicamente.
-
-## Tools: catálogo — [ToolsPageContent.astro](../../../src/components/ToolsPageContent.astro)
-
-Dos tarjetas: «Conversor de vídeo a MP3/MP4» (estado Disponible, enlace real a su ruta) y «Comprobador de quién no te sigue en Instagram» (En desarrollo, sin `href`, renderiza un `span` con `aria-disabled="true"` — no contacta Instagram ni permite importar datos).
-
-Dato clave para no confundirse al editar: es la existencia de `item.href` la que determina si el CTA es un enlace real, **no** el texto de `status`. Cambiar solo la palabra "En desarrollo" por "Disponible" no implementa nada — hace falta además añadir el `href`. El grid está pensado para tres columnas aunque hoy solo haya dos tarjetas.
-
 ## Contacto — [ContactSection.astro](../../../src/components/ContactSection.astro)
 
 Rediseñada el 23 de octubre (ver [[Auditoria-Contacto]]): ya no es la sección clara. Mismo grafito #24221f y grano que About/Servicios/Tools, título gráfico con halo dorado (sin la etiqueta repetida), un párrafo de entrada y dos columnas desde 1100px (una por debajo): a la izquierda el formulario ([[Formularios]]) dentro de un panel de tarjeta; a la derecha los **canales directos**, con el correo (`mailto:jesusleonromero233@gmail.com`, que solo abre el gestor de correo del visitante: la web nunca lo envía por sí misma) y las filas de LinkedIn, GitHub y Redes Sociales con los logos dorados del sidebar. El fondo termina con un fundido a #050505, donde empieza FAQ. Sin `.rd-reveal`: visible sin JavaScript.
@@ -66,12 +56,9 @@ Auditoría del 10 de octubre: ejemplo Tools con h3 tras h2, correo ajustado a 32
 
 Proyectos, Servicios, Tools, Contacto y FAQ muestran su título como imagen WebP transparente (`public/assets/images/section-title-*-es.webp`, 2000×1145, aportadas por el usuario y sin modificar). `SectionHeadingCard` (con `halo` opcional: el resplandor dorado estático de About, usado en Servicios y Tools) oculta los márgenes transparentes solo con CSS (marco con `aspect-ratio` y `overflow: hidden`, el mismo método que el título de About) y dimensiona por **altura de letra**: `clamp(5rem, 10vw, 9rem)`, de modo que todas las palabras se ven a la misma escala (128px a 1280px de ancho, 80px en móvil) y el ancho sigue la proporción de cada una (`min(100%, altura × proporción)`), sin deformarse. Los datos (`titleImage` con `src`, `width`, `height` y `crop`) viven junto al título en `site.js` y su tipo es `TitleImage`. El texto del título sigue en el DOM como `h2` oculto visualmente (accesible); la imagen es decorativa (`alt=""`, `aria-hidden`). Sin `titleImage` (el inglés, que no tiene arte) se muestra la tarjeta de cristal con texto. Las páginas `/servicios/` y `/tools/` conservan su `h1` de texto.
 
-## Componentes existentes pero sin montar en ninguna ruta
+## Código retirado (3 de noviembre de 2026)
 
-`ServicesTeaser.astro`, `ToolsTeaser.astro` y `ClosingStatement.astro` **no se importan** en ninguna ruta actual:
-
-- [ServicesTeaser.astro](../../../src/components/ServicesTeaser.astro) y [ToolsTeaser.astro](../../../src/components/ToolsTeaser.astro): representarían Servicios y Tools como secciones **separadas**, cada una con su propio ID (`services`, `tools`). Montarlas junto a [ServicesSection.astro](../../../src/components/ServicesSection.astro) y [ToolsSection.astro](../../../src/components/ToolsSection.astro), que ya usan esos IDs, los duplicaría — no son un simple "añadir de vuelta", requieren decidir cuál de los dos esquemas se usa.
-- [ClosingStatement.astro](../../../src/components/ClosingStatement.astro): `closing.text` y `closing.signature` siguen existiendo en `site.js`, pero no hay cierre ni footer después de FAQ en ninguna ruta actual.
+Se borraron los componentes que ninguna ruta importaba: `ServicesTeaser`, `ToolsTeaser`, `ServicesPageContent`, `ToolsPageContent`, `ServicesForm` y `ClosingStatement` (el cierre vive dentro de FAQ), junto con `lib/forms/submit.ts` y `validateServicesForm`. En `site.js`/`content-types.ts` siguen datos que ya solo usaban esos componentes (p. ej. `services.form`, los teasers); son inertes y se pueden podar con calma.
 
 ## Relacionado
 

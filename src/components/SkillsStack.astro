@@ -105,7 +105,9 @@ const columns = groups.map((group, gi) => {
 <style>
   .pt {
     width: min(100%, 68rem);
-    margin: clamp(3rem, 6vw, 5rem) auto 0;
+    /* The bottom margin leaves room for the fade into Servicios (see
+       ServicesBridge, .sb-fade). */
+    margin: clamp(3rem, 6vw, 5rem) auto clamp(3.5rem, 6vw, 5.5rem);
   }
 
   /* Title: no box, just letters between two gold rules that run towards the

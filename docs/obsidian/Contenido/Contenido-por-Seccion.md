@@ -80,7 +80,7 @@ FAQ: experiencia profesional, disponibilidad freelance, acceso al trabajo de dis
 
 ## Contenido existente pero no publicado
 
-Ver [[Otras-Secciones-y-Compartidos]] (teasers y `ClosingStatement`) y [[Bilingue-ES-EN]] (estado del inglés).
+Ver [[Otras-Secciones-y-Compartidos]] (código retirado) y [[Bilingue-ES-EN]] (estado del inglés). Cifras del Hero desde el 3 de noviembre de 2026: «3+ años» y «20+ proyectos».
 
 ## Frase de Proyectos (30 de octubre de 2026)
 

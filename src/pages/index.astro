@@ -17,9 +17,7 @@ const t = content.es;
 
 {/*
   Section order per the redesign spec: Home (hero) -> Sobre mí -> Proyectos ->
-  Servicios -> Tools -> Contacto -> FAQ. No footer/closing statement after
-  FAQ — `ClosingStatement.astro` is intentionally not rendered here anymore
-  (left in place, unused, rather than deleted — see delivery notes).
+  Servicios -> Tools -> Contacto -> FAQ. The closing line lives inside FAQ.
 */}
 <Layout title={t.seo.title} description={t.seo.description} bodyClass="redesign redesign-home" lang="es">
   <HeroExperience t={t} />

@@ -44,7 +44,7 @@ El usuario ve, en el primer scroll tras mostrarse la primera tarjeta de Sobre m�
 |---|---|---|
 | Inglés incompleto y sin publicar | Falta `hero.personalNote`; verificar contratos y etiquetas antes de crear rutas. Tampoco hay títulos gráficos EN para las cinco secciones (usan la tarjeta de texto) | [[Bilingue-ES-EN]] |
 | Comentarios históricos contradicen el código actual | Fuente editorial sí presente, About warm, CTA final eliminado, uso de Lucide, raster de marca | [[00-Empieza-Aqui]] |
-| Código y contenido no usados | Teasers, `ClosingStatement`, `fitWordmarkWidth`, `siteName`/SEO auxiliar según consumidor | [[Otras-Secciones-y-Compartidos]], [[Hero-y-Sidebar]] |
+| Código y contenido no usados | Teasers y `ClosingStatement` **ya borrados** (3 de noviembre de 2026); quedan `fitWordmarkWidth`, `siteName`/SEO auxiliar y datos de `site.js` que solo usaban los componentes borrados | [[Otras-Secciones-y-Compartidos]], [[Hero-y-Sidebar]] |
 | Diagnósticos ruidosos del check | Se analiza JS generado de `public/ffmpeg`; 126 hints, sin errores | [[Comandos-y-Pruebas]] |
 | Limpieza para una posible navegación parcial futura | Listeners y observers fuera del contexto de GSAP; no hay `ClientRouter` hoy | [[Hero-y-Sidebar]] |
 

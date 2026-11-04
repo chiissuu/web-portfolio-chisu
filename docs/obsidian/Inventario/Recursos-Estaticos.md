@@ -10,8 +10,6 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 
 | Recurso | Bytes | Uso actual |
 |---|---:|---|
-| [public/assets/fonts/Milesdane-ReadMe.txt](../../../public/assets/fonts/Milesdane-ReadMe.txt) | 429 | Aviso de licencia de la fuente Trial archivada |
-| [public/assets/fonts/Milesdane-Trial.otf](../../../public/assets/fonts/Milesdane-Trial.otf) | 77.304 | Archivada; sin `@font-face` ni petición. Licencia: uso personal, no comercial |
 | [public/assets/fonts/PPNeueMontreal-Book.woff2](../../../public/assets/fonts/PPNeueMontreal-Book.woff2) | 27.516 | Fuente editorial local |
 | [public/assets/icons/flags/de.svg](../../../public/assets/icons/flags/de.svg) | 204 | Bandera decorativa (idioma) en la biografía de About; se carga por código de país |
 | [public/assets/icons/flags/es.svg](../../../public/assets/icons/flags/es.svg) | 153 | Bandera decorativa (ubicación e idioma) en la biografía de About |
@@ -24,11 +22,8 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 | [public/assets/images/about-title-es.png](../../../public/assets/images/about-title-es.png) | 1.814.007 | Título PNG «SOBRE MÍ» (2446×1400), activo; recorte solo por CSS |
 | [public/assets/images/about-veins.webp](../../../public/assets/images/about-veins.webp) | 328.428 | Venas doradas extraídas de la textura del Hero (1600×1832, reflejada), fondo de Sobre mí — ver [[Sobre-Mi]] |
 | [public/assets/images/hero-background-gold-alternative.png](../../../public/assets/images/hero-background-gold-alternative.png) | 2.341.187 | Fondo activo del Hero mediante CSS y textura desaturada de About |
-| [public/assets/images/hero-background-gold.png](../../../public/assets/images/hero-background-gold.png) | 4.666.957 | Variante conservada; solo aparece mencionada en un comentario del Hero |
 | [public/assets/images/hero-wordmark-gold.png](../../../public/assets/images/hero-wordmark-gold.png) | 1.991.664 | Marca del Hero y sidebar |
 | [public/assets/images/profile-cutout-alt.png](../../../public/assets/images/profile-cutout-alt.png) | 143.795 | Retrato activo, provisional |
-| [public/assets/images/profile-cutout-trimmed.png](../../../public/assets/images/profile-cutout-trimmed.png) | 33.175 | Retrato alternativo conservado, sin referencia activa |
-| [public/assets/images/profile-cutout.png](../../../public/assets/images/profile-cutout.png) | 44.383 | Retrato alternativo conservado, sin referencia activa |
 | [public/assets/images/section-title-contacto-es.webp](../../../public/assets/images/section-title-contacto-es.webp) | 167.828 | Título gráfico «CONTACTO» (2000×1145, alfa); recorte solo por CSS |
 | [public/assets/images/section-title-faq-es.webp](../../../public/assets/images/section-title-faq-es.webp) | 61.656 | Título gráfico «FAQ» |
 | [public/assets/images/section-title-proyectos-es.webp](../../../public/assets/images/section-title-proyectos-es.webp) | 195.824 | Título gráfico «PROYECTOS» |
@@ -39,7 +34,6 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 | [public/assets/skills/c.png](../../../public/assets/skills/c.png) | 23.215 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/canva.png](../../../public/assets/skills/canva.png) | 342.330 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/cpp.png](../../../public/assets/skills/cpp.png) | 75.646 | Logo decorativo del stack de About (42 herramientas) |
-| [public/assets/skills/css.png](../../../public/assets/skills/css.png) | 5.623 | Logo conservado; HTML/CSS ya no aparecen en el stack visible |
 | [public/assets/skills/docker.png](../../../public/assets/skills/docker.png) | 9.800 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/excel.png](../../../public/assets/skills/excel.png) | 1.987 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/gimp.png](../../../public/assets/skills/gimp.png) | 753.558 | Logo decorativo del stack de About (42 herramientas) |
@@ -47,7 +41,6 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 | [public/assets/skills/github.svg](../../../public/assets/skills/github.svg) | 968 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/google-drive.png](../../../public/assets/skills/google-drive.png) | 2.181 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/gsap.png](../../../public/assets/skills/gsap.png) | 7.623 | Logo decorativo del stack de About (42 herramientas) |
-| [public/assets/skills/html.png](../../../public/assets/skills/html.png) | 28.161 | Logo conservado; HTML/CSS ya no aparecen en el stack visible |
 | [public/assets/skills/illustrator.png](../../../public/assets/skills/illustrator.png) | 1.580 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/java.png](../../../public/assets/skills/java.png) | 16.703 | Logo decorativo del stack de About (42 herramientas) |
 | [public/assets/skills/javascript.png](../../../public/assets/skills/javascript.png) | 13.662 | Logo decorativo del stack de About (42 herramientas) |
@@ -83,7 +76,7 @@ Tamaños exactos en bytes, medidos el 23 de octubre de 2026 (antes: 10 de septie
 
 Los dos archivos de `public/ffmpeg/` no están en el repositorio Git (los regenera `npm run copy:ffmpeg-core` desde `node_modules/@ffmpeg/core/dist/esm/`), por eso no llevan enlace. Su tamaño depende de la versión instalada del núcleo.
 
-Las 42 herramientas del stack de About tienen logo local (ver [[Logos-Stack]]); los tres logos del sidebar están documentados en [[Logos-Redes]]. `html.png` y `css.png` se conservan pero ya no se muestran. Los títulos gráficos (`about-title-*` PNG y `section-title-*` WebP) no se recortan ni recolorean: sus márgenes transparentes se ocultan con CSS (ver [[Sobre-Mi]]).
+Las 42 herramientas del stack de About tienen logo local (ver [[Logos-Stack]]); los tres logos del sidebar están documentados en [[Logos-Redes]]. Se retiraron (3 de noviembre de 2026) los recursos sin uso: la fuente Milesdane Trial (licencia personal), `hero-background-gold.png`, `profile-cutout.png`, `profile-cutout-trimmed.png`, `html.png` y `css.png`. Nuevo: `og-chiissuu.png` (1200×630, tarjeta al compartir; se regenera con `scripts/generate-og-image.mjs`). Los títulos gráficos (`about-title-*` PNG y `section-title-*` WebP) no se recortan ni recolorean: sus márgenes transparentes se ocultan con CSS (ver [[Sobre-Mi]]).
 
 El hallazgo de «peso elevado de recursos utilizados» (fondo alternativo ~2,34 MB, wordmark ~1,99 MB y los dos títulos PNG de About de ~1,8 MB) está registrado en [[Hallazgos-y-Pendientes]].
 

@@ -18,9 +18,12 @@
 // `bd-light` plus `section-theme-warm` when the backdrop is light).
 interface Props {
   kind: "champagne" | "blueprint" | "brushed" | "dawn" | "ivory";
+  /** Draw the wavy liquid-gold edge above the section (default). A section
+   *  that makes its own boundary (Servicios) turns it off. */
+  edge?: boolean;
 }
 
-const { kind } = Astro.props as Props;
+const { kind, edge = true } = Astro.props as Props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // Per-section tone at its top edge, and the shape of its wave (two sine terms
@@ -55,6 +58,7 @@ for (let i = 0; i < pts.length - 1; i++) {
 const fill = `${curve} L ${WIDTH} ${HEIGHT} L 0 ${HEIGHT} Z`;
 ---
 
+{edge && (
 <div class="bd-edge" data-bd-edge aria-hidden="true" style={`--edge-fill:${EDGE.fill}`}>
   <svg class="bd-edge-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none" focusable="false">
     <defs>
@@ -74,6 +78,7 @@ const fill = `${curve} L ${WIDTH} ${HEIGHT} L 0 ${HEIGHT} Z`;
     <path d={curve} fill="none" stroke={`url(#bd-rim-${kind})`} stroke-width="3" vector-effect="non-scaling-stroke" />
   </svg>
 </div>
+)}
 <div class={`bd bd--${kind}`} data-bd={kind} aria-hidden="true" style={`--bd-veins: url("${base}/assets/images/about-veins.webp");--edge-fill:${EDGE.fill}`}>
   <div class="bd-bridge"></div>
   {kind === "champagne" && <div class="bd-veins"></div>}
@@ -163,6 +168,9 @@ const fill = `${curve} L ${WIDTH} ${HEIGHT} L 0 ${HEIGHT} Z`;
     height: var(--edge-h, clamp(4rem, 7vw, 6.5rem));
     z-index: 2;
     overflow-x: clip;
+    /* The gold glow of the rim may spread upwards but not below the edge's own
+       bottom: there it would lie over the section's top as a pale band. */
+    clip-path: inset(-3rem 0 0 0);
     pointer-events: none;
   }
 

@@ -1,0 +1,459 @@
+---
+// The way out of Servicios into Tools: the same language as the way in, run
+// the other way (dark to light).
+//   Boundary: no wavy edge and none of the rule-and-scale of Servicios (that
+//   one belongs to the plan). Tools is a workshop: over the end of Servicios the
+//   black goes to the champagne through gold with a fine brushed grain, ending
+//   in a bevelled lip of brushed metal with a row of rivets.
+//   Light: from the two diamonds that close Servicios' rails, two threads go
+//   down either side of the gold button, turn inwards below it, join in a
+//   diamond and go on as one thread, crossing the lip at a bolt
+//   to a diamond over the title of Tools, which is drawn in top to bottom as
+//   the light arrives. Then a metal sheen sweeps the brushed plate once (and
+//   glints along the lip), and the introduction and the catalog come up.
+// The threads, the reveals and the sweep run by TIME, once the button of
+// Servicios has come into view, only on wide desktop (1200px and up) and with
+// motion (where Servicios' own rails exist); otherwise only the gradient and
+// the lip are there, static. The positions are measured from Servicios'
+// closing diamonds, its button and the title, so they follow the layout.
+---
+
+<div class="tb" data-tb aria-hidden="true">
+  <span class="tb-seg tb-seg--v tb-seg--lv" data-k="lv"><i class="tb-lit"></i><i class="tb-spark"></i></span>
+  <span class="tb-seg tb-seg--v tb-seg--rv" data-k="rv"><i class="tb-lit"></i><i class="tb-spark"></i></span>
+  <span class="tb-seg tb-seg--h tb-seg--lh" data-k="lh"><i class="tb-lit"></i><i class="tb-spark"></i></span>
+  <span class="tb-seg tb-seg--h tb-seg--rh" data-k="rh"><i class="tb-lit"></i><i class="tb-spark"></i></span>
+  <span class="tb-seg tb-seg--v tb-seg--cv" data-k="cv"><i class="tb-lit"></i><i class="tb-spark"></i></span>
+  <i class="tb-node tb-node--m"></i>
+  <i class="tb-node tb-node--e"></i>
+  <i class="tb-bolt"></i>
+  <i class="tb-sheen"></i>
+</div>
+<!-- The boundary itself, always there: a lip of brushed metal. -->
+<div class="tb-sheet" aria-hidden="true">
+  <i class="tb-fade"></i>
+  <i class="tb-lip"></i>
+</div>
+
+<style is:global>
+  /* Until the light arrives, the title is covered from the bottom up (drawn in
+     top to bottom, --tb-t 0 to 1) and the introduction and catalog are down and
+     faded (--tb-c 0 to 1). `tb-revealed` lifts it all when it has finished. */
+  .tb-wired:not(.tb-revealed) .shc-art-frame {
+    clip-path: inset(0 0 calc(100% - var(--tb-t, 1) * 100%) 0);
+  }
+
+  .tb-wired:not(.tb-revealed) [data-tb-fade] {
+    opacity: var(--tb-c, 1);
+    transform: translateY(calc((1 - var(--tb-c, 1)) * 16px));
+  }
+</style>
+
+<style>
+  .tb-sheet {
+    --fade-h: clamp(8rem, 12vw, 10.5rem);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    height: 0;
+    pointer-events: none;
+  }
+
+  /* Over the end of Servicios: black to champagne through gold, eased. */
+  .tb-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--fade-h);
+    background: linear-gradient(
+      180deg,
+      rgb(176 138 50 / 0%) 0,
+      rgb(150 112 38 / 28%) 20%,
+      rgb(190 150 62 / 62%) 40%,
+      rgb(226 196 120 / 86%) 62%,
+      rgb(238 224 182 / 97%) 82%,
+      #f0e5c2 100%
+    );
+  }
+
+  /* Fine horizontal streaks over the lighter half of the gradient: the
+     brushed grain of the metal, so the dark does not just fade, it turns into
+     the plate. */
+  .tb-fade::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgb(255 250 230 / 16%) 0 1px, transparent 1px 3px);
+    mask-image: linear-gradient(180deg, transparent 25%, #000 85%);
+  }
+
+  /* The boundary: a bevelled lip of brushed gold metal across the page, with a
+     row of rivets. Light edge on top, dark underside, a shadow on the plate. */
+  .tb-lip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -3px;
+    height: 12px;
+    background:
+      radial-gradient(circle at 50% 50%, #fff3c4 0 1px, #7a5a1a 1.6px, transparent 2.7px) 0 50% / 96px 12px repeat-x,
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 14%) 0 1px, rgb(0 0 0 / 7%) 1px 2px),
+      linear-gradient(180deg, #fbf1c8 0, #f0dc98 18%, #d6b968 45%, #a9873a 78%, #7a5a1a 100%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 252 235 / 95%),
+      inset 0 -1px 0 rgb(60 40 10 / 50%),
+      0 4px 9px rgb(70 50 14 / 35%);
+    transition: filter 0.5s ease;
+  }
+
+  /* A glint that runs along the lip once (the same --sh as the plate's sheen). */
+  .tb-lip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 40%, rgb(255 253 240 / 95%) 50%, transparent 60%);
+    background-size: 260% 100%;
+    background-repeat: no-repeat;
+    background-position: calc(var(--sh, 0) * 100%) 0;
+  }
+
+  /* With the threads wired the lip is dull until the thread crosses it. */
+  :global(.tb-wired) .tb-lip {
+    filter: brightness(0.72) saturate(0.75);
+  }
+
+  .tb.is-x + .tb-sheet .tb-lip {
+    filter: none;
+  }
+
+  /* --- The light: threads, diamonds, registration mark, sheen ---------------- */
+  .tb {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 3;
+    display: none;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .tb.is-wired {
+    display: block;
+  }
+
+  .tb-seg {
+    position: absolute;
+    background: rgb(176 138 50 / 62%);
+  }
+
+  .tb-seg--v {
+    width: 3px;
+    transform: translateX(-50%);
+  }
+
+  .tb-seg--h {
+    height: 3px;
+    transform: translateY(-50%);
+  }
+
+  .tb-seg--lv {
+    left: var(--lx, 0);
+    top: var(--y0, 0);
+    height: calc(var(--ym, 0px) - var(--y0, 0px));
+  }
+
+  .tb-seg--rv {
+    left: var(--rx, 0);
+    top: var(--y0, 0);
+    height: calc(var(--ym, 0px) - var(--y0, 0px));
+  }
+
+  .tb-seg--lh {
+    left: var(--lx, 0);
+    top: var(--ym, 0);
+    width: calc(var(--cx, 0px) - var(--lx, 0px));
+  }
+
+  .tb-seg--rh {
+    left: var(--cx, 0);
+    top: var(--ym, 0);
+    width: calc(var(--rx, 0px) - var(--cx, 0px));
+  }
+
+  .tb-seg--cv {
+    left: var(--cx, 0);
+    top: var(--ym, 0);
+    height: calc(var(--ye, 0px) - var(--ym, 0px));
+  }
+
+  .tb-lit {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #b08a32, #c19b3d);
+    transform-origin: top;
+    transform: scaleY(var(--s, 1));
+  }
+
+  .tb-seg--h .tb-lit {
+    transform-origin: left;
+    transform: scaleX(var(--s, 1));
+  }
+
+  .tb-seg--rh .tb-lit {
+    transform-origin: right;
+  }
+
+  .tb-spark {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--s, 1) * (100% - 11px));
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff3c4;
+    box-shadow: 0 0 16px 6px rgb(239 214 131 / 90%);
+    opacity: min(1, calc(var(--s, 1) * 30), calc((1 - var(--s, 1)) * 30));
+    transform: translateX(-50%);
+  }
+
+  .tb-seg--h .tb-spark {
+    top: 50%;
+    left: calc(var(--s, 1) * (100% - 11px));
+    transform: translateY(-50%);
+  }
+
+  .tb-seg--rh .tb-spark {
+    left: auto;
+    right: calc(var(--s, 1) * (100% - 11px));
+  }
+
+  .tb-node {
+    position: absolute;
+    left: var(--cx, 0);
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid #8f6c24;
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 35%);
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .tb-node--m {
+    top: var(--ym, 0);
+  }
+
+  .tb-node--e {
+    top: var(--ye, 0);
+  }
+
+  .tb.is-m .tb-node--m,
+  .tb.is-e .tb-node--e {
+    border-color: #fff0b0;
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1.5px #8f6c24,
+      0 0 16px rgb(239 214 131 / 95%),
+      0 0 34px rgb(239 214 131 / 55%);
+    animation: tb-flash 0.8s ease-out;
+  }
+
+  @keyframes tb-flash {
+    0% {
+      filter: brightness(2.2);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
+  /* The thread crosses the lip at a bolt: a hex head that lights when it does. */
+  .tb-bolt {
+    position: absolute;
+    top: 3px;
+    left: var(--cx, 0);
+    width: 1.5rem;
+    height: 1.5rem;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 2px 2px rgb(60 40 10 / 45%));
+    transition: filter 0.5s ease;
+  }
+
+  .tb-bolt::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%);
+    background: linear-gradient(145deg, #fff3c4, #c9a443 45%, #7a5a1a);
+  }
+
+  .tb-bolt::after {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff8dc, #b08a32 60%, #6f5522);
+    box-shadow: inset 0 0 0 1px rgb(60 40 10 / 50%);
+  }
+
+  .tb.is-x .tb-bolt {
+    filter: drop-shadow(0 0 8px rgb(239 214 131 / 95%)) drop-shadow(0 0 16px rgb(239 214 131 / 60%));
+  }
+
+  /* The metal sheen: a band of light that crosses the brushed plate once. */
+  .tb-sheen {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--tb-h, 0px);
+    overflow: hidden;
+    opacity: var(--tb-o, 0);
+  }
+
+  .tb-sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgb(224 188 96 / 22%) 46%,
+      rgb(255 253 240 / 85%) 50%,
+      rgb(224 188 96 / 22%) 54%,
+      transparent 60%
+    );
+    background-size: 260% 100%;
+    background-repeat: no-repeat;
+    background-position: calc(var(--sh, 0) * 100%) 0;
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const bridge = document.querySelector<HTMLElement>("[data-tb]");
+  const section = bridge?.closest<HTMLElement>("section");
+  const services = document.getElementById("services");
+  const fade = section?.querySelector<HTMLElement>(".tb-fade");
+
+  if (bridge && section && services && fade) {
+    // The sidebar's cards turn light when they leave the dark of Servicios; the
+    // fade is lighter than dark over its lower half, so the dark section counts
+    // as ending in the middle of the fade (see checkArticleThemes in the Hero).
+    const trim = () => {
+      services.dataset.themeTrim = String(fade.getBoundingClientRect().height * 0.5);
+    };
+    trim();
+    window.addEventListener("resize", trim);
+
+    const cta = services.querySelector<HTMLElement>(".sc-cta");
+    const endL = services.querySelector<HTMLElement>(".sb-end--l");
+    const endR = services.querySelector<HTMLElement>(".sb-end--r");
+
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 1200px) and (prefers-reduced-motion: no-preference)", () => {
+      if (!cta || !endL || !endR || !services.classList.contains("sb-wired")) return;
+
+      const LAND_AT = 1.3; // s: the threads have joined (merge diamond)
+      const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const seg = (k: string) => bridge.querySelector<HTMLElement>(`[data-k="${k}"]`)!;
+      const lv = seg("lv");
+      const rv = seg("rv");
+      const lh = seg("lh");
+      const rh = seg("rh");
+      const cv = seg("cv");
+      const title = section.querySelector<HTMLElement>(".shc-art-frame");
+      const fades = Array.from(section.querySelectorAll<HTMLElement>(".sc-intro, .tc"));
+      let cross = 0.5; // share of the central thread at which it crosses the rule
+
+      // Everything is measured from the closing diamonds of Servicios, its
+      // button and the title of Tools, relative to this section.
+      const layout = () => {
+        const s = section.getBoundingClientRect();
+        const a = endL.getBoundingClientRect();
+        const b = endR.getBoundingClientRect();
+        const lx = a.left + a.width / 2 - s.left;
+        const rx = b.left + b.width / 2 - s.left;
+        const y0 = a.top + a.height / 2 - s.top;
+        const ym = cta.getBoundingClientRect().bottom - s.top + 1.4 * rem();
+        const ye = title ? title.getBoundingClientRect().top - s.top - 1.1 * rem() : ym + 6 * rem();
+        const set = (name: string, value: number) => bridge.style.setProperty(name, value + "px");
+        set("--lx", lx);
+        set("--rx", rx);
+        set("--cx", (lx + rx) / 2);
+        set("--y0", y0);
+        set("--ym", ym);
+        set("--ye", ye);
+        set("--tb-h", section.offsetHeight);
+        cross = ye > ym ? Math.min(1, Math.max(0, (0 - ym) / (ye - ym))) : 0.5;
+      };
+      layout();
+      ScrollTrigger.addEventListener("refresh", layout);
+
+      bridge.classList.add("is-wired");
+      section.classList.add("tb-wired");
+      fades.forEach((el) => el.setAttribute("data-tb-fade", ""));
+
+      gsap.set([lv, rv, lh, rh, cv], { "--s": 0 });
+      gsap.set(section, { "--tb-t": 0, "--tb-c": 0, "--sh": 0 });
+      gsap.set(bridge, { "--tb-o": 0 });
+
+      const run = gsap.timeline({
+        paused: true,
+        onUpdate: () => {
+          const t = run.time();
+          const c = parseFloat(cv.style.getPropertyValue("--s")) || 0;
+          bridge.classList.toggle("is-m", t >= LAND_AT - 0.02);
+          bridge.classList.toggle("is-x", c >= cross && c > 0);
+          bridge.classList.toggle("is-e", c >= 0.999);
+          // Done: the covers come off (they would hold on to transforms).
+          section.classList.toggle("tb-revealed", run.progress() === 1);
+        },
+      });
+      run
+        // Down either side of the button, then inwards under it.
+        .to([lv, rv], { "--s": 1, duration: 0.7, ease: "none" }, 0)
+        .to([lh, rh], { "--s": 1, duration: 0.6, ease: "none" }, 0.7)
+        // One thread from the joint, down through the rule to the title.
+        .to(cv, { "--s": 1, duration: 0.9, ease: "none" }, LAND_AT + 0.05)
+        // The title is drawn in as the thread ends, top to bottom.
+        .to(section, { "--tb-t": 1, duration: 0.9, ease: "power2.out" }, LAND_AT + 0.95)
+        // The metal sheen crosses the plate once.
+        .to(bridge, { "--tb-o": 1, duration: 0.2, ease: "none" }, LAND_AT + 1.0)
+        .to(section, { "--sh": 1, duration: 1.7, ease: "power1.inOut" }, LAND_AT + 1.0)
+        .to(bridge, { "--tb-o": 0, duration: 0.5, ease: "none" }, LAND_AT + 2.2)
+        // The introduction and the catalog come up.
+        .to(section, { "--tb-c": 1, duration: 0.8, ease: "power2.out" }, LAND_AT + 1.5);
+
+      const trigger = ScrollTrigger.create({
+        trigger: cta,
+        start: "bottom 78%",
+        end: "max",
+        // After the pins above and the bridge of Servicios.
+        refreshPriority: -6,
+        onEnter: () => run.timeScale(1).play(),
+        onLeaveBack: () => run.timeScale(2.5).reverse(),
+        // Loaded already past it (restored scroll, resize): show it done.
+        onRefresh: (self) => {
+          if (self.isActive) run.progress(1);
+        },
+      });
+
+      return () => {
+        trigger.kill();
+        ScrollTrigger.removeEventListener("refresh", layout);
+        bridge.classList.remove("is-wired", "is-m", "is-x", "is-e");
+        section.classList.remove("tb-wired", "tb-revealed");
+        fades.forEach((el) => el.removeAttribute("data-tb-fade"));
+      };
+    });
+  }
+</script>

@@ -1,0 +1,263 @@
+---
+// "How I work": the steps of a project under the service cards, joined by a
+// thread of light. The thread is always there, dim; when the strip comes into
+// view a light runs along it by time and lights each diamond (brown to gold) as
+// it passes, which also brings its step up from dim to full. Desktop with
+// motion only; below 1000px or with reduced motion the steps are simply there,
+// lit, as a vertical list.
+import type { ServicesProcess } from "../lib/content-types";
+
+interface Props {
+  process: ServicesProcess;
+}
+
+const { process } = Astro.props as Props;
+---
+
+<section class="sp" data-sp>
+  <h3 class="sp-title">{process.title}</h3>
+  <div class="sp-steps">
+    <span class="sp-line" aria-hidden="true"><i class="sp-lit"></i><i class="sp-spark"></i></span>
+    <ol class="sp-list">
+      {process.steps.map((step, index) => (
+        <li class="sp-step is-lit" data-sp-step>
+          <span class="sp-node" aria-hidden="true"></span>
+          <span class="sp-num" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          <h4 class="sp-name">{step.title}</h4>
+          <p class="sp-text">{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .sp {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .sp-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0 0 clamp(1.4rem, 3vw, 2rem);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-brand-gold);
+  }
+
+  .sp-title::before,
+  .sp-title::after {
+    content: "";
+    width: clamp(2rem, 6vw, 4.5rem);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(193 155 61 / 70%));
+  }
+
+  .sp-title::after {
+    transform: scaleX(-1);
+  }
+
+  .sp-steps {
+    position: relative;
+  }
+
+  .sp-list {
+    display: grid;
+    grid-template-columns: repeat(var(--sp-n, 4), minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sp-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2.1rem;
+    text-align: center;
+  }
+
+  /* The diamond on the thread: brown until the light arrives, then gold. */
+  .sp-node {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid #8f6c24;
+    background: linear-gradient(135deg, #7d5d26, #4a3817);
+    transform: translate(-50%, 0) rotate(45deg);
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .sp-step.is-lit .sp-node {
+    border-color: #fff0b0;
+    background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
+    box-shadow:
+      0 0 0 1.5px #8f6c24,
+      0 0 16px rgb(239 214 131 / 90%),
+      0 0 34px rgb(239 214 131 / 45%);
+  }
+
+  .sp-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--theme-text-muted);
+  }
+
+  .sp-name {
+    margin: 0.35rem 0 0.45rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--theme-text);
+  }
+
+  .sp-text {
+    max-width: 17rem;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--theme-text-muted);
+  }
+
+  .sp-line {
+    display: none;
+  }
+
+  /* Desktop: one horizontal thread through the diamonds, first to last. */
+  @media (min-width: 1000px) {
+    .sp-line {
+      position: absolute;
+      top: calc(0.45rem + 0.475rem - 1.5px);
+      left: calc(50% / var(--sp-n, 4));
+      right: calc(50% / var(--sp-n, 4));
+      display: block;
+      height: 3px;
+      background: linear-gradient(90deg, rgb(176 138 50 / 72%), rgb(176 138 50 / 58%) 50%, rgb(176 138 50 / 72%));
+    }
+
+    .sp-lit {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #c19b3d, #b08a32 50%, #c19b3d);
+      transform: scaleX(var(--c, 1));
+      transform-origin: left;
+    }
+
+    .sp-spark {
+      position: absolute;
+      top: 50%;
+      left: calc(var(--c, 1) * (100% - 11px));
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff3c4;
+      box-shadow: 0 0 16px 6px rgb(239 214 131 / 90%);
+      opacity: min(1, calc(var(--c, 1) * 30), calc((1 - var(--c, 1)) * 30));
+      transform: translateY(-50%);
+    }
+
+    /* Wired: steps start dim and come up as their diamond lights. */
+    .sp.is-wired .sp-step:not(.is-lit) {
+      opacity: 0.4;
+    }
+
+    .sp-step {
+      transition: opacity 0.4s ease;
+    }
+  }
+
+  /* Below 1000px: a vertical list, thread on the left. */
+  @media (max-width: 999px) {
+    .sp-list {
+      grid-template-columns: 1fr;
+      gap: 1.4rem;
+    }
+
+    .sp-step {
+      align-items: flex-start;
+      padding: 0 0 0 2.2rem;
+      text-align: left;
+    }
+
+    .sp-node {
+      top: 0.2rem;
+      left: 0.5rem;
+    }
+
+    .sp-step::before {
+      content: "";
+      position: absolute;
+      top: 1rem;
+      bottom: -1.4rem;
+      left: calc(0.5rem - 1.5px);
+      width: 3px;
+      background: rgb(176 138 50 / 55%);
+    }
+
+    .sp-step:last-child::before {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll<HTMLElement>("[data-sp]").forEach((root) => {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>("[data-sp-step]"));
+    const line = root.querySelector<HTMLElement>(".sp-steps");
+    if (!line || steps.length < 2) return;
+    root.style.setProperty("--sp-n", String(steps.length));
+
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 1000px) and (prefers-reduced-motion: no-preference)", () => {
+      const RUN = 0.45 * steps.length; // seconds the light takes along the thread
+      root.classList.add("is-wired");
+      gsap.set(line, { "--c": 0 });
+
+      const run = gsap.timeline({
+        paused: true,
+        // Each diamond lights when the light reaches it (and dims again on the way back).
+        onUpdate: () => {
+          const t = run.time();
+          steps.forEach((step, i) => step.classList.toggle("is-lit", t >= (RUN * i) / (steps.length - 1) - 0.02));
+        },
+      });
+      run.to(line, { "--c": 1, duration: RUN, ease: "none" }, 0.15);
+      steps.forEach((step) => step.classList.remove("is-lit"));
+
+      const trigger = ScrollTrigger.create({
+        trigger: root,
+        start: "top 78%",
+        end: "max",
+        refreshPriority: -5,
+        onEnter: () => run.timeScale(1).play(),
+        onLeaveBack: () => run.timeScale(2.5).reverse(),
+        onRefresh: (self) => {
+          if (self.isActive) run.progress(1);
+        },
+      });
+
+      return () => {
+        trigger.kill();
+        root.classList.remove("is-wired");
+        steps.forEach((step) => step.classList.add("is-lit"));
+        gsap.set(line, { clearProps: "--c" });
+      };
+    });
+  });
+</script>

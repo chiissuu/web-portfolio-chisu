@@ -65,7 +65,7 @@ Remotas (Google Fonts): Space Grotesk, Archivo Black, Inter Tight, Inter, JetBra
 
 Excepción de About: su biografía usa Inter, con pesos reales 400, 500 y 600 ya disponibles, para diferenciar cuerpo y énfasis. Las demás secciones conservan `--font-editorial`.
 
-La prueba de Milesdane Trial se retiró del render el 2026-10-23 para unificar la lectura y evitar su marca en «2». El OTF y su aviso de licencia permanecen archivados junto a las fuentes; no hay un `@font-face` activo ni solicitud de ese archivo. La biografía usa los pesos reales de Inter ya cargados. No se añaden fuentes, dependencias ni solicitudes externas nuevas.
+La prueba de Milesdane Trial se retiró del render el 2026-10-23 para unificar la lectura y evitar su marca en «2». El OTF y su aviso de licencia se **borraron del proyecto el 3 de noviembre de 2026** (licencia solo personal, no comercial; no se usaba). La biografía usa los pesos reales de Inter ya cargados. No se añaden fuentes, dependencias ni solicitudes externas nuevas.
 
 ## Breakpoints y CSS generado
 
