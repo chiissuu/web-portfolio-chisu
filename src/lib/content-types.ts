@@ -82,7 +82,7 @@ export interface HeroContent {
   /** Button that turns the site animations on or off (see
    * `public/motion-init.js`). `on`/`off` are the state words shown after
    * `label`; `aria` is the accessible name of the button. */
-  motion: { label: string; on: string; off: string; aria: string };
+  motion: { label: string; on: string; off: string; aria: string; toastOn: string; toastOff: string };
   /** Language switch (ES | EN): `label` names the group; `toEs`/`toEn` are the
    * accessible names of the link that goes to each language's version. */
   language: { label: string; toEs: string; toEn: string };

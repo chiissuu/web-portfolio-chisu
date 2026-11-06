@@ -129,6 +129,25 @@
     filter: none;
   }
 
+  /* Phones and tablets: the lip is dull until it comes into view, then it
+     brightens and a glint runs along it once. */
+  :global(.tb-m) .tb-lip {
+    filter: brightness(0.72) saturate(0.75);
+  }
+
+  :global(.tb-m) .tb.is-x + .tb-sheet .tb-lip::after {
+    animation: tb-glint 1.4s ease-out;
+  }
+
+  @keyframes tb-glint {
+    from {
+      background-position: 0% 0;
+    }
+    to {
+      background-position: 100% 0;
+    }
+  }
+
   /* --- The light: threads, diamonds, registration mark, sheen ---------------- */
   .tb {
     position: absolute;
@@ -336,6 +355,7 @@
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { revealOnEnter } from "../lib/mobileReveal";
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -453,6 +473,34 @@
         bridge.classList.remove("is-wired", "is-m", "is-x", "is-e");
         section.classList.remove("tb-wired", "tb-revealed");
         fades.forEach((el) => el.removeAttribute("data-tb-fade"));
+      };
+    });
+
+    // Phones and tablets: the lip lights once (with a glint) when it comes into
+    // view, and the title, introduction and catalog come up.
+    mm.add("(max-width: 1199px) and (prefers-reduced-motion: no-preference)", () => {
+      section.classList.add("tb-m");
+      const lip = section.querySelector<HTMLElement>(".tb-lip");
+      const stop = revealOnEnter(Array.from(section.querySelectorAll<HTMLElement>(".shc-art-frame, .sc-intro, .tc")));
+      let io: IntersectionObserver | null = null;
+      if (lip && "IntersectionObserver" in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            bridge.classList.add("is-x");
+            io?.disconnect();
+          },
+          { rootMargin: "0px 0px -30% 0px" }
+        );
+        io.observe(lip);
+      } else {
+        bridge.classList.add("is-x");
+      }
+      return () => {
+        stop();
+        io?.disconnect();
+        section.classList.remove("tb-m");
+        bridge.classList.remove("is-x");
       };
     });
   }

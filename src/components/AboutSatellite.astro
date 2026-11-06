@@ -26,10 +26,12 @@ const bars = [30, 56, 40, 76, 50, 68, 34, 60, 24];
         <circle class="f" style="--i:3" cx="22" cy="21" r="3.2" fill="currentColor" stroke="none" />
         <circle class="f" style="--i:4" cx="35" cy="21" r="3.2" fill="currentColor" stroke="none" />
         <circle class="f" style="--i:5" cx="48" cy="21" r="3.2" fill="currentColor" stroke="none" />
-        <text class="t mono" style="--i:6" x="20" y="62" stroke="none">$ whoami</text>
-        <text class="t mono hi" style="--i:9" x="20" y="84" stroke="none">jesus-leon</text>
-        <text class="t mono dim" style="--i:12" x="20" y="106" stroke="none"># U-TAD · Madrid</text>
-        <rect class="t cursor" style="--i:14" x="20" y="116" width="7" height="13" fill="currentColor" stroke="none" />
+        <!-- No blinking cursor here: the output is already written, and the only
+             caret on the page belongs to the "/whoami" title, which is the part
+             that is still being typed. The three lines are centred in the window. -->
+        <text class="t mono" style="--i:6" x="20" y="71" stroke="none">$ whoami</text>
+        <text class="t mono hi" style="--i:9" x="20" y="93" stroke="none">jesus-leon</text>
+        <text class="t mono dim" style="--i:12" x="20" y="115" stroke="none"># U-TAD · Madrid</text>
       </>
     )}
     {kind === "stack" && (
@@ -341,14 +343,10 @@ const bars = [30, 56, 40, 76, 50, 68, 34, 60, 24];
     transition-duration: 0.2s;
   }
 
-  /* Alive once lit: the equalizer dances and the terminal cursor blinks. */
+  /* Alive once lit: the equalizer dances. */
   :global(.ab-journey.ab-js .ab-step.is-lit) .eq {
     animation: ab-sat-eq 1s ease-in-out infinite alternate;
     animation-delay: calc(var(--i, 0) * -0.17s);
-  }
-
-  :global(.ab-journey.ab-js .ab-step.is-lit) .cursor {
-    animation: ab-sat-blink 1.1s steps(1) 1.4s infinite;
   }
 
   @keyframes ab-sat-eq {
@@ -357,12 +355,6 @@ const bars = [30, 56, 40, 76, 50, 68, 34, 60, 24];
     }
     to {
       transform: scaleY(1);
-    }
-  }
-
-  @keyframes ab-sat-blink {
-    50% {
-      opacity: 0;
     }
   }
 
@@ -382,8 +374,7 @@ const bars = [30, 56, 40, 76, 50, 68, 34, 60, 24];
 
   /* motion off (nav button) */
   @media all {
-    :global(html[data-motion="off"]) :global(.ab-journey .ab-step) .eq,
-    :global(html[data-motion="off"]) :global(.ab-journey .ab-step) .cursor {
+    :global(html[data-motion="off"]) :global(.ab-journey .ab-step) .eq {
       animation: none;
     }
   }

@@ -160,6 +160,14 @@ El menú usa fade de 220ms y entrada escalonada 40–240ms solo con `prefers-red
 
 La decisión, el botón y el estado están en [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]]. En este componente: el marcado de las dos píldoras (`.hx-motion-desktop`, `.hx-motion-mobile`), su script final, `updateStaticSidebar` (menú lateral sin morfo, en escritorio y con las animaciones apagadas) y `decodeWithTimeout` (límite de 1,2 s a la espera de decodificar el retrato). Las menciones a `prefers-reduced-motion` de esta nota se leen ahora como «animaciones apagadas con el botón».
 
+## Menú móvil: cajón lateral (5 de noviembre de 2026)
+
+Por debajo de 900 px el menú lateral no existe y se usa un **cajón** que entra desde la derecha, con las mismas tarjetas y botones dorados que el menú lateral, el selector de idioma, el botón de animaciones y las redes. Detalle, decisiones y pruebas en [[Comandos-y-Pruebas]] (sección «Móvil: menú en cajón lateral»). Las descripciones anteriores de este apartado sobre el panel claro de pantalla completa y sus enlaces grandes (`.hx-mobile-nav a`) ya no aplican.
+
+## Hero en móvil: composición propia (6 de noviembre de 2026)
+
+Hasta 640 px de ancho el Hero tiene su propia composición, inspirada en la de heynesh.com en móvil (no es una versión reducida de la de escritorio): wordmark casi de borde a borde (`--hx-wordmark-height: min(36vw, 22svh)`), dos tarjetas de cifras escalonadas bajo la barbilla (la derecha más baja), tarjeta de rasgos a la izquierda del pecho (solo con 800 px de alto o más), y una **pila de texto alineada a la izquierda abajo** (título, botones, nota personal) sobre un degradado oscuro que sube desde abajo (`.hx-foreground::before`) y enlaza con la sección oscura siguiente; con ese fondo el título pasa de tinta a marfil. El lema (`.hx-tagline`) no se dibuja en móvil (está en el cajón). Todo se mide desde abajo o desde el wordmark, así que vale de 640 a 900 px de alto. Marcado, línea de entrada (solo escribe `y`/opacidad/`transform` y lo limpia) y los tramos desde 641 px no se tocan. Pruebas y límites en [[Comandos-y-Pruebas]] (sección del 6 de noviembre, segunda parte). Copia previa: `backups/HeroExperience.astro.pre-hero-nesh-2026-11-06.bak`.
+
 ## Relacionado
 
 [[03-Sistema-de-Diseno|Sistema-de-Diseno]] · [[02-Rutas-y-Navegacion|Rutas-y-Navegacion]] · [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] · [[Hallazgos-y-Pendientes]]

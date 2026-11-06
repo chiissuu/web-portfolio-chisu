@@ -7,7 +7,7 @@
 // Run with: node scripts/generate-about-veins.mjs
 import sharp from "sharp";
 
-const SOURCE = "public/assets/images/hero-background-gold-alternative.png";
+const SOURCE = "public/assets/images/hero-background-gold-alternative.webp";
 const OUTPUT = "public/assets/images/about-veins.webp";
 const WIDTH = 1600;
 const GOLD = [239, 214, 131];

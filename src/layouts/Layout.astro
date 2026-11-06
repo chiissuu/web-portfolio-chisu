@@ -472,6 +472,30 @@ const otherLocales = Object.keys(alternates ?? {}).filter((l) => l !== lang);
     transform: translateY(0);
   }
 
+  /* One-shot reveals for phones and tablets (see src/lib/mobileReveal.ts): the
+     classes are put on by script, and taken off again after the first reveal. */
+  .m-rev {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.6s ease var(--m-d, 0ms),
+      transform 0.7s cubic-bezier(0.22, 0.8, 0.2, 1) var(--m-d, 0ms);
+  }
+
+  .m-rev.m-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .m-iris {
+    clip-path: circle(0% at 50% 14%);
+    transition: clip-path 1s cubic-bezier(0.3, 0.6, 0.2, 1) var(--m-d, 0ms);
+  }
+
+  .m-iris.m-in {
+    clip-path: circle(150% at 50% 14%);
+  }
+
   /* The gold metal button of the page (same finish as the sidebar's and the
      Servicios one): face, skewed bevel, stationary edge beneath, pressed state.
      Used by Contact (email and send buttons) and the 404 page. */
