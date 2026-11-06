@@ -340,6 +340,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     />
     <span class="hx-top-mark-registered" aria-hidden="true">&reg;</span>
   </a>
+  <i class="hx-top-sp hx-top-sp--a" aria-hidden="true"></i>
   <div class="hx-top-tools">
     {langOptions.length > 0 && (
       <div class="hx-lang hx-lang-top" role="group" aria-label={t.hero.language.label}>
@@ -353,6 +354,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
         ])}
       </div>
     )}
+    <i class="hx-top-sp" aria-hidden="true"></i>
     <button
       type="button"
       class="hx-motion hx-motion-top"
@@ -369,6 +371,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       <span class="hx-motion-track" aria-hidden="true"><i></i></span>
     </button>
   </div>
+  <i class="hx-top-sp" aria-hidden="true"></i>
+  <span class="hx-top-end" aria-hidden="true"></span>
 </div>
 
 <!-- Confirmation after the animations are switched (the page reloads, so the
@@ -2721,16 +2725,22 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
   }
 
   @media (max-width: 640px) {
+    /* The row runs from the left margin to the round menu button's right edge
+       (a 48px placeholder, .hx-top-end, stands where the button is). Between the
+       items go spacers that share the free space equally, so the gaps are always
+       the same: [mark] . [ES|EN] . [sparkles] . [menu]. While the Hero is on
+       screen the mark has no width and its spacer none, so the three items that
+       are there spread evenly across the whole width (no hole on the left); when
+       the mark appears, its width and its spacer grow (a transition) and the
+       others slide over. */
     .hx-topbar {
       position: fixed;
       top: 1rem;
       left: 1.25rem;
-      right: calc(1rem + 48px + 0.6rem);
+      right: 1rem;
       z-index: 110;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
       height: 48px;
       pointer-events: none;
     }
@@ -2738,6 +2748,38 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     .hx-topbar > *,
     .hx-top-tools > * {
       pointer-events: auto;
+    }
+
+    .hx-topbar > .hx-top-sp,
+    .hx-topbar > .hx-top-end,
+    .hx-top-tools > .hx-top-sp {
+      pointer-events: none;
+    }
+
+    .hx-top-sp {
+      flex: 1 1 0;
+      min-width: 0.4rem;
+      height: 1px;
+    }
+
+    .hx-top-end {
+      flex: none;
+      width: 48px;
+      height: 48px;
+    }
+
+    .hx-top-sp--a {
+      flex-grow: 0;
+      min-width: 0;
+    }
+
+    .hx-topbar.is-past-hero .hx-top-sp--a {
+      flex-grow: 1;
+      min-width: 0.4rem;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-top-sp--a {
+      transition: flex-grow 0.6s cubic-bezier(0.3, 0.6, 0.2, 1);
     }
 
     /* The menu covers it while it is open (the drawer has its own copy). */
@@ -2749,36 +2791,38 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
        section. It is drawn only once the Hero is behind: it is uncovered from
        left to right (like the big wordmark's entrance) and a glint crosses it
        once. With the animations off it simply appears. */
+    /* Its width grows from 0 (the pill is clipped by its own overflow, so it is
+       uncovered from left to right while the others slide); the ring is an inset
+       shadow, not a border, so that at width 0 nothing is left. */
     .hx-top-mark {
       position: relative;
       display: inline-flex;
       align-items: center;
       flex: none;
       box-sizing: border-box;
+      width: 0;
       height: 2.1rem;
-      padding: 0 1.05rem 0 0.7rem;
+      padding: 0;
       overflow: hidden;
       background: rgb(14 12 8 / 74%);
-      border: 1px solid rgb(224 197 139 / 55%);
       border-radius: 999px;
-      box-shadow: 0 2px 10px rgb(0 0 0 / 28%);
+      box-shadow: inset 0 0 0 1px rgb(224 197 139 / 55%), 0 2px 10px rgb(0 0 0 / 28%);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       visibility: hidden;
-      clip-path: inset(0 100% 0 0 round 999px);
     }
 
     .hx-topbar.is-past-hero .hx-top-mark {
+      width: 5.9rem;
       visibility: visible;
-      clip-path: inset(0 0 0 0 round 999px);
     }
 
     :global(html:not([data-motion="off"])) .hx-top-mark {
-      transition: clip-path 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s linear 0.6s;
+      transition: width 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s linear 0.6s;
     }
 
     :global(html:not([data-motion="off"])) .hx-topbar.is-past-hero .hx-top-mark {
-      transition: clip-path 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s;
+      transition: width 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s;
     }
 
     .hx-top-mark::after {
@@ -2810,8 +2854,10 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
 
     .hx-top-mark-img {
       display: block;
+      flex: none;
       width: 4.1rem;
       height: auto;
+      margin-inline-start: 0.7rem;
     }
 
     .hx-top-mark-registered {
@@ -2824,11 +2870,10 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       color: var(--color-brand-gold);
     }
 
+    /* Only a wrapper in the markup: its two controls and the spacer between
+       them are items of the row itself. */
     .hx-top-tools {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-inline-start: auto;
+      display: contents;
     }
 
     .hx-top-tools .hx-lang,
@@ -2948,7 +2993,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
   }
 
   @media (max-width: 359px) {
-    .hx-top-mark {
+    .hx-top-mark,
+    .hx-top-sp--a {
       display: none;
     }
   }
