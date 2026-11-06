@@ -208,6 +208,29 @@ const { process } = Astro.props as Props;
     .sp-step:last-child::before {
       display: none;
     }
+
+    /* With animations: the steps start dim and light one after another as the
+       visitor reaches them (once); the thread segment under each one is drawn
+       when it lights. Nothing runs while scrolling, only one transition each. */
+    .sp.is-m-wired .sp-step {
+      opacity: 0.4;
+      transition: opacity 0.5s ease;
+    }
+
+    .sp.is-m-wired .sp-step.is-lit {
+      opacity: 1;
+    }
+
+    .sp.is-m-wired .sp-step::before {
+      background: linear-gradient(180deg, #c19b3d, #b08a32);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.6s ease 0.2s;
+    }
+
+    .sp.is-m-wired .sp-step.is-lit::before {
+      transform: scaleY(1);
+    }
   }
 </style>
 
@@ -257,6 +280,30 @@ const { process } = Astro.props as Props;
         root.classList.remove("is-wired");
         steps.forEach((step) => step.classList.add("is-lit"));
         gsap.set(line, { clearProps: "--c" });
+      };
+    });
+
+    // Phones and tablets (the vertical list): each step lights once, when it
+    // comes into view.
+    mm.add("(max-width: 999px) and (prefers-reduced-motion: no-preference)", () => {
+      if (!("IntersectionObserver" in window)) return;
+      root.classList.add("is-m-wired");
+      steps.forEach((step) => step.classList.remove("is-lit"));
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            (entry.target as HTMLElement).classList.add("is-lit");
+            io.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -16% 0px" }
+      );
+      steps.forEach((step) => io.observe(step));
+      return () => {
+        io.disconnect();
+        root.classList.remove("is-m-wired");
+        steps.forEach((step) => step.classList.add("is-lit"));
       };
     });
   });

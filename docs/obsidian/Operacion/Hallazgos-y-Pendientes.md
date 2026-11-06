@@ -21,6 +21,7 @@ La ronda autorizada del 10 de octubre está en [[Auditoria-Web]], con IDs, evide
 
 | Hallazgo | Evidencia / actuación mínima propuesta | Nota relacionada |
 |---|---|---|
+| **Versión tableta (641–899 px) sin diseñar** (anotado el 6 de noviembre de 2026; trabajar después de cerrar la versión móvil) | Hero: la nota «Fuera del código…» queda arriba sobre el wordmark (sin regla de posición por encima de 640 px), el título oscuro cae sobre el retrato, botones y lema quedan tapados, y no hay fila superior con ES \| EN y animaciones. Revisar también Servicios/Tools/Contacto (alternativas hasta 1199 px) y el resto de secciones en ese ancho | [[Hero-y-Sidebar]], [[Comandos-y-Pruebas]] |
 | Regla del retrato tablet ausente en el CSS generado | Comentario mal delimitado en Hero (líneas ~1633–1727); corregir delimitadores y probar en tablet | [[03-Sistema-de-Diseno|Sistema-de-Diseno]], [[Hero-y-Sidebar]] |
 | Reveals invisibles sin JS | `.rd-reveal`; establecer una mejora progresiva con contenido visible por defecto | [[04-Accesibilidad-y-Movimiento|Accesibilidad-y-Movimiento]] |
 | Modo estático depende del historial de resize | `evaluateMode`, rama `else if`; comprobar tanto carga directa como transición entre modos | [[Hero-y-Sidebar]] |

@@ -217,6 +217,17 @@ const external = href ? /^https?:/.test(href) : false;
     white-space: nowrap;
   }
 
+  /* Phones: the card strip scrolls sideways, and a blur behind every pill
+     (six cards, about four pills each) is repainted on each scroll frame. A
+     denser flat background reads the same without the cost. */
+  @media (max-width: 899px) {
+    .pj-num,
+    .pj-tags li {
+      background: rgb(5 5 5 / 62%);
+      backdrop-filter: none;
+    }
+  }
+
   .pj-tags {
     display: flex;
     flex-wrap: wrap;

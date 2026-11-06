@@ -317,11 +317,56 @@
     border-width: 1px;
     border-color: rgb(239 214 131 / 30%);
   }
+
+  /* Phones: no thread (the desktop's light path is not drawn). The rim of the
+     horizon is dull until the title comes into view; then it lights and one
+     signal leaves the beacon: three rings grow once (a transform, so it stays
+     off the main thread's layout) and fade. */
+  :global(.cb-m) .cb-thread,
+  :global(.cb-m) .cb-node {
+    display: none;
+  }
+
+  :global(.cb-m) .cb-arc {
+    border-color: rgb(176 138 50 / 55%);
+    box-shadow: none;
+  }
+
+  :global(.cb-m) .cb-ring {
+    opacity: 0;
+  }
+
+  .cb.cb-m-fire .cb-ring {
+    animation: cb-m-ring 1.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+
+  .cb.cb-m-fire .cb-ring--2 {
+    animation-delay: 0.12s;
+  }
+
+  .cb.cb-m-fire .cb-ring--3 {
+    animation-delay: 0.24s;
+  }
+
+  @keyframes cb-m-ring {
+    0% {
+      opacity: 0.95;
+      transform: translate(-50%, -50%) scale(0);
+    }
+    65% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
 </style>
 
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { revealOnEnter } from "../lib/mobileReveal";
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -420,6 +465,59 @@
         bridge.classList.remove("is-wired", "is-x", "is-e");
         section.classList.remove("cb-wired", "cb-revealed");
         targets.forEach((el) => el.removeAttribute("data-cb-reveal"));
+      };
+    });
+
+    // Phones: when the title comes into view the rim lights and one signal of
+    // three rings leaves the beacon; the title, line and cards come up.
+    mm.add("(max-width: 899px) and (prefers-reduced-motion: no-preference)", () => {
+      section.classList.add("cb-m");
+      const title = section.querySelector<HTMLElement>(".shc-art-frame");
+      const stop = revealOnEnter(Array.from(section.querySelectorAll<HTMLElement>(".shc-art-frame, .ct-lead, .ct-card")));
+      const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const props = ["--cx", "--ye", "--cb-h", "--cr"];
+      let timer = 0;
+      let io: IntersectionObserver | null = null;
+
+      const fire = () => {
+        const s = section.getBoundingClientRect();
+        const w = section.clientWidth;
+        const ye = title ? title.getBoundingClientRect().top - s.top - 1.1 * rem() : 4 * rem();
+        section.style.setProperty("--cx", w / 2 + "px");
+        section.style.setProperty("--ye", Math.max(0, ye) + "px");
+        section.style.setProperty("--cb-h", section.offsetHeight + "px");
+        // Large enough to leave the screen on every side.
+        section.style.setProperty("--cr", Math.round(Math.hypot(w / 2, 700)) + "px");
+        bridge.style.setProperty("--cb-o", "1");
+        bridge.classList.add("is-wired", "is-x", "cb-m-fire");
+        timer = window.setTimeout(() => {
+          bridge.classList.remove("is-wired", "cb-m-fire");
+          bridge.style.removeProperty("--cb-o");
+        }, 2400);
+      };
+
+      if (title && "IntersectionObserver" in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            io?.disconnect();
+            fire();
+          },
+          { rootMargin: "0px 0px -25% 0px" }
+        );
+        io.observe(title);
+      } else {
+        bridge.classList.add("is-x");
+      }
+
+      return () => {
+        stop();
+        io?.disconnect();
+        window.clearTimeout(timer);
+        section.classList.remove("cb-m");
+        bridge.classList.remove("is-wired", "is-x", "cb-m-fire");
+        bridge.style.removeProperty("--cb-o");
+        props.forEach((p) => section.style.removeProperty(p));
       };
     });
   }

@@ -5,7 +5,7 @@ import RollLink from "./RollLink.astro";
 // `stroke="currentColor"` by default, which is why the icons never set an
 // explicit color: they inherit whatever the parent `<a>` sets (light/dark/
 // active box text color — see `.hx-compact-vertical-nav a` below).
-import { House, UserRound, Mail, FolderKanban, BriefcaseBusiness, Wrench, CircleHelp } from "lucide-astro";
+import { House, UserRound, Mail, FolderKanban, BriefcaseBusiness, Wrench, CircleHelp, Sparkles } from "lucide-astro";
 import type { HeroExperienceContent } from "../lib/content-types";
 import type { Locale } from "../lib/i18n";
 
@@ -81,13 +81,13 @@ const portraitSrc = `${base}/assets/images/profile-cutout-alt.png`;
 // accessible name — NOT the site's real name (that's `siteName`,
 // "CHIISSUU", used as `.hx-compact-mark`'s real text elsewhere). The mark
 // itself is now a single raster image (public/assets/images/
-// hero-wordmark-gold.png, trimmed to its opaque bounds, transparent
+// hero-wordmark-gold.webp, trimmed to its opaque bounds, transparent
 // background preserved) instead of per-letter spans. GSAP's entrance
 // tween (the script block below, untouched) still finds it via the same
 // `.hx-wordmark-letter` selector — it now matches exactly one element
 // instead of five, so the same wipe-in tween applies to the image as a
 // whole with no JS change needed.
-const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
+const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
 ---
 
 <section class="hx-wrap section-theme-warm" id="home">
@@ -184,7 +184,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
             ))}
           </div>
 
-          <p class="hx-personal-note">{t.hero.personalNote}</p>
+          <p class="hx-personal-note"><span class="hx-pn-full">{t.hero.personalNote}</span><span class="hx-pn-short">{t.hero.personalNoteShort}</span></p>
 
           <div class="hx-aside-right">
             <div class="hx-chip-card hx-frosted-card">
@@ -320,6 +320,72 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   </article>
 </aside>
 
+<!-- Phone header row (hidden from 641px up), fixed like the round menu button:
+     the language switch and the animations pill sit to its left, always there;
+     the small mark on the left shows only once the Hero (which has its own big
+     wordmark) has been left behind, as the sidebar does on desktop. It hides
+     while the menu is open. The same controls live in the drawer; the scripts
+     at the end of this file bind every `[data-lang-link]` and
+     `[data-motion-toggle]`. -->
+<div class="hx-topbar" id="hx-topbar">
+  <a class="hx-top-mark" href="#home" aria-label={t.hero.sidebarMark}>
+    <img
+      class="hx-top-mark-img"
+      src={wordmarkSrc}
+      alt=""
+      aria-hidden="true"
+      draggable="false"
+      width="2142"
+      height="815"
+    />
+    <span class="hx-top-mark-registered" aria-hidden="true">&reg;</span>
+  </a>
+  <i class="hx-top-sp hx-top-sp--a" aria-hidden="true"></i>
+  <div class="hx-top-tools">
+    {langOptions.length > 0 && (
+      <div class="hx-lang hx-lang-top" role="group" aria-label={t.hero.language.label}>
+        {langOptions.map((opt, i) => [
+          i > 0 && <span class="hx-lang-sep" aria-hidden="true">|</span>,
+          opt.code === locale ? (
+            <span class="hx-lang-opt is-current" lang={opt.code} aria-current="true">{opt.label}</span>
+          ) : (
+            <a class="hx-lang-opt" href={opt.href} hreflang={opt.code} lang={opt.code} aria-label={opt.aria} data-lang-link>{opt.label}</a>
+          ),
+        ])}
+      </div>
+    )}
+    <i class="hx-top-sp" aria-hidden="true"></i>
+    <button
+      type="button"
+      class="hx-motion hx-motion-top"
+      data-motion-toggle
+      data-on={t.hero.motion.on}
+      data-off={t.hero.motion.off}
+      aria-pressed="true"
+      aria-label={t.hero.motion.aria}
+      title={t.hero.motion.aria}
+    >
+      <span class="hx-motion-icon" aria-hidden="true"><Sparkles size={14} /></span>
+      <span class="hx-motion-label">{t.hero.motion.label}:</span>
+      <span class="hx-motion-state">{t.hero.motion.on}</span>
+      <span class="hx-motion-track" aria-hidden="true"><i></i></span>
+    </button>
+  </div>
+  <i class="hx-top-sp" aria-hidden="true"></i>
+  <span class="hx-top-end" aria-hidden="true"></span>
+</div>
+
+<!-- Confirmation after the animations are switched (the page reloads, so the
+     script shows it on the next load): phones and tablets only. -->
+<div
+  class="hx-motion-toast"
+  id="hx-motion-toast"
+  role="status"
+  aria-live="polite"
+  data-on={t.hero.motion.toastOn}
+  data-off={t.hero.motion.toastOff}
+></div>
+
 <button
   type="button"
   class="hx-mobile-toggle"
@@ -334,34 +400,96 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 </button>
 
 <nav class="hx-mobile-nav" id="hx-mobile-nav" aria-label="Mobile navigation" aria-hidden="true" inert>
-  {navItems.map((item) => (
-    <a href={item.href}>{item.label}</a>
-  ))}
-  {langOptions.length > 0 && (
-    <nav class="hx-lang hx-lang-mobile" aria-label={t.hero.language.label}>
-      {langOptions.map((opt, i) => [
-        i > 0 && <span class="hx-lang-sep" aria-hidden="true">|</span>,
-        opt.code === locale ? (
-          <span class="hx-lang-opt is-current" lang={opt.code} aria-current="true">{opt.label}</span>
+  <!-- Side drawer for phones: the same cards as the desktop sidebar (brand,
+       gold buttons, socials) plus the language and animations controls. The
+       empty area to its left is the backdrop (a click on it closes the menu).
+       The gold toggle button stays on top and turns into the close button. -->
+  <div class="hx-drawer">
+    <article class="hx-sidebar-article hx-glass hx-drawer-card hx-drawer-brand" data-theme="dark">
+      <a class="hx-compact-mark" href="#home" aria-label={t.hero.sidebarMark}>
+        <img
+          class="hx-compact-wordmark-image"
+          src={wordmarkSrc}
+          alt=""
+          aria-hidden="true"
+          draggable="false"
+          width="2142"
+          height="815"
+        />
+        <span class="hx-compact-mark-registered" aria-hidden="true">&reg;</span>
+      </a>
+      <p class="hx-compact-tagline">{t.hero.tagline}</p>
+    </article>
+
+    <article class="hx-sidebar-article hx-glass hx-drawer-card" data-theme="dark">
+      <div class="hx-compact-vertical-nav">
+        {sidebarNavItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <a class="hx-metal-button" href={item.href} data-nav-id={item.navId}>
+              <Icon class="hx-compact-nav-icon hx-metal-content" aria-hidden="true" size={18} />
+              <span class="hx-compact-nav-label hx-metal-content">{item.label}</span>
+            </a>
+          );
+        })}
+      </div>
+    </article>
+
+    <article class="hx-sidebar-article hx-glass hx-drawer-card hx-drawer-tools" data-theme="dark">
+      {langOptions.length > 0 && (
+        <div class="hx-lang hx-lang-mobile" role="group" aria-label={t.hero.language.label}>
+          {langOptions.map((opt, i) => [
+            i > 0 && <span class="hx-lang-sep" aria-hidden="true">|</span>,
+            opt.code === locale ? (
+              <span class="hx-lang-opt is-current" lang={opt.code} aria-current="true">{opt.label}</span>
+            ) : (
+              <a class="hx-lang-opt" href={opt.href} hreflang={opt.code} lang={opt.code} aria-label={opt.aria} data-lang-link>{opt.label}</a>
+            ),
+          ])}
+        </div>
+      )}
+      <button
+        type="button"
+        class="hx-motion hx-motion-mobile"
+        data-motion-toggle
+        data-on={t.hero.motion.on}
+        data-off={t.hero.motion.off}
+        aria-pressed="true"
+        aria-label={t.hero.motion.aria}
+      >
+        <span class="hx-motion-label">{t.hero.motion.label}:</span>
+        <span class="hx-motion-state">{t.hero.motion.on}</span>
+        <span class="hx-motion-track" aria-hidden="true"><i></i></span>
+      </button>
+    </article>
+
+    <article class="hx-sidebar-article hx-glass hx-drawer-card" data-theme="dark">
+      <div class="hx-compact-socials">
+        {t.contact.links.linkedin ? (
+          <a class="hx-compact-social-row" href={t.contact.links.linkedin} target="_blank" rel="noopener noreferrer">
+            <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+            <span>{t.contact.links.linkedinLabel}</span>
+            <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+          </a>
         ) : (
-          <a class="hx-lang-opt" href={opt.href} hreflang={opt.code} lang={opt.code} aria-label={opt.aria} data-lang-link>{opt.label}</a>
-        ),
-      ])}
-    </nav>
-  )}
-  <button
-    type="button"
-    class="hx-motion hx-motion-mobile"
-    data-motion-toggle
-    data-on={t.hero.motion.on}
-    data-off={t.hero.motion.off}
-    aria-pressed="true"
-    aria-label={t.hero.motion.aria}
-  >
-    <span class="hx-motion-label">{t.hero.motion.label}:</span>
-    <span class="hx-motion-state">{t.hero.motion.on}</span>
-    <span class="hx-motion-track" aria-hidden="true"><i></i></span>
-  </button>
+          <span class="hx-compact-social-row hx-compact-social-linkedin" aria-disabled="true" title={t.contact.links.linkedinTooltip}>
+            <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linkedin-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+            <span>{t.contact.links.linkedinLabel}</span>
+          </span>
+        )}
+        <a class="hx-compact-social-row" href={t.contact.links.github} target="_blank" rel="noopener noreferrer">
+          <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/github-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+          <span>{t.contact.links.githubLabel}</span>
+          <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+        </a>
+        <a class="hx-compact-social-row" href={t.contact.links.linktree} target="_blank" rel="noopener noreferrer">
+          <img class="hx-compact-social-icon" src={`${base}/assets/icons/social/linktree-gold.png`} alt="" aria-hidden="true" width="96" height="96" loading="lazy" decoding="async" />
+          <span>{t.contact.links.linktreeLabel}</span>
+          <span class="hx-compact-social-arrow" aria-hidden="true">&#8599;</span>
+        </a>
+      </div>
+    </article>
+  </div>
 </nav>
 
 <!-- Animations on/off (desktop): a fixed pill, so it is reachable from the first
@@ -531,11 +659,23 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     /* Hero background art: untouched PNG, no recompression/format
        conversion. Root-relative path, matching how every other
        `public/assets/...` asset in this component is already referenced. */
-    background-image: url(/assets/images/hero-background-gold-alternative.png);
+    background-image: url(/assets/images/hero-background-gold-alternative.webp);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none;
+  }
+
+  /* Phones and tablets held upright: the desktop background is a wide picture
+     (2048x1172) and "cover" on a tall screen keeps only its middle 26%, the
+     part of vertical rays without the swirls, which reads flat. This version
+     is the same picture, its middle 62% fitted to a tall frame (780x1688), so
+     the light from the top, the swirls on the right and the loop at the bottom
+     all show. No pointer on a touch screen, so no water effect either way. */
+  @media (max-width: 899px) and (orientation: portrait) {
+    .hx-pin-fade {
+      background-image: url(/assets/images/hero-background-gold-mobile.webp);
+    }
   }
 
   .hx-glow {
@@ -900,6 +1040,11 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      color from an ancestor. Added here, matching `.hx-tagline`'s new
      treatment, since it needs the same dark-on-gold contrast and the task
      calls for both to share this exact color/opacity. */
+  /* Phones show the short summary of "Sobre mí" instead (see the 640px block). */
+  .hx-pn-short {
+    display: none;
+  }
+
   .hx-personal-note {
     color: rgba(248, 240, 220, 0.82);
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.38);
@@ -1017,6 +1162,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
      unit instead of fixing the actual layout cause. */
   /* Hero and sidebar share the same gold finish in every section. */
   .hx-actions,
+  .hx-mobile-nav,
   .hx-compact-sidebar {
     --hx-metal-light: #dfc357;
     --hx-metal-face: #c19b3d;
@@ -1153,7 +1299,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
     .hx-motion-mobile {
       display: inline-flex;
-      margin-top: 1rem;
     }
   }
 
@@ -1226,26 +1371,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
     .hx-lang-mobile {
       display: inline-flex;
-      margin-top: 1.25rem;
     }
 
-    /* The menu links are big titles (.hx-mobile-nav a); the language options
-       are small text inside a pill, so they undo that. */
-    .hx-mobile-nav .hx-lang a.hx-lang-opt {
-      display: inline;
-      width: auto;
-      max-width: none;
-      min-height: 0;
-      border-top: none;
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      color: inherit;
-    }
-
-    .hx-mobile-nav .hx-lang a.hx-lang-opt:hover {
-      color: #fff;
-    }
+    /* Inside the drawer the controls sit in their own card. */
   }
 
   /* Per-article theme — deliberately NOT a single `data-bg-theme` on the
@@ -1338,7 +1466,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   /* Brand mark — now the same gold wordmark image used in the hero
-     (`hero-wordmark-gold.png`), not a boxed text treatment: the image is
+     (`hero-wordmark-gold.webp`), not a boxed text treatment: the image is
      already gold, so no background/padding/typography is needed anymore.
      `align-self: center` centers its image-sized box inside the article
      without stretching it. `position: relative` gives the small
@@ -2164,18 +2292,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       right: 1rem;
       top: 1rem;
       z-index: 110;
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      border: 1px solid var(--color-line);
-      background: rgb(213 207 190 / 70%);
-      backdrop-filter: blur(8px);
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border-radius: 50%;
+      /* The gold metal of the site's buttons, as a round key. */
+      border: 1px solid #49361a;
+      background: linear-gradient(180deg, #dfc357, #c19b3d 48%, #b08a32);
+      box-shadow: inset 0 1px 1px rgb(255 255 255 / 55%), 0 3px 0 #49361a, 0 6px 10px rgb(0 0 0 / 35%);
+      cursor: pointer;
+    }
+
+    .hx-mobile-toggle:active {
+      transform: translateY(2px);
+      box-shadow: inset 0 2px 4px rgb(0 0 0 / 30%), 0 1px 0 #49361a;
+    }
+
+    .hx-mobile-toggle:focus-visible {
+      outline: 2px solid #efd683;
+      outline-offset: 4px;
     }
 
     .hx-mobile-toggle span {
       width: 18px;
       height: 2px;
-      background: var(--color-ink);
+      background: #211b0e;
     }
 
     /* Hamburger -> X, computed from the bars' own dimensions right above
@@ -2203,21 +2344,19 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
        base rule (further up this file, outside any media query) still
        hides both completely at >=900px, untouched. */
     .hx-mobile-nav {
+      /* Same size unit as the sidebar, so its cards fit the same way. */
+      --u: clamp(0.62rem, 2.3svh, 1rem);
+      /* Never display: none here (the base rule above hides it on desktop), so
+         it can fade; visibility and pointer-events are the closed state. */
+      display: block;
       position: fixed;
       inset: 0;
       z-index: 105;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(1rem, 4svh, 1.75rem);
-      padding: 2rem 1.5rem;
-      /* Was rgb(213 207 190 / 96%) -- pushed closer to opaque so the busy
-         Hero content behind it never distracts through the panel. */
-      background: rgb(213 207 190 / 98%);
-      backdrop-filter: blur(14px);
+      /* The backdrop: the page dims behind the drawer. */
+      background: rgb(5 5 5 / 62%);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
       font-family: var(--font-body);
-      color: var(--color-ink);
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
@@ -2229,47 +2368,147 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       pointer-events: auto;
     }
 
-    .hx-mobile-nav a {
-      width: 100%;
-      max-width: 22rem;
-      min-height: clamp(52px, 8svh, 60px);
+    .hx-drawer {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
       display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      width: min(21rem, 88vw);
+      padding: 0.75rem;
+      padding-block-end: max(0.75rem, env(safe-area-inset-bottom));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      /* Dark like the site's dark sections. */
+      background: linear-gradient(180deg, var(--section-dark-start), var(--section-dark-center) 50%, var(--section-dark-end));
+      border-inline-start: 1px solid rgb(224 197 139 / 45%);
+      box-shadow: -14px 0 36px rgb(0 0 0 / 50%);
+      transform: translateX(100%);
+    }
+
+    .hx-mobile-nav.hx-open .hx-drawer {
+      transform: translateX(0);
+    }
+
+    .hx-drawer-card {
+      flex: none;
+    }
+
+    /* Leave room for the gold toggle, which sits over the top right corner
+       and works as the close button. */
+    .hx-drawer-brand {
+      padding-inline-end: 4.25rem;
+    }
+
+    /* Touch targets of at least 44px. */
+    .hx-drawer .hx-compact-vertical-nav a {
+      min-height: max(2.75rem, calc(2.75 * var(--u)));
+    }
+
+    .hx-drawer-tools {
+      flex-direction: row;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      font-family: var(--font-title);
-      font-weight: 700;
-      /* Was a flat 1.2rem/600 on the old container-level rule. */
-      font-size: clamp(1.5rem, 6svh, 2.2rem);
-      color: var(--color-ink);
-      /* Thin separators between links instead of individual cards --
-         first link has none, so the stack reads as one sober list, not a
-         set of boxes. */
-      border-top: 1px solid var(--color-line);
+      gap: 0.5rem;
     }
 
-    .hx-mobile-nav a:first-child {
-      border-top: none;
+    .hx-drawer-tools .hx-lang-mobile,
+    .hx-drawer-tools .hx-motion-mobile {
+      margin-top: 0;
     }
 
-    .hx-mobile-nav a:hover {
-      color: var(--color-brand-gold);
+    /* When the drawer does not fit (very low screens, landscape) it scrolls
+       inside; a soft fade at the bottom says there is more (the script puts
+       `has-more` on the drawer only while there is something left below). */
+    .hx-drawer::after {
+      content: "";
+      flex: none;
+      position: sticky;
+      inset-block-end: 0;
+      height: 2.75rem;
+      margin-top: -2.75rem;
+      background: linear-gradient(180deg, transparent, var(--section-dark-end));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
     }
 
-    .hx-mobile-nav a:focus-visible {
-      outline: 2px solid var(--color-brand-gold);
-      outline-offset: 4px;
-      border-radius: 4px;
+    .hx-drawer.has-more::after {
+      opacity: 1;
     }
   }
 
-  /* Motion (fade + slight rise + stagger) is opt-in behind `no-preference`
-     only -- under `prefers-reduced-motion: reduce` none of these
-     `transition`/opacity-offset declarations apply at all, so the panel,
-     links and toggle bars simply snap between their open/closed end
-     states instantly (those end states -- the X shape, visible links --
-     are unconditional above, since they're the actual UI state, not the
-     animation). Nothing extra to strip out under `reduce`. */
+  /* Medium and low phone screens (most real phones once the browser's own bars
+     take their share, about 660-750px visible; the full version needs ~765px): the drawer is compacted so the
+     seven buttons and the controls fit without scrolling. The brand card drops
+     its tagline (the Hero already says it) and the social links become a row
+     of round icons (their names stay available to screen readers). The
+     buttons keep 44px, the minimum for a thumb. Taller screens keep the full
+     version above; desktop is not touched (everything here is below 900px). */
+  /* Under 700px tall the tagline goes too (there is no room left for it). */
+  @media (max-width: 899px) and (max-height: 699px) {
+    .hx-drawer-brand .hx-compact-tagline {
+      display: none;
+    }
+  }
+
+  @media (max-width: 899px) and (max-height: 800px) {
+    .hx-drawer {
+      gap: 0.45rem;
+      padding: 0.6rem;
+      padding-block-end: max(0.6rem, env(safe-area-inset-bottom));
+    }
+
+    .hx-drawer .hx-sidebar-article {
+      padding-block: 0.5rem;
+    }
+
+    .hx-drawer .hx-compact-socials {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 0.7rem;
+      width: 100%;
+      max-width: none;
+    }
+
+    .hx-drawer .hx-compact-social-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      min-height: 0;
+      border: 1px solid rgb(224 197 139 / 45%);
+      border-radius: 50%;
+    }
+
+    .hx-drawer .hx-compact-social-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    /* The name is kept for screen readers, not drawn. */
+    .hx-drawer .hx-compact-social-row > span:not(.hx-compact-social-arrow) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .hx-drawer .hx-compact-social-arrow {
+      display: none;
+    }
+  }
+
+  /* Motion is only drawn with the animations on (the nav button): the
+     backdrop fades, the drawer slides in from the right and its cards rise one
+     after another. With them off the menu simply appears. */
   @media (max-width: 899px) {
     :global(html:not([data-motion="off"])) .hx-mobile-toggle span {
       transition: transform 220ms ease, opacity 220ms ease;
@@ -2279,39 +2518,35 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       transition: opacity 220ms ease, visibility 220ms ease;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav a {
+    :global(html:not([data-motion="off"])) .hx-drawer {
+      transition: transform 300ms cubic-bezier(0.22, 0.8, 0.2, 1);
+    }
+
+    :global(html:not([data-motion="off"])) .hx-drawer-card {
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 220ms ease, transform 220ms ease, color 180ms ease;
+      transform: translateY(8px);
+      transition: opacity 240ms ease, transform 240ms ease;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open .hx-drawer-card {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(1) {
-      transition-delay: 40ms;
-    }
-
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(2) {
-      transition-delay: 80ms;
-    }
-
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(3) {
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open .hx-drawer-card:nth-child(1) {
       transition-delay: 120ms;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(4) {
-      transition-delay: 160ms;
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open .hx-drawer-card:nth-child(2) {
+      transition-delay: 170ms;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(5) {
-      transition-delay: 200ms;
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open .hx-drawer-card:nth-child(3) {
+      transition-delay: 220ms;
     }
 
-    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open a:nth-child(6) {
-      transition-delay: 240ms;
+    :global(html:not([data-motion="off"])) .hx-mobile-nav.hx-open .hx-drawer-card:nth-child(4) {
+      transition-delay: 270ms;
     }
   }
 
@@ -2342,127 +2577,659 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     scrollbar-gutter: stable;
   }
 
-  /* Mobile Hero fix, up to 640px. CSS-only, scoped entirely to this media
-     query -- does not touch HTML, script block, GSAP/ScrollTrigger, .hx-wrap,
-     .hx-pin, the mobile nav/toggle, the 641-899px tier, or the >=900px
-     tier. .hx-portrait / .hx-portrait img and the side-card horizontal
-     distribution (.hx-metrics, .hx-chip-card) are intentionally left
-     untouched per explicit approval -- only the vertical architecture of
-     .hx-aside-right (chip-card vs tagline) changes here.
-
-     "First configuration" per real measurements supplied from 390x844
-     (post-animation-settle), targeting the 5 reported collisions:
-     "Software Engineer" x 2nd metric card, "Software Engineer" x
-     tagline, "Data Science" x tagline, personal note x wordmark, and
-     mobile toggle x wordmark. Starting values to visually validate, not
-     guaranteed-final. */
+  /* Phone Hero, up to 640px: its own composition, not a shrunk desktop one.
+     The idea (taken from heynesh.com's phone hero): the wordmark runs almost
+     edge to edge at the top and the head overlaps it; two figure cards sit
+     staggered under the chin, one on each side; the traits card floats on the
+     left of the chest; and the text lives in a left-aligned stack at the
+     bottom (title, buttons, one line of small print), the way you read a
+     phone, instead of centred in the middle of the picture. Everything is
+     measured from the bottom or from the wordmark, so it holds from 640 to
+     900px of height. The tagline is not drawn here (it is in the menu drawer).
+     Only positions, sizes and alignment change: the markup, the entrance
+     timeline (it only writes y/opacity/transform and clears them) and every
+     tier from 641px up are untouched. */
   @media (max-width: 640px) {
     .hx-pin {
-      --hx-wordmark-height: min(18svh, 30vw, 8rem);
+      --hx-wordmark-height: min(36vw, 22svh);
+      --hx-gutter: 1.25rem;
+      --hx-stack-bottom: 4.25rem;
+      --hx-btn-h: 46px;
     }
 
     .hx-wordmark {
-      /* Was --hx-wordmark-top (4vh, ~34px at 844px tall) -- pushed down
-         so its top clears the mobile toggle's own bottom edge (~60px).
-         Centering (justify-content: center on the base rule) and all
-         type/color/z-index untouched. */
+      /* Clears the round menu button (its bottom edge is ~64px). */
       top: 4rem;
     }
 
+    /* Figures: two cards, one per side, the right one lower. */
+    .hx-metrics {
+      top: calc(4rem + var(--hx-wordmark-height) + 0.75rem);
+      left: var(--hx-gutter);
+      right: var(--hx-gutter);
+      width: auto;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .hx-metric-card,
+    .hx-metric-card:nth-child(2) {
+      flex: 0 1 8.6rem;
+      align-self: flex-start;
+      margin-top: 0;
+      padding: 0.6rem 0.75rem;
+    }
+
+    .hx-metric-card:nth-child(2) {
+      margin-top: 1.75rem;
+    }
+
+    .hx-metric-value {
+      font-size: 1.55rem;
+      line-height: 1.15;
+    }
+
+    /* Traits: the same five words as a centred row of small pills, the first
+       thing of the bottom stack (over the title). As a card on the side it
+       left a hole next to it and took 160px; as pills it takes about 70px and
+       fits on every phone. */
+    .hx-aside-right {
+      position: static;
+      order: 0;
+      inset: auto;
+      align-items: center;
+      width: 100%;
+      max-width: none;
+    }
+
+    .hx-chip-card,
+    .hx-chip-card.hx-frosted-card {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem 0.45rem;
+      padding: 0;
+      background: none;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .hx-chip-card::before {
+      display: none;
+    }
+
+    .hx-chip {
+      padding: 0.34rem 0.75rem;
+      font-size: 0.7rem;
+      background: rgb(14 12 8 / 70%);
+      border-radius: 999px;
+      box-shadow:
+        inset 0 0 0 1px rgb(224 197 139 / 60%),
+        0 2px 8px rgb(0 0 0 / 30%);
+    }
+
+    .hx-tagline {
+      display: none;
+    }
+
+    /* The stack at the bottom, centred: title, buttons and the summary flow one
+       under another from the bottom of the Hero, so a longer summary (or a
+       narrower screen that wraps it onto more lines) just pushes the rest up.
+       The figure cards and the traits card stay absolutely placed. */
+    .hx-foreground {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      box-sizing: border-box;
+      padding: 0 var(--hx-gutter) 2.25rem;
+    }
+
     .hx-title-block {
-      /* Was top: 44% -- moved down so it starts below the metrics/traits
-         cards instead of overlapping them. Horizontal centering
-         (left: var(--hx-figure-x) + transform: translateX(-50%)) is the
-         base rule's existing mechanism and is left untouched here. */
-      top: 51%;
-      /* Base rule has no explicit width (shrink-to-fit); bounding it lets
-         the title wrap onto its existing multi-line structure instead of
-         overflowing the 390px viewport. */
-      width: calc(100% - 2rem);
-      max-width: 22rem;
-      /* Was clamp(2.05rem, 4.1vw, 3.56rem) -- shrunk for this width so
-         "Software Engineer" fits on one line at max-width without
-         wrapping mid-word. font-family/weight/color/stroke/paint-order/
-         line-height/highlight all untouched. */
-      font-size: clamp(1.7rem, 7.2vw, 2rem);
+      position: static;
+      order: 1;
+      top: auto;
+      left: auto;
+      width: auto;
+      max-width: none;
+      transform: none;
+      align-items: center;
+      text-align: center;
+      font-size: clamp(1.8rem, 8.2vw, 2.3rem);
     }
 
     .hx-title-line {
       white-space: nowrap;
     }
 
-    /* .hx-chip-card (traits) is intentionally NOT overridden here -- its
-       position stays governed by the base/unscoped .hx-aside-right flex
-       flow, per explicit approval. Only the container is stretched
-       downward so `justify-content: space-between` can push .hx-tagline
-       (the second flex child) toward the container's own bottom edge,
-       away from the traits card and clear of the title above it, without
-       moving .hx-chip-card. */
-    .hx-aside-right {
-      bottom: 20vh;
-      justify-content: space-between;
-      /* Widen the container so it spans symmetrically between the same
-         inset used on the right (--hx-aside-inset) mirrored on the left,
-         centering the container itself on the viewport's horizontal
-         center. max-width: none prevents the existing 18rem cap from
-         forcing the box back to a smaller width, which would otherwise
-         shift `right` (and with it .hx-chip-card's anchored edge) via
-         the browser's absolute-positioning over-constraint resolution.
-         .hx-chip-card is untouched: align-items: flex-end (unchanged,
-         inherited from the base rule) keeps it flush with the
-         container's right edge, which stays at the same `right` inset
-         as before -- so its position is unaffected by this change. */
-      left: var(--hx-aside-inset);
-      max-width: none;
+    /* The text stack sits on a dark fade that rises from the bottom (it also
+       leads into the dark section that follows), so it can be ivory instead
+       of ink: the left side of the title falls over the dark background, not
+       over the figure's white clothes. */
+    .hx-foreground::before {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: 74%;
+      z-index: -1;
+      background: linear-gradient(
+        0deg,
+        rgb(10 8 4 / 88%) 0%,
+        rgb(10 8 4 / 66%) 40%,
+        rgb(10 8 4 / 0%) 100%
+      );
+      pointer-events: none;
     }
 
-    /* Only .hx-tagline is pulled out of the flex-end alignment inherited
-       from .hx-aside-right; align-self: center centers its own box
-       within the now-wider container (which is itself centered on the
-       viewport), and text-align: center centers its line(s) inside that
-       box. Width/max-width (20ch), font-size, line-height, color, and
-       opacity are all untouched -- only the box's horizontal position
-       and its internal text alignment change. */
-    .hx-tagline {
-      align-self: center;
-      text-align: center;
+    .hx-pin:not(.hx-static) .hx-title-line:not(.hx-title-highlight) {
+      color: var(--hx-ui-ivory);
+      -webkit-text-stroke: 0;
+      text-shadow: 0 2px 12px rgb(0 0 0 / 55%);
     }
 
     .hx-actions {
-      /* Was bottom: clamp(2.25rem, 6.5vh, 3.75rem) -- raised slightly to
-         clear the personal note below it. */
-      bottom: 4.75rem;
-      /* Was gap: 1rem. */
-      gap: 0.75rem;
-      /* Was flex-wrap: wrap, which is why the two buttons were stacking
-         vertically at this width; forced onto a single row instead.
-         Button design/height/colors/text/links/hover/focus untouched. */
+      position: static;
+      order: 2;
+      /* Not drawn on phones: the menu button is always there and scrolling is
+         the natural gesture, so the two buttons only took space (62px). They
+         stay on tablets and desktop. */
+      display: none;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      justify-content: center;
       flex-wrap: nowrap;
+      gap: 0.75rem;
+    }
+
+    /* The short summary of "Sobre mí" replaces the long-standing one-liner. */
+    .hx-pn-full {
+      display: none;
+    }
+
+    .hx-pn-short {
+      display: inline;
     }
 
     .hx-personal-note {
-      /* No unscoped base rule exists for this selector at all below
-         900px (confirmed by direct read of the source) -- it was
-         rendering in normal document flow at the very top of the Hero,
-         colliding with the wordmark. Given an explicit position here,
-         plus the same font-size/line-height/color/opacity already used
-         by the >=900px rule, so it reads exactly like the desktop/tablet
-         copy instead of unstyled browser-default text. Centered via
-         inset-inline + margin-inline: auto (not transform), per spec. */
-      position: absolute;
-      inset-inline: 0;
-      bottom: 0.5rem;
-      z-index: 4;
-      width: calc(100% - 2rem);
-      max-width: 22rem;
-      margin-inline: auto;
+      position: static;
+      order: 3;
+      inset: auto;
+      width: auto;
+      max-width: 24rem;
+      margin: 0;
       text-align: center;
-      font-size: 0.95rem;
-      line-height: 1.55;
-      color: var(--color-ink);
-      opacity: 0.7;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: rgb(248 240 220 / 80%);
+      opacity: 1;
+    }
+
+    /* The cards' border is lit like the cards of "Sobre mí": the same gold
+       metal gradient painted as a 2px ring (mask composite), plus a soft glow
+       around it. The old thin border goes transparent so they do not add up. */
+    .hx-frosted-card {
+      position: relative;
+      isolation: isolate;
+      border-color: transparent;
+      border-radius: 12px;
+      box-shadow:
+        0 0 22px rgb(224 197 139 / 20%),
+        0 10px 26px var(--hx-ui-shadow),
+        inset 0 1px 0 rgb(255 242 207 / 12%);
+    }
+
+    .hx-frosted-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 1;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
     }
   }
+
+  /* Very narrow phones (320px): everything a little smaller so the pills stay
+     on two rows and the stack does not climb into the figure cards. */
+  @media (max-width: 359px) {
+    .hx-chip {
+      padding: 0.28rem 0.55rem;
+      font-size: 0.64rem;
+      gap: 0.4rem;
+    }
+
+    .hx-chip-card {
+      gap: 0.3rem 0.35rem;
+    }
+
+    .hx-title-block {
+      font-size: 1.6rem;
+    }
+
+    .hx-metric-card,
+    .hx-metric-card:nth-child(2) {
+      padding: 0.5rem 0.6rem;
+    }
+
+    .hx-metric-value {
+      font-size: 1.35rem;
+    }
+
+    .hx-metric-label {
+      font-size: 0.68rem;
+    }
+
+    .hx-personal-note {
+      font-size: 0.76rem;
+    }
+  }
+
+  /* Low phone screens: a little less air under the stack, so the pills keep a
+     margin from the figure cards. */
+  @media (max-width: 640px) and (max-height: 680px) {
+    .hx-foreground {
+      padding-bottom: 1.4rem;
+    }
+  }
+
+  /* The pills of the top row get the cards' lit rim: the gold metal gradient
+     as a 2px ring (mask composite) plus a soft glow, instead of a thin border. */
+  @media (max-width: 640px) {
+    .hx-top-tools .hx-lang,
+    .hx-top-tools .hx-motion {
+      position: relative;
+      isolation: isolate;
+      border-color: transparent;
+      box-shadow:
+        0 0 18px rgb(224 197 139 / 20%),
+        0 2px 10px rgb(0 0 0 / 28%);
+    }
+
+    .hx-top-tools .hx-lang::before,
+    .hx-top-tools .hx-motion::before,
+    .hx-top-mark::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 1;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    .hx-top-mark::before {
+      inset: 0;
+    }
+
+    .hx-top-mark {
+      box-shadow: 0 0 18px rgb(224 197 139 / 20%), 0 2px 10px rgb(0 0 0 / 28%);
+    }
+  }
+
+  /* The narrowest and lowest phones (320x640): once everything is smaller there
+     is room to spare, so the stack goes up and the hole between the figure
+     cards and the pills shrinks. */
+  @media (max-width: 359px) and (max-height: 680px) {
+    .hx-foreground {
+      padding-bottom: 3rem;
+    }
+  }
+
+  /* Phone header row: fixed at the top like the round menu button (z-index
+     110), to the left of it. The language switch and the animations pill are
+     always there; the small mark appears once the Hero has been left behind
+     (script: .is-past-hero), because inside the Hero it would sit right over the
+     big wordmark and look duplicated. The animations pill is shortened to
+     "ON/OFF + switch" so everything fits at 360px; under 360px the mark goes
+     and the two controls stay. */
+  .hx-topbar {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    /* The row runs from the left margin to the round menu button's right edge
+       (a 48px placeholder, .hx-top-end, stands where the button is). Between the
+       items go spacers that share the free space equally, so the gaps are always
+       the same: [mark] . [ES|EN] . [sparkles] . [menu]. While the Hero is on
+       screen the mark has no width and its spacer none, so the three items that
+       are there spread evenly across the whole width (no hole on the left); when
+       the mark appears, its width and its spacer grow (a transition) and the
+       others slide over. */
+    .hx-topbar {
+      position: fixed;
+      top: 20px;
+      left: 1.25rem;
+      right: 1rem;
+      z-index: 110;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      pointer-events: none;
+    }
+
+    .hx-topbar > *,
+    .hx-top-tools > * {
+      pointer-events: auto;
+    }
+
+    .hx-topbar > .hx-top-sp,
+    .hx-topbar > .hx-top-end,
+    .hx-top-tools > .hx-top-sp {
+      pointer-events: none;
+    }
+
+    .hx-top-sp {
+      flex: 1 1 0;
+      min-width: 0.4rem;
+      height: 1px;
+    }
+
+    .hx-top-end {
+      flex: none;
+      width: 36px;
+      height: 40px;
+    }
+
+    .hx-top-sp--a {
+      flex-grow: 0;
+      min-width: 0;
+    }
+
+    .hx-topbar.is-past-hero .hx-top-sp--a {
+      flex-grow: 1;
+      min-width: 0.4rem;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-top-sp--a {
+      transition: flex-grow 0.6s cubic-bezier(0.3, 0.6, 0.2, 1);
+    }
+
+    /* The menu covers it while it is open (the drawer has its own copy). */
+    :global(html.hx-mobile-nav-open) .hx-topbar {
+      visibility: hidden;
+    }
+
+    /* The mark is a glass pill like the two controls, so it reads over any
+       section. It is drawn only once the Hero is behind: it is uncovered from
+       left to right (like the big wordmark's entrance) and a glint crosses it
+       once. With the animations off it simply appears. */
+    /* Its width grows from 0 (the pill is clipped by its own overflow, so it is
+       uncovered from left to right while the others slide); the ring is an inset
+       shadow, not a border, so that at width 0 nothing is left. */
+    .hx-top-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex: none;
+      box-sizing: border-box;
+      width: 0;
+      height: 2.5rem;
+      padding: 0;
+      overflow: hidden;
+      background: rgb(14 12 8 / 74%);
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgb(224 197 139 / 55%), 0 2px 10px rgb(0 0 0 / 28%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      visibility: hidden;
+    }
+
+    .hx-topbar.is-past-hero .hx-top-mark {
+      width: 6.3rem;
+      visibility: visible;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-top-mark {
+      transition: width 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s linear 0.6s;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-topbar.is-past-hero .hx-top-mark {
+      transition: width 0.6s cubic-bezier(0.3, 0.6, 0.2, 1), visibility 0s;
+    }
+
+    .hx-top-mark::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(100deg, transparent 38%, rgb(255 244 205 / 75%) 50%, transparent 62%);
+      background-size: 260% 100%;
+      background-position: 130% 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-topbar.is-past-hero .hx-top-mark::after {
+      animation: hx-mark-glint 0.9s ease-out 0.45s both;
+    }
+
+    @keyframes hx-mark-glint {
+      0% {
+        opacity: 1;
+        background-position: 130% 0;
+      }
+      100% {
+        opacity: 0;
+        background-position: -30% 0;
+      }
+    }
+
+    .hx-top-mark-img {
+      display: block;
+      flex: none;
+      width: 4.4rem;
+      height: auto;
+      margin-inline-start: 0.75rem;
+    }
+
+    .hx-top-mark-registered {
+      position: absolute;
+      top: 0.32rem;
+      right: 0.4rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--color-brand-gold);
+    }
+
+    /* Only a wrapper in the markup: its two controls and the spacer between
+       them are items of the row itself. */
+    .hx-top-tools {
+      display: contents;
+    }
+
+    .hx-top-tools .hx-lang,
+    .hx-top-tools .hx-motion {
+      display: inline-flex;
+      padding: 0.4rem 0.62rem;
+      font-size: 0.68rem;
+    }
+
+    .hx-top-tools .hx-lang {
+      gap: 0.4rem;
+    }
+
+    .hx-top-tools .hx-motion-label {
+      display: none;
+    }
+
+    .hx-top-tools .hx-lang,
+    .hx-top-tools .hx-motion {
+      box-sizing: border-box;
+      height: 2.5rem;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    /* The animations pill: sparkles + switch. The word and its yes/no are kept
+       for screen readers (aria-label) and for the other copies of the button. */
+    .hx-top-tools .hx-motion-state {
+      display: none;
+    }
+
+    .hx-motion-icon {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      color: #efd683;
+    }
+
+    .hx-motion-icon svg {
+      display: block;
+    }
+
+    /* Off: the sparkles go dim and are crossed out. */
+    .hx-motion[aria-pressed="false"] .hx-motion-icon {
+      color: #8d8a82;
+    }
+
+    .hx-motion[aria-pressed="false"] .hx-motion-icon::after {
+      content: "";
+      position: absolute;
+      left: -1px;
+      right: -1px;
+      top: 50%;
+      height: 1.5px;
+      background: #f3e6c4;
+      border-radius: 1px;
+      transform: rotate(-45deg);
+    }
+  }
+
+  .hx-motion-icon {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .hx-top-tools .hx-motion-icon {
+      display: inline-grid;
+    }
+  }
+
+  /* The round menu button as a metal key, closer to the nav's gold buttons:
+     a brushed (circular) gold face with a soft highlight at the top left, a
+     lit 3px rim (the nav's rim gradient), an extruded bronze edge underneath
+     and embossed bars. Same footprint as before apart from 2px. */
+  @media (max-width: 899px) {
+    .hx-mobile-toggle {
+      gap: 3.5px;
+      /* Flush with the pills' top edge (20px); the face is 36px and the bronze
+         edge under it adds 4px, so key and pills are 40px tall and end on the
+         same line. */
+      top: 20px;
+      width: 36px;
+      height: 36px;
+      border: 2.5px solid transparent;
+      background:
+        radial-gradient(circle at 30% 22%, rgb(255 251 214 / 90%) 0, rgb(255 238 160 / 35%) 16%, transparent 40%) padding-box,
+        repeating-conic-gradient(from 20deg, rgb(255 255 255 / 7%) 0 3deg, rgb(0 0 0 / 5%) 3deg 6deg) padding-box,
+        linear-gradient(180deg, #fbeba0 0%, #e2c156 28%, #b08a32 52%, #c9a443 74%, #f3da8a 100%) padding-box,
+        linear-gradient(135deg, #fff3c4 8%, #8f6c24 30%, #c9a443 48%, #fff3c4 72%, #8f6c24) border-box;
+      box-shadow:
+        inset 0 2px 2px rgb(255 255 255 / 70%),
+        inset 0 -3px 5px rgb(92 62 12 / 45%),
+        0 2px 0 #6b4f1d,
+        0 4px 0 #3a2a0e,
+        0 7px 12px rgb(0 0 0 / 45%);
+    }
+
+    .hx-mobile-toggle:active {
+      transform: translateY(2px);
+      box-shadow:
+        inset 0 3px 6px rgb(60 40 5 / 45%),
+        0 1px 0 #6b4f1d,
+        0 2px 0 #3a2a0e;
+    }
+
+    .hx-mobile-toggle span {
+      width: 15px;
+      height: 2.5px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #3b2a0c, #1d1405);
+      box-shadow: 0 1px 0 rgb(255 245 190 / 70%);
+    }
+
+    /* Bars 2.5px tall with a 3.5px gap: 6px from one centre to the next. */
+    .hx-mobile-toggle.hx-open span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+  }
+
+  /* Confirmation after switching the animations, under the round menu button. */
+  .hx-motion-toast {
+    display: none;
+  }
+
+  @media (max-width: 899px) {
+    .hx-motion-toast {
+      position: fixed;
+      top: calc(20px + 40px + 0.8rem);
+      right: 1rem;
+      z-index: 110;
+      display: block;
+      max-width: calc(100vw - 2rem);
+      padding: 0.5rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #f3e6c4;
+      background: rgb(14 12 8 / 88%);
+      border: 1px solid rgb(224 197 139 / 55%);
+      border-radius: 999px;
+      box-shadow: 0 2px 10px rgb(0 0 0 / 35%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .hx-motion-toast.is-shown {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-motion-toast {
+      transform: translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    }
+
+    :global(html:not([data-motion="off"])) .hx-motion-toast.is-shown {
+      transform: none;
+    }
+
+    :global(html.hx-mobile-nav-open) .hx-motion-toast {
+      display: none;
+    }
+  }
+
+  @media (max-width: 359px) {
+    .hx-top-mark,
+    .hx-top-sp--a {
+      display: none;
+    }
+  }
+
 </style>
 
 <script>
@@ -2512,6 +3279,10 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   const mobileToggle = document.getElementById("hx-mobile-toggle");
   const mobileNav = document.getElementById("hx-mobile-nav");
   const mobileLinks = mobileNav ? Array.from(mobileNav.querySelectorAll("a")) : [];
+  // Everything the keyboard can reach inside the drawer (links and buttons).
+  const mobileFocusables = mobileNav
+    ? Array.from(mobileNav.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"))
+    : [];
 
   const MOBILE_MENU_QUERY = "(max-width: 899px)";
   const SCROLL_LOCK_CLASS = "hx-mobile-nav-open";
@@ -2556,7 +3327,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
   }
 
   function getMenuFocusOrder(): HTMLElement[] {
-    return mobileToggle ? [mobileToggle, ...mobileLinks] : mobileLinks;
+    return mobileToggle ? [mobileToggle, ...mobileFocusables] : mobileFocusables;
   }
 
   // Only attached while the panel is actually open (see openMobileMenu /
@@ -2600,6 +3371,17 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     }
   }
 
+  // `has-more` on the drawer while its content continues below the visible
+  // part (only possible on very low screens): CSS draws a fade from it.
+  const drawerEl = mobileNav?.querySelector<HTMLElement>(".hx-drawer") ?? null;
+  function updateDrawerHint() {
+    if (!drawerEl) return;
+    const left = drawerEl.scrollHeight - drawerEl.clientHeight - drawerEl.scrollTop;
+    drawerEl.classList.toggle("has-more", left > 4);
+  }
+  drawerEl?.addEventListener("scroll", updateDrawerHint, { passive: true });
+  window.addEventListener("resize", updateDrawerHint);
+
   function openMobileMenu() {
     if (!mobileToggle || !mobileNav) return;
     if (!mobileMenuMediaQuery.matches) return;
@@ -2616,11 +3398,12 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
 
     lockBackgroundScroll();
     setBackgroundInert(true);
+    updateDrawerHint();
 
     document.addEventListener("keydown", handleMenuKeydown);
     mobileNav.addEventListener("click", handleOverlayClick);
 
-    const firstLink = mobileLinks[0];
+    const firstLink = mobileNav.querySelector<HTMLElement>("[data-nav-id]") ?? mobileLinks[0];
     if (firstLink) {
       requestAnimationFrame(() => {
         firstLink.focus();
@@ -3587,9 +4370,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
       // lights up only its own nav entry while it is on screen.
       // `data-nav-id` (set on each sidebar link's markup above) is the
       // section's real `id`, which is also the anchor its link points to.
-      const navLinkEls = Array.from(
-        compactSidebarEl.querySelectorAll<HTMLAnchorElement>("[data-nav-id]")
-      );
+      // The sidebar's links and the mobile drawer's links (same ids).
+      const navLinkEls = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-nav-id]"));
 
       const NAV_TRIGGER_GROUPS: { sectionId: string; navIds: string[] }[] = [
         { sectionId: "home", navIds: ["home"] },
@@ -3699,7 +4481,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     const pinFadeEl = document.getElementById("hx-pin-fade");
     if (pinFadeEl) {
       const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-      const fluid = createHeroFluid(pinFadeEl, `${base}/assets/images/hero-background-gold-alternative.png`);
+      const fluid = createHeroFluid(pinFadeEl, `${base}/assets/images/hero-background-gold-alternative.webp`);
       document.addEventListener("astro:before-swap", () => fluid?.destroy());
     }
   }
@@ -3719,7 +4501,24 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     });
   });
 
+  // Phone header row: the small mark shows only once the Hero is behind (its
+  // bottom edge above the top bar), as on desktop, where the sidebar's mark
+  // appears when the Hero's big wordmark is gone.
+  const topbar = document.getElementById("hx-topbar");
+  const heroWrap = document.querySelector<HTMLElement>(".hx-wrap");
+  if (topbar && heroWrap && "IntersectionObserver" in window) {
+    new IntersectionObserver(
+      ([entry]) => {
+        // Only once the whole Hero is above the screen, so nothing of it is
+        // left behind the bar.
+        topbar.classList.toggle("is-past-hero", !entry.isIntersecting && entry.boundingClientRect.bottom <= 0);
+      },
+      { rootMargin: "0px" }
+    ).observe(heroWrap);
+  }
+
   const MOTION_KEY = "chiissuu:motion";
+  const TOAST_KEY = "chiissuu:motion-toast";
   const motionIsOff = () => document.documentElement.dataset.motion === "off";
 
   document.querySelectorAll<HTMLButtonElement>("[data-motion-toggle]").forEach((button) => {
@@ -3728,12 +4527,36 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.png`;
     if (state) state.textContent = (motionIsOff() ? button.dataset.off : button.dataset.on) ?? "";
 
     button.addEventListener("click", () => {
+      const next = motionIsOff() ? "on" : "off";
       try {
-        localStorage.setItem(MOTION_KEY, motionIsOff() ? "on" : "off");
+        localStorage.setItem(MOTION_KEY, next);
       } catch {
         return; // storage blocked: nothing can be remembered, so leave things as they are
+      }
+      try {
+        sessionStorage.setItem(TOAST_KEY, next); // read once by the next load, below
+      } catch {
+        // no message after the reload, nothing else lost
       }
       window.location.reload();
     });
   });
+
+  // After the reload: say what changed (phones and tablets only, where the
+  // button shows no word; desktop has the pill with its label and state).
+  (() => {
+    const toast = document.getElementById("hx-motion-toast");
+    let flag: string | null = null;
+    try {
+      flag = sessionStorage.getItem(TOAST_KEY);
+      sessionStorage.removeItem(TOAST_KEY);
+    } catch {
+      return;
+    }
+    if (!toast || !flag || !window.matchMedia("(max-width: 899px)").matches) return;
+    toast.textContent = (flag === "off" ? toast.dataset.off : toast.dataset.on) ?? "";
+    // Next frame, so the hidden state is painted first and the fade can run.
+    requestAnimationFrame(() => toast.classList.add("is-shown"));
+    window.setTimeout(() => toast.classList.remove("is-shown"), 2600);
+  })();
 </script>

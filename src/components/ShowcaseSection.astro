@@ -663,13 +663,17 @@ const light = backdrop !== "blueprint";
      gold when the row has been seen to its end (class is-done, see initRail):
      the light then goes on down to the title of the stack. */
   .sc-section[data-rail-on] .sc-foot::before,
-  .sc-section[data-rail-on] .sc-foot::after {
+  .sc-section[data-rail-on] .sc-foot::after,
+  .sc-section[data-m-rail] .sc-foot::before,
+  .sc-section[data-m-rail] .sc-foot::after {
     background: linear-gradient(135deg, #7d5d26, #4a3817);
     box-shadow: 0 0 0 1px #8f6c24;
   }
 
   .sc-section[data-rail-on] .sc-foot.is-done::before,
-  .sc-section[data-rail-on] .sc-foot.is-done::after {
+  .sc-section[data-rail-on] .sc-foot.is-done::after,
+  .sc-section[data-m-rail] .sc-foot.is-done::before,
+  .sc-section[data-m-rail] .sc-foot.is-done::after {
     background: linear-gradient(135deg, #fff3c4, #efd683 45%, #c9a443);
     box-shadow:
       0 0 0 1px #8f6c24,
@@ -755,7 +759,10 @@ const light = backdrop !== "blueprint";
     transform-origin: right;
   }
 
-  .sc-section[data-rail-on] .sc-progress {
+  /* data-m-rail: phones and tablets with animations, where the row is a
+     native swipe strip; the counter and the line follow its scroll. */
+  .sc-section[data-rail-on] .sc-progress,
+  .sc-section[data-m-rail] .sc-progress {
     display: flex;
   }
 
@@ -943,6 +950,7 @@ const light = backdrop !== "blueprint";
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { revealOnEnter } from "../lib/mobileReveal";
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -1035,6 +1043,33 @@ const light = backdrop !== "blueprint";
         root.removeAttribute("data-rail-on");
         cards.forEach((card) => card.classList.remove("is-focus"));
         focused = -1;
+      };
+    });
+
+    // Phones and tablets: the row stays a native swipe strip (a pinned row
+    // would take over the vertical scroll). The counter and the progress line
+    // follow its scroll (one passive listener, transforms only), the closing
+    // diamonds light at the end of the row, and the head opens once like an
+    // iris when it comes into view.
+    mm.add("(max-width: 899px) and (prefers-reduced-motion: no-preference)", () => {
+      root.setAttribute("data-m-rail", "");
+      if (totalEl) totalEl.textContent = pad(cards.length);
+      const read = () => {
+        const max = rail.scrollWidth - rail.clientWidth;
+        const p = max > 0 ? Math.min(1, Math.max(0, rail.scrollLeft / max)) : 0;
+        follow(p);
+        setDone(p >= 0.98);
+      };
+      rail.addEventListener("scroll", read, { passive: true });
+      read();
+      const stop = revealOnEnter([root.querySelector<HTMLElement>(".sc-head")], "iris");
+      return () => {
+        rail.removeEventListener("scroll", read);
+        stop();
+        root.removeAttribute("data-m-rail");
+        cards.forEach((card) => card.classList.remove("is-focus"));
+        focused = -1;
+        setDone(false);
       };
     });
 

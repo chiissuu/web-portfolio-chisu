@@ -134,6 +134,30 @@
     opacity: 0;
   }
 
+  /* Phones and tablets: the rule is dull until it comes into view, then it
+     lights with one pulse (the desktop's light path is not drawn here). */
+  :global(.sb-m) .sb-rule {
+    filter: brightness(0.55) saturate(0.8);
+    box-shadow: none;
+  }
+
+  :global(.sb-m) .sb-ruler {
+    opacity: 0;
+  }
+
+  :global(.sb-m) .sb.is-lit + .sb-sheet .sb-rule {
+    animation: sb-pulse 0.9s ease-out;
+  }
+
+  @keyframes sb-pulse {
+    0% {
+      filter: brightness(2.4);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+
   /* Registration marks: a ring with a cross through it around each diamond,
      as on the corners of a drawing; dim until the light arrives. */
   .sb-reg {
@@ -340,6 +364,7 @@
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { revealOnEnter } from "../lib/mobileReveal";
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -450,6 +475,36 @@
         inner.style.paddingLeft = "";
         inner.style.paddingRight = "";
         targets.forEach((el) => el.removeAttribute("data-sb-reveal"));
+      };
+    });
+
+    // Phones and tablets: the gold rule lights once with a pulse when it comes
+    // into view, and the title, introduction, cards and button come up one by one.
+    mm.add("(max-width: 1199px) and (prefers-reduced-motion: no-preference)", () => {
+      section.classList.add("sb-m");
+      const rule = bridge.nextElementSibling?.querySelector<HTMLElement>(".sb-rule");
+      const stop = revealOnEnter(
+        Array.from(section.querySelectorAll<HTMLElement>(".shc-art-frame, .sc-intro, .sc-card, .sv-rule, .sc-cta"))
+      );
+      let io: IntersectionObserver | null = null;
+      if (rule && "IntersectionObserver" in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            bridge.classList.add("is-lit");
+            io?.disconnect();
+          },
+          { rootMargin: "0px 0px -30% 0px" }
+        );
+        io.observe(rule);
+      } else {
+        bridge.classList.add("is-lit");
+      }
+      return () => {
+        stop();
+        io?.disconnect();
+        section.classList.remove("sb-m");
+        bridge.classList.remove("is-lit");
       };
     });
   }

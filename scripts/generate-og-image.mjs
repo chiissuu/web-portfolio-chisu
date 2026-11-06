@@ -43,7 +43,7 @@ const background = Buffer.from(`
   <text x="${W / 2}" y="580" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="2" fill="#8b8f96">chiissuu.com</text>
 </svg>`);
 
-const wordmark = await sharp(join(images, "hero-wordmark-gold.png"))
+const wordmark = await sharp(join(images, "hero-wordmark-gold.webp"))
   .trim()
   .resize({ width: 560 })
   .toBuffer();

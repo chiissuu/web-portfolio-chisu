@@ -82,7 +82,7 @@ export interface HeroContent {
   /** Button that turns the site animations on or off (see
    * `public/motion-init.js`). `on`/`off` are the state words shown after
    * `label`; `aria` is the accessible name of the button. */
-  motion: { label: string; on: string; off: string; aria: string };
+  motion: { label: string; on: string; off: string; aria: string; toastOn: string; toastOff: string };
   /** Language switch (ES | EN): `label` names the group; `toEs`/`toEn` are the
    * accessible names of the link that goes to each language's version. */
   language: { label: string; toEs: string; toEn: string };
@@ -95,6 +95,8 @@ export interface HeroContent {
    * composition only), separate from `tagline` (bottom-right). No card,
    * no background — plain text, 2-3 lines max. */
   personalNote: string;
+  /** Short summary of the About section, shown instead of `personalNote` on phones. */
+  personalNoteShort: string;
 }
 
 /** `HeroExperience.astro`'s full `Props.t` shape — the wordmark/nav/portrait/
