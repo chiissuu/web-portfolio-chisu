@@ -95,6 +95,8 @@ export interface HeroContent {
    * composition only), separate from `tagline` (bottom-right). No card,
    * no background — plain text, 2-3 lines max. */
   personalNote: string;
+  /** Short summary of the About section, shown instead of `personalNote` on phones. */
+  personalNoteShort: string;
 }
 
 /** `HeroExperience.astro`'s full `Props.t` shape — the wordmark/nav/portrait/

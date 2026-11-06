@@ -62,6 +62,8 @@ const es = {
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
     personalNote:
       "Fuera del código, me interesan la inversión, los mercados financieros y el análisis de negocio.",
+    personalNoteShort:
+      "Desarrollo proyectos visuales y funcionales: uno la ingeniería de software con el diseño gráfico para darles más personalidad y una experiencia cuidada.",
   },
   about: {
     aboutMe: {
@@ -671,6 +673,8 @@ const en = {
     chips: ["Creative", "Strategist", "Efficient", "Builder", "Team-first"],
     personalNote:
       "Outside of code, I am interested in investing, financial markets and business analysis.",
+    personalNoteShort:
+      "I develop visual, functional projects: I combine software engineering with graphic design to give them more personality and a thoughtfully designed experience.",
   },
   about: {
     aboutMe: {

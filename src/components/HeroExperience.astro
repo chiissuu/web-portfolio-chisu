@@ -184,7 +184,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
             ))}
           </div>
 
-          <p class="hx-personal-note">{t.hero.personalNote}</p>
+          <p class="hx-personal-note"><span class="hx-pn-full">{t.hero.personalNote}</span><span class="hx-pn-short">{t.hero.personalNoteShort}</span></p>
 
           <div class="hx-aside-right">
             <div class="hx-chip-card hx-frosted-card">
@@ -1040,6 +1040,11 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
      color from an ancestor. Added here, matching `.hx-tagline`'s new
      treatment, since it needs the same dark-on-gold contrast and the task
      calls for both to share this exact color/opacity. */
+  /* Phones show the short summary of "Sobre mí" instead (see the 640px block). */
+  .hx-pn-short {
+    display: none;
+  }
+
   .hx-personal-note {
     color: rgba(248, 240, 220, 0.82);
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.38);
@@ -2626,35 +2631,76 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       line-height: 1.15;
     }
 
-    /* Traits: left, on the chest, under the first figure card. */
+    /* Traits: the same five words as a centred row of small pills, the first
+       thing of the bottom stack (over the title). As a card on the side it
+       left a hole next to it and took 160px; as pills it takes about 70px and
+       fits on every phone. */
     .hx-aside-right {
-      top: calc(4rem + var(--hx-wordmark-height) + 7.25rem);
-      right: auto;
-      bottom: auto;
-      left: var(--hx-gutter);
-      align-items: flex-start;
+      position: static;
+      order: 0;
+      inset: auto;
+      align-items: center;
+      width: 100%;
       max-width: none;
     }
 
-    .hx-chip-card {
-      padding: 0.8rem 1rem;
-      gap: 0.45rem;
+    .hx-chip-card,
+    .hx-chip-card.hx-frosted-card {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem 0.45rem;
+      padding: 0;
+      background: none;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .hx-chip-card::before {
+      display: none;
+    }
+
+    .hx-chip {
+      padding: 0.34rem 0.75rem;
+      font-size: 0.7rem;
+      background: rgb(14 12 8 / 70%);
+      border-radius: 999px;
+      box-shadow:
+        inset 0 0 0 1px rgb(224 197 139 / 60%),
+        0 2px 8px rgb(0 0 0 / 30%);
     }
 
     .hx-tagline {
       display: none;
     }
 
-    /* The stack at the bottom, left-aligned. */
+    /* The stack at the bottom, centred: title, buttons and the summary flow one
+       under another from the bottom of the Hero, so a longer summary (or a
+       narrower screen that wraps it onto more lines) just pushes the rest up.
+       The figure cards and the traits card stay absolutely placed. */
+    .hx-foreground {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      box-sizing: border-box;
+      padding: 0 var(--hx-gutter) 2.25rem;
+    }
+
     .hx-title-block {
+      position: static;
+      order: 1;
       top: auto;
-      bottom: calc(var(--hx-stack-bottom) + var(--hx-btn-h) + 1.1rem);
-      left: var(--hx-gutter);
+      left: auto;
       width: auto;
       max-width: none;
       transform: none;
-      align-items: flex-start;
-      text-align: left;
+      align-items: center;
+      text-align: center;
       font-size: clamp(1.8rem, 8.2vw, 2.3rem);
     }
 
@@ -2671,7 +2717,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       position: absolute;
       inset-inline: 0;
       bottom: 0;
-      height: 58%;
+      height: 74%;
       z-index: -1;
       background: linear-gradient(
         0deg,
@@ -2689,27 +2735,159 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
 
     .hx-actions {
-      left: var(--hx-gutter);
-      bottom: var(--hx-stack-bottom);
+      position: static;
+      order: 2;
+      /* Not drawn on phones: the menu button is always there and scrolling is
+         the natural gesture, so the two buttons only took space (62px). They
+         stay on tablets and desktop. */
+      display: none;
+      left: auto;
+      bottom: auto;
       transform: none;
-      justify-content: flex-start;
+      justify-content: center;
       flex-wrap: nowrap;
       gap: 0.75rem;
     }
 
+    /* The short summary of "Sobre mí" replaces the long-standing one-liner. */
+    .hx-pn-full {
+      display: none;
+    }
+
+    .hx-pn-short {
+      display: inline;
+    }
+
     .hx-personal-note {
-      position: absolute;
-      inset-inline: var(--hx-gutter);
-      bottom: 0.9rem;
-      z-index: 4;
+      position: static;
+      order: 3;
+      inset: auto;
       width: auto;
       max-width: 24rem;
       margin: 0;
-      text-align: left;
+      text-align: center;
       font-size: 0.8rem;
       line-height: 1.45;
-      color: rgb(248 240 220 / 78%);
+      color: rgb(248 240 220 / 80%);
       opacity: 1;
+    }
+
+    /* The cards' border is lit like the cards of "Sobre mí": the same gold
+       metal gradient painted as a 2px ring (mask composite), plus a soft glow
+       around it. The old thin border goes transparent so they do not add up. */
+    .hx-frosted-card {
+      position: relative;
+      isolation: isolate;
+      border-color: transparent;
+      border-radius: 12px;
+      box-shadow:
+        0 0 22px rgb(224 197 139 / 20%),
+        0 10px 26px var(--hx-ui-shadow),
+        inset 0 1px 0 rgb(255 242 207 / 12%);
+    }
+
+    .hx-frosted-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 1;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+  }
+
+  /* Very narrow phones (320px): everything a little smaller so the pills stay
+     on two rows and the stack does not climb into the figure cards. */
+  @media (max-width: 359px) {
+    .hx-chip {
+      padding: 0.28rem 0.55rem;
+      font-size: 0.64rem;
+      gap: 0.4rem;
+    }
+
+    .hx-chip-card {
+      gap: 0.3rem 0.35rem;
+    }
+
+    .hx-title-block {
+      font-size: 1.6rem;
+    }
+
+    .hx-metric-card,
+    .hx-metric-card:nth-child(2) {
+      padding: 0.5rem 0.6rem;
+    }
+
+    .hx-metric-value {
+      font-size: 1.35rem;
+    }
+
+    .hx-metric-label {
+      font-size: 0.68rem;
+    }
+
+    .hx-personal-note {
+      font-size: 0.76rem;
+    }
+  }
+
+  /* Low phone screens: a little less air under the stack, so the pills keep a
+     margin from the figure cards. */
+  @media (max-width: 640px) and (max-height: 680px) {
+    .hx-foreground {
+      padding-bottom: 1.4rem;
+    }
+  }
+
+  /* The pills of the top row get the cards' lit rim: the gold metal gradient
+     as a 2px ring (mask composite) plus a soft glow, instead of a thin border. */
+  @media (max-width: 640px) {
+    .hx-top-tools .hx-lang,
+    .hx-top-tools .hx-motion {
+      position: relative;
+      isolation: isolate;
+      border-color: transparent;
+      box-shadow:
+        0 0 18px rgb(224 197 139 / 20%),
+        0 2px 10px rgb(0 0 0 / 28%);
+    }
+
+    .hx-top-tools .hx-lang::before,
+    .hx-top-tools .hx-motion::before,
+    .hx-top-mark::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 1;
+      padding: 2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    .hx-top-mark::before {
+      inset: 0;
+    }
+
+    .hx-top-mark {
+      box-shadow: 0 0 18px rgb(224 197 139 / 20%), 0 2px 10px rgb(0 0 0 / 28%);
+    }
+  }
+
+  /* The narrowest and lowest phones (320x640): once everything is smaller there
+     is room to spare, so the stack goes up and the hole between the figure
+     cards and the pills shrinks. */
+  @media (max-width: 359px) and (max-height: 680px) {
+    .hx-foreground {
+      padding-bottom: 3rem;
     }
   }
 
@@ -2735,13 +2913,13 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
        others slide over. */
     .hx-topbar {
       position: fixed;
-      top: 1rem;
+      top: 20px;
       left: 1.25rem;
       right: 1rem;
       z-index: 110;
       display: flex;
       align-items: center;
-      height: 48px;
+      height: 40px;
       pointer-events: none;
     }
 
@@ -2764,8 +2942,8 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
 
     .hx-top-end {
       flex: none;
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 40px;
     }
 
     .hx-top-sp--a {
@@ -2801,7 +2979,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       flex: none;
       box-sizing: border-box;
       width: 0;
-      height: 2.1rem;
+      height: 2.5rem;
       padding: 0;
       overflow: hidden;
       background: rgb(14 12 8 / 74%);
@@ -2813,7 +2991,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
 
     .hx-topbar.is-past-hero .hx-top-mark {
-      width: 5.9rem;
+      width: 6.3rem;
       visibility: visible;
     }
 
@@ -2855,9 +3033,9 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     .hx-top-mark-img {
       display: block;
       flex: none;
-      width: 4.1rem;
+      width: 4.4rem;
       height: auto;
-      margin-inline-start: 0.7rem;
+      margin-inline-start: 0.75rem;
     }
 
     .hx-top-mark-registered {
@@ -2894,7 +3072,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     .hx-top-tools .hx-lang,
     .hx-top-tools .hx-motion {
       box-sizing: border-box;
-      height: 2.1rem;
+      height: 2.5rem;
       align-items: center;
     }
   }
@@ -2945,6 +3123,59 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
   }
 
+  /* The round menu button as a metal key, closer to the nav's gold buttons:
+     a brushed (circular) gold face with a soft highlight at the top left, a
+     lit 3px rim (the nav's rim gradient), an extruded bronze edge underneath
+     and embossed bars. Same footprint as before apart from 2px. */
+  @media (max-width: 899px) {
+    .hx-mobile-toggle {
+      gap: 3.5px;
+      /* Flush with the pills' top edge (20px); the face is 36px and the bronze
+         edge under it adds 4px, so key and pills are 40px tall and end on the
+         same line. */
+      top: 20px;
+      width: 36px;
+      height: 36px;
+      border: 2.5px solid transparent;
+      background:
+        radial-gradient(circle at 30% 22%, rgb(255 251 214 / 90%) 0, rgb(255 238 160 / 35%) 16%, transparent 40%) padding-box,
+        repeating-conic-gradient(from 20deg, rgb(255 255 255 / 7%) 0 3deg, rgb(0 0 0 / 5%) 3deg 6deg) padding-box,
+        linear-gradient(180deg, #fbeba0 0%, #e2c156 28%, #b08a32 52%, #c9a443 74%, #f3da8a 100%) padding-box,
+        linear-gradient(135deg, #fff3c4 8%, #8f6c24 30%, #c9a443 48%, #fff3c4 72%, #8f6c24) border-box;
+      box-shadow:
+        inset 0 2px 2px rgb(255 255 255 / 70%),
+        inset 0 -3px 5px rgb(92 62 12 / 45%),
+        0 2px 0 #6b4f1d,
+        0 4px 0 #3a2a0e,
+        0 7px 12px rgb(0 0 0 / 45%);
+    }
+
+    .hx-mobile-toggle:active {
+      transform: translateY(2px);
+      box-shadow:
+        inset 0 3px 6px rgb(60 40 5 / 45%),
+        0 1px 0 #6b4f1d,
+        0 2px 0 #3a2a0e;
+    }
+
+    .hx-mobile-toggle span {
+      width: 15px;
+      height: 2.5px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #3b2a0c, #1d1405);
+      box-shadow: 0 1px 0 rgb(255 245 190 / 70%);
+    }
+
+    /* Bars 2.5px tall with a 3.5px gap: 6px from one centre to the next. */
+    .hx-mobile-toggle.hx-open span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+  }
+
   /* Confirmation after switching the animations, under the round menu button. */
   .hx-motion-toast {
     display: none;
@@ -2953,7 +3184,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
   @media (max-width: 899px) {
     .hx-motion-toast {
       position: fixed;
-      top: calc(1rem + 48px + 0.6rem);
+      top: calc(20px + 40px + 0.8rem);
       right: 1rem;
       z-index: 110;
       display: block;
@@ -2995,14 +3226,6 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
   @media (max-width: 359px) {
     .hx-top-mark,
     .hx-top-sp--a {
-      display: none;
-    }
-  }
-
-  /* Not enough height for the traits card (about every real phone once the
-     browser's own bars take their share): figures, title and buttons stay. */
-  @media (max-width: 640px) and (max-height: 799px) {
-    .hx-aside-right {
       display: none;
     }
   }
