@@ -3223,11 +3223,12 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
   }
 
-  @media (max-width: 359px) {
-    .hx-top-mark,
-    .hx-top-sp--a {
-      display: none;
-    }
+  /* The mark is dropped when it does not fit between the pills (the script at
+     the end of the file measures it and puts `no-mark` on the row): then only
+     the three buttons remain, evenly spaced. */
+  .hx-topbar.no-mark .hx-top-mark,
+  .hx-topbar.no-mark .hx-top-sp--a {
+    display: none;
   }
 
 </style>
@@ -4515,6 +4516,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       },
       { rootMargin: "0px" }
     ).observe(heroWrap);
+  }
+
+  // The mark only shows if it fits: its width (6.3rem, as in the CSS) plus the
+  // two pills and the menu key's slot, with at least 10px between the four.
+  // Measured, not a fixed screen width, so it also follows the font size of
+  // the system and the language (the pills can change width). Below that the
+  // row keeps just the three buttons.
+  if (topbar && "ResizeObserver" in window) {
+    const lang = topbar.querySelector<HTMLElement>(".hx-lang-top");
+    const motion = topbar.querySelector<HTMLElement>(".hx-motion-top");
+    const end = topbar.querySelector<HTMLElement>(".hx-top-end");
+    const MIN_GAP = 10;
+    const fitMark = () => {
+      if (!lang || !motion || !end) return;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const need =
+        6.3 * rem +
+        lang.getBoundingClientRect().width +
+        motion.getBoundingClientRect().width +
+        end.getBoundingClientRect().width +
+        3 * MIN_GAP;
+      topbar.classList.toggle("no-mark", topbar.clientWidth < need);
+    };
+    new ResizeObserver(fitMark).observe(topbar);
+    fitMark();
   }
 
   const MOTION_KEY = "chiissuu:motion";
