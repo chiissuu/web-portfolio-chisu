@@ -945,6 +945,17 @@ const light = backdrop !== "blueprint";
       grid-template-columns: 1fr;
     }
   }
+
+  /* Tablets (641 to 899px): two columns; a last card left alone spans both. */
+  @media (min-width: 641px) and (max-width: 899px) {
+    .sc-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sc-grid > :global(*:last-child:nth-child(odd)) {
+      grid-column: 1 / -1;
+    }
+  }
 </style>
 
 <script>

@@ -232,6 +232,21 @@ const { process } = Astro.props as Props;
       transform: scaleY(1);
     }
   }
+
+  /* Tablets (641 to 899px): the four steps in two columns of two (1-2 and 3-4),
+     the thread running down each one and not joining the columns. */
+  @media (min-width: 641px) and (max-width: 899px) {
+    .sp-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+      grid-auto-flow: column;
+      column-gap: 2.5rem;
+    }
+
+    .sp-step:nth-child(even)::before {
+      display: none;
+    }
+  }
 </style>
 
 <script>
