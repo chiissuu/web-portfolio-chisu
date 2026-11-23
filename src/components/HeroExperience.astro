@@ -2577,7 +2577,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     scrollbar-gutter: stable;
   }
 
-  /* Phone Hero, up to 640px: its own composition, not a shrunk desktop one.
+  /* Phone and tablet Hero, up to 899px (tablets are sized up in the block at the end of this stylesheet): its own composition, not a shrunk desktop one.
      The idea (taken from heynesh.com's phone hero): the wordmark runs almost
      edge to edge at the top and the head overlaps it; two figure cards sit
      staggered under the chin, one on each side; the traits card floats on the
@@ -2589,7 +2589,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
      Only positions, sizes and alignment change: the markup, the entrance
      timeline (it only writes y/opacity/transform and clears them) and every
      tier from 641px up are untouched. */
-  @media (max-width: 640px) {
+  @media (max-width: 899px) {
     .hx-pin {
       --hx-wordmark-height: min(36vw, 22svh);
       --hx-gutter: 1.25rem;
@@ -2846,7 +2846,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
 
   /* The pills of the top row get the cards' lit rim: the gold metal gradient
      as a 2px ring (mask composite) plus a soft glow, instead of a thin border. */
-  @media (max-width: 640px) {
+  @media (max-width: 899px) {
     .hx-top-tools .hx-lang,
     .hx-top-tools .hx-motion {
       position: relative;
@@ -2902,7 +2902,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     display: none;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 899px) {
     /* The row runs from the left margin to the round menu button's right edge
        (a 48px placeholder, .hx-top-end, stands where the button is). Between the
        items go spacers that share the free space equally, so the gaps are always
@@ -3077,7 +3077,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 899px) {
     /* The animations pill: sparkles + switch. The word and its yes/no are kept
        for screen readers (aria-label) and for the other copies of the button. */
     .hx-top-tools .hx-motion-state {
@@ -3117,7 +3117,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     display: none;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 899px) {
     .hx-top-tools .hx-motion-icon {
       display: inline-grid;
     }
@@ -3223,13 +3223,205 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     }
   }
 
-  @media (max-width: 359px) {
-    .hx-top-mark,
-    .hx-top-sp--a {
-      display: none;
+  /* The mark is dropped when it does not fit between the pills (the script at
+     the end of the file measures it and puts `no-mark` on the row): then only
+     the three buttons remain, evenly spaced. */
+  .hx-topbar.no-mark .hx-top-mark,
+  .hx-topbar.no-mark .hx-top-sp--a {
+    display: none;
+  }
+
+
+  /* Tablets (641 to 899px): the phone composition above, sized up to use the
+     width. Same pieces and order; bigger wordmark gaps, cards, pills, title and
+     summary, a taller top row and a bigger menu key (it was 36px, too small for
+     an iPad). The 185svh portrait of the old tablet tier is replaced by the
+     phone one (a figure standing on the bottom edge). */
+  @media (min-width: 641px) and (max-width: 899px) {
+    .hx-pin {
+      --hx-wordmark-height: min(24svh, 27vw, 15rem);
+      --hx-gutter: 2.5rem;
+    }
+
+    .hx-pin:not(.hx-static) .hx-portrait {
+      top: auto;
+      inset-block-end: 0;
+      height: min(90svh, 900px);
+    }
+
+    .hx-wordmark {
+      top: 5rem;
+    }
+
+    .hx-metrics {
+      top: calc(5rem + var(--hx-wordmark-height) + 1rem);
+    }
+
+    .hx-metric-card,
+    .hx-metric-card:nth-child(2) {
+      flex: 0 1 13rem;
+      padding: 0.85rem 1.1rem;
+    }
+
+    .hx-metric-card:nth-child(2) {
+      margin-top: 2.5rem;
+    }
+
+    .hx-metric-value {
+      font-size: 2.1rem;
+    }
+
+    .hx-metric-label {
+      font-size: 0.98rem;
+    }
+
+    .hx-foreground {
+      gap: 1.4rem;
+      padding-bottom: 3.25rem;
+    }
+
+    .hx-title-block {
+      font-size: clamp(2.7rem, 6.6vw, 3.8rem);
+    }
+
+    .hx-chip-card {
+      gap: 0.6rem 0.7rem;
+    }
+
+    .hx-chip {
+      padding: 0.5rem 1.05rem;
+      font-size: 0.86rem;
+    }
+
+    .hx-personal-note {
+      max-width: 36rem;
+      font-size: 1.08rem;
+      line-height: 1.5;
+    }
+
+    /* Top row: 48px tall, wider margins. */
+    .hx-topbar {
+      top: 22px;
+      left: 2rem;
+      right: 2rem;
+      height: 48px;
+    }
+
+    .hx-top-end {
+      width: 44px;
+      height: 48px;
+    }
+
+    .hx-top-tools .hx-lang,
+    .hx-top-tools .hx-motion {
+      height: 3rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .hx-top-mark {
+      height: 3rem;
+    }
+
+    .hx-topbar.is-past-hero .hx-top-mark {
+      width: 7.6rem;
+    }
+
+    .hx-top-mark-img {
+      width: 5.3rem;
+    }
+
+    .hx-top-mark-registered {
+      top: 0.45rem;
+      font-size: 0.65rem;
+    }
+
+    .hx-mobile-toggle {
+      top: 22px;
+      right: 2rem;
+      width: 44px;
+      height: 44px;
+      gap: 4.5px;
+    }
+
+    .hx-mobile-toggle span {
+      width: 19px;
+      height: 3px;
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(1) {
+      transform: translateY(7.5px) rotate(45deg);
+    }
+
+    .hx-mobile-toggle.hx-open span:nth-child(3) {
+      transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    .hx-motion-toast {
+      top: calc(22px + 48px + 0.8rem);
+      right: 2rem;
     }
   }
 
+  /* Tablets that are not tall (under 900px of height, as when the window is
+     short or the tablet is held wide): the sizes above are for a 1024px-tall
+     iPad and pile up here (pills and title over the figure cards). Everything
+     in the middle of the Hero is made smaller, and under 700px the traits go. */
+  @media (min-width: 641px) and (max-width: 899px) and (max-height: 900px) {
+    .hx-pin {
+      --hx-wordmark-height: min(20svh, 22vw, 12rem);
+    }
+
+    .hx-metrics {
+      top: calc(5rem + var(--hx-wordmark-height) + 0.75rem);
+    }
+
+    .hx-metric-card,
+    .hx-metric-card:nth-child(2) {
+      flex-basis: 11.5rem;
+      padding: 0.65rem 0.9rem;
+    }
+
+    .hx-metric-card:nth-child(2) {
+      margin-top: 1.5rem;
+    }
+
+    .hx-metric-value {
+      font-size: 1.7rem;
+    }
+
+    .hx-metric-label {
+      font-size: 0.85rem;
+    }
+
+    .hx-foreground {
+      gap: 1rem;
+      padding-bottom: 2rem;
+    }
+
+    .hx-title-block {
+      font-size: clamp(2rem, 4.6vw, 2.8rem);
+    }
+
+    .hx-chip {
+      padding: 0.36rem 0.8rem;
+      font-size: 0.74rem;
+    }
+
+    .hx-chip-card {
+      gap: 0.4rem 0.5rem;
+    }
+
+    .hx-personal-note {
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 899px) and (max-height: 700px) {
+    .hx-aside-right {
+      display: none;
+    }
+  }
 </style>
 
 <script>
@@ -4515,6 +4707,31 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
       },
       { rootMargin: "0px" }
     ).observe(heroWrap);
+  }
+
+  // The mark only shows if it fits: its width (6.3rem, as in the CSS) plus the
+  // two pills and the menu key's slot, with at least 10px between the four.
+  // Measured, not a fixed screen width, so it also follows the font size of
+  // the system and the language (the pills can change width). Below that the
+  // row keeps just the three buttons.
+  if (topbar && "ResizeObserver" in window) {
+    const lang = topbar.querySelector<HTMLElement>(".hx-lang-top");
+    const motion = topbar.querySelector<HTMLElement>(".hx-motion-top");
+    const end = topbar.querySelector<HTMLElement>(".hx-top-end");
+    const MIN_GAP = 10;
+    const fitMark = () => {
+      if (!lang || !motion || !end) return;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const need =
+        6.3 * rem +
+        lang.getBoundingClientRect().width +
+        motion.getBoundingClientRect().width +
+        end.getBoundingClientRect().width +
+        3 * MIN_GAP;
+      topbar.classList.toggle("no-mark", topbar.clientWidth < need);
+    };
+    new ResizeObserver(fitMark).observe(topbar);
+    fitMark();
   }
 
   const MOTION_KEY = "chiissuu:motion";

@@ -315,6 +315,14 @@ const channels = [
       grid-template-columns: 1fr;
     }
   }
+
+  /* Tablets (641 to 899px): there is no sidebar, so the page is wide enough for
+     the two columns again (email and links | form). */
+  @media (min-width: 641px) and (max-width: 899px) {
+    .ct-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    }
+  }
 </style>
 
 <script>
