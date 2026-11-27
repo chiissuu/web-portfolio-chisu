@@ -91,7 +91,7 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
 ---
 
 <section class="hx-wrap section-theme-warm" id="home">
-  <div class="hx-pin" id="hx-pin">
+  <div class="hx-pin" id="hx-pin" data-card-shape="cut">
     <!--
       `.hx-pin-fade` is a real DOM child, NOT `.hx-pin`'s own CSS
       `background` — deliberately, since ScrollTrigger pins `.hx-pin`
@@ -3562,6 +3562,185 @@ const wordmarkSrc = `${base}/assets/images/hero-wordmark-gold.webp`;
     .hx-tagline {
       visibility: hidden;
     }
+  }
+
+  /* TRIAL (27 Nov 2026): the Hero cards with two cut corners (top left and
+     bottom right) instead of rounded corners. To go back to rounded cards,
+     delete data-card-shape="cut" from the #hx-pin element in the markup above
+     (this whole block then stops applying) or delete this block.
+     How it works: the card itself is clipped to the cut shape, and the gold
+     rim is a pseudo-element painted as a ring of the same shape (an evenodd
+     polygon: outer outline plus inner outline). The soft outer glow is lost
+     (a clip-path cuts shadows). The traits card is only cut from 900px up: on
+     tablets and phones the traits are a row of pills, not a card.
+     --hx-cut = size of the cut; --hx-ring = thickness of the rim. */
+  .hx-pin[data-card-shape="cut"] {
+    --hx-cut: 0.9rem;
+    --hx-ring: 2px;
+    --hx-k: calc(var(--hx-ring) * 0.4142);
+  }
+
+  .hx-pin[data-card-shape="cut"] .hx-metric-card {
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    clip-path: polygon(
+      var(--hx-cut) 0,
+      100% 0,
+      100% calc(100% - var(--hx-cut)),
+      calc(100% - var(--hx-cut)) 100%,
+      0 100%,
+      0 var(--hx-cut)
+    );
+  }
+
+  .hx-pin[data-card-shape="cut"] .hx-metric-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    padding: 0;
+    border-radius: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    -webkit-mask: none;
+    mask: none;
+    clip-path: polygon(
+      evenodd,
+      var(--hx-cut) 0,
+      100% 0,
+      100% calc(100% - var(--hx-cut)),
+      calc(100% - var(--hx-cut)) 100%,
+      0 100%,
+      0 var(--hx-cut),
+      var(--hx-cut) 0,
+      calc(var(--hx-cut) + var(--hx-k)) var(--hx-ring),
+      calc(100% - var(--hx-ring)) var(--hx-ring),
+      calc(100% - var(--hx-ring)) calc(100% - var(--hx-cut) - var(--hx-k)),
+      calc(100% - var(--hx-cut) - var(--hx-k)) calc(100% - var(--hx-ring)),
+      var(--hx-ring) calc(100% - var(--hx-ring)),
+      var(--hx-ring) calc(var(--hx-cut) + var(--hx-k)),
+      calc(var(--hx-cut) + var(--hx-k)) var(--hx-ring)
+    );
+  }
+
+  @media (min-width: 900px) {
+    .hx-pin[data-card-shape="cut"] .hx-chip-card.hx-frosted-card {
+      isolation: isolate;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      clip-path: polygon(
+        var(--hx-cut) 0,
+        100% 0,
+        100% calc(100% - var(--hx-cut)),
+        calc(100% - var(--hx-cut)) 100%,
+        0 100%,
+        0 var(--hx-cut)
+      );
+    }
+
+    .hx-pin[data-card-shape="cut"] .hx-chip-card.hx-frosted-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      padding: 0;
+      border-radius: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+      clip-path: polygon(
+        evenodd,
+        var(--hx-cut) 0,
+        100% 0,
+        100% calc(100% - var(--hx-cut)),
+        calc(100% - var(--hx-cut)) 100%,
+        0 100%,
+        0 var(--hx-cut),
+        var(--hx-cut) 0,
+        calc(var(--hx-cut) + var(--hx-k)) var(--hx-ring),
+        calc(100% - var(--hx-ring)) var(--hx-ring),
+        calc(100% - var(--hx-ring)) calc(100% - var(--hx-cut) - var(--hx-k)),
+        calc(100% - var(--hx-cut) - var(--hx-k)) calc(100% - var(--hx-ring)),
+        var(--hx-ring) calc(100% - var(--hx-ring)),
+        var(--hx-ring) calc(var(--hx-cut) + var(--hx-k)),
+        calc(var(--hx-cut) + var(--hx-k)) var(--hx-ring)
+      );
+    }
+  }
+
+  /* In the three-column range (900 to 1279px) the traits card sits in the flow
+     (static): it needs to be a positioning box for its rim. From 1280px it is
+     already absolute, so this must not apply there. */
+  @media (min-width: 900px) and (max-width: 1279px) {
+    .hx-pin[data-card-shape="cut"] .hx-chip-card.hx-frosted-card {
+      position: relative;
+      top: auto;
+      right: auto;
+    }
+  }
+
+  /* TRIAL, part 2 (27 Nov 2026): the same cut corners on the controls at the top
+     (ES | EN, animations, and the logo pill that shows after the Hero), with a
+     smaller cut (0.6rem) and a 1.5px rim. Same switch as above: remove
+     data-card-shape="cut" from #hx-pin (the selectors look for it with :has())
+     or delete both TRIAL blocks. The round menu key keeps its round shape. */
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-lang-desktop,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-motion-desktop,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-tools .hx-lang,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-tools .hx-motion,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-mark {
+    --c: 0.6rem;
+    --t: 1.5px;
+    --k: calc(var(--t) * 0.4142);
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    clip-path: polygon(
+      var(--c) 0,
+      100% 0,
+      100% calc(100% - var(--c)),
+      calc(100% - var(--c)) 100%,
+      0 100%,
+      0 var(--c)
+    );
+  }
+
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-lang-desktop::before,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-motion-desktop::before,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-tools .hx-lang::before,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-tools .hx-motion::before,
+  :global(html:has(#hx-pin[data-card-shape="cut"])) .hx-top-mark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    padding: 0;
+    border-radius: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, #efd683 8%, #b08a32 30%, #c19b3d 48%, #efd683 72%, #b08a32);
+    -webkit-mask: none;
+    mask: none;
+    clip-path: polygon(
+      evenodd,
+      var(--c) 0,
+      100% 0,
+      100% calc(100% - var(--c)),
+      calc(100% - var(--c)) 100%,
+      0 100%,
+      0 var(--c),
+      var(--c) 0,
+      calc(var(--c) + var(--k)) var(--t),
+      calc(100% - var(--t)) var(--t),
+      calc(100% - var(--t)) calc(100% - var(--c) - var(--k)),
+      calc(100% - var(--c) - var(--k)) calc(100% - var(--t)),
+      var(--t) calc(100% - var(--t)),
+      var(--t) calc(var(--c) + var(--k)),
+      calc(var(--c) + var(--k)) var(--t)
+    );
   }
 </style>
 
