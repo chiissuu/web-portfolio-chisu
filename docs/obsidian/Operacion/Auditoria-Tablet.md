@@ -43,6 +43,24 @@ Sin desbordamiento horizontal a 768 px (la página mide 11.128 px de alto).
 
 Cae en el diseño de escritorio con menú lateral, y **el Hero se agolpa**: el título «Software Engineer / Data Science / GFX» queda **tapado por las tarjetas de cifras y la de rasgos**, y la fila de enlaces cruza el retrato. Sobre mí y el resto se ven bien (zig-zag, ilustraciones, menú lateral). Revisar el tramo 900–1100 px con alturas de 768 a 850.
 
+> **Actualización (27 de noviembre de 2026):** el Hero en horizontal (900–1279 px) está **resuelto**; ver [[Comandos-y-Pruebas]], «Hero en horizontal». También están hechos el Hero de tableta, Sobre mí, Servicios, «Cómo trabajo» y Contacto (17 de noviembre).
+
+## Segunda auditoría: Hero en horizontal, 900–1279 px (27 de noviembre de 2026)
+
+El primer arreglo (cada grupo de tarjetas a su lado) quitó los solapes con el título, pero el usuario ve que la composición sigue descompensada. Medidas a **927 × 970** (su tamaño) tomadas sobre el código actual, sin cambios:
+
+| Zona | Medida | Problema |
+|---|---|---|
+| Wordmark | 876 × 334 px (34 % de la altura) | Muy grande frente a lo que lo rodea |
+| Título «Software Engineer / Data Science / GFX» | cuerpo de **24 px**, caja de 200 × 92 px | Diminuto: es el tamaño de 1280 px reducido (`clamp(1.412rem, 2.599vw, 2.057rem)`); en tableta vertical se usa hasta 3,8 rem |
+| Cifras («3+», «20+») | 130 px de ancho, a la izquierda | Estrechas; texto de 0,72 rem |
+| Hueco izquierdo | **165 px** entre las cifras y la frase de abajo | Espacio muerto (a 1024 × 768 son 34 px: crece con la altura) |
+| Hueco derecho | **194 px** entre los rasgos y el lema | Igual |
+| Frase de la izquierda | llega a **33 px** sobre el botón «Ver Proyectos» (a 900 px, 46 px) | Solape |
+| Botones ↔ lema | **101 px** vacíos a la derecha de «Sobre Mí» | Descompensado |
+
+Propuesta A (recomendada): **columnas laterales con contenido apilado** — columna izquierda = cifras + frase debajo; columna derecha = rasgos + lema debajo; centro = título grande (hasta ~3 rem); abajo solo los botones, centrados. Para ello el contenedor `.hx-foreground` pasaría a ser una rejilla de 3 columnas en este rango. Riesgos: el paso del Hero al menú lateral mide estas cajas, hay que volver a probarlo con las animaciones encendidas. Propuesta B: mantener las cajas absolutas, pero con tarjetas y letra más grandes (en función de la altura), título mayor y la frase y el lema con ancho máximo por zona.
+
 ## Propuesta de orden (sin aprobar)
 
 1. Hero de tableta (arreglar el fallo y elegir composición) y fila superior.
